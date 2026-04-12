@@ -205,3 +205,6 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Regenerated triage output (run `python behavioral_friction_gemma2b.py`)
+fact_battery_triage.csv
