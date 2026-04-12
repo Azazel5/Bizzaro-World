@@ -8,9 +8,10 @@ Run: python behavioral_friction_gemma2b.py
 
 from __future__ import annotations
 
+import csv
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import torch
 
@@ -81,6 +82,31 @@ def _softmax_entropy_from_logits(final_logits: torch.Tensor) -> torch.Tensor:
     return entropy
 
 
+def _final_logits(model: HookedTransformer, prompt: str) -> torch.Tensor:
+    """Next-token logits at the final prompt position, shape [vocab]."""
+    tokens = model.to_tokens(prompt, prepend_bos=True).to(model.cfg.device)
+    with torch.no_grad():
+        logits = model(tokens)
+    return logits[0, -1, :]
+
+
+def _ld_and_target_probs(
+    final_logits: torch.Tensor,
+    clean_target_id: int,
+    corrupt_target_id: int,
+) -> Tuple[float, float, float]:
+    """
+    Logit difference LD = logit(clean_target) - logit(corrupt_target) in fp32,
+    plus softmax probabilities for the two token ids (sanity checks).
+    """
+    lf = final_logits.float()
+    ld = (lf[clean_target_id] - lf[corrupt_target_id]).item()
+    probs = torch.softmax(lf, dim=-1)
+    p_clean_tok = probs[clean_target_id].item()
+    p_corrupt_tok = probs[corrupt_target_id].item()
+    return ld, p_clean_tok, p_corrupt_tok
+
+
 def _prob_and_entropy_for_target(
     model: HookedTransformer,
     prompt: str,
@@ -92,10 +118,7 @@ def _prob_and_entropy_for_target(
             f"{target_token!r} encodes to {len(tids)} ids {tids}; expected exactly one."
         )
     tid = tids[0]
-    tokens = model.to_tokens(prompt, prepend_bos=True).to(model.cfg.device)
-    with torch.no_grad():
-        logits = model(tokens)
-    final_logits = logits[0, -1, :]
+    final_logits = _final_logits(model, prompt)
     probs = torch.softmax(final_logits.float(), dim=-1)
     prob_target = probs[tid].item()
     entropy = _softmax_entropy_from_logits(final_logits).item()
@@ -121,16 +144,38 @@ def _validate_fact_entry(model: HookedTransformer, entry: Dict[str, str], index:
 
 
 def run_fact_battery(model: HookedTransformer) -> List[Dict[str, Any]]:
+    """
+    For each aligned pair, compute bidirectional logit differences (patching-style triage).
+
+    LD = logit(clean_target) - logit(corrupt_target) at the final prompt position.
+
+    - LD_clean: forward on clean_prompt (expect strongly positive if the model prefers
+      the clean completion over the corrupt token on the clean context).
+    - LD_corrupt: forward on corrupt_prompt (expect strongly negative if the model
+      prefers the corrupt completion on the corrupt context).
+
+    Total_Swing = LD_clean - LD_corrupt measures symmetric separation (larger is better
+    for \"golden pair\" screening before activation patching).
+    """
     rows: List[Dict[str, Any]] = []
+    tok = model.tokenizer
     for i, entry in enumerate(FACT_BATTERY):
         _validate_fact_entry(model, entry, i)
-        clean_stats = _prob_and_entropy_for_target(
-            model, entry["clean_prompt"], entry["clean_target"]
+        clean_tid = _token_ids_for_target(tok, entry["clean_target"])[0]
+        corrupt_tid = _token_ids_for_target(tok, entry["corrupt_target"])[0]
+
+        lf_clean = _final_logits(model, entry["clean_prompt"])
+        ld_clean, p_clean_on_clean, _p_corrupt_on_clean = _ld_and_target_probs(
+            lf_clean, clean_tid, corrupt_tid
         )
-        corrupt_stats = _prob_and_entropy_for_target(
-            model, entry["corrupt_prompt"], entry["corrupt_target"]
+
+        lf_corrupt = _final_logits(model, entry["corrupt_prompt"])
+        ld_corrupt, _p_clean_on_corrupt, p_corrupt_on_corrupt = _ld_and_target_probs(
+            lf_corrupt, clean_tid, corrupt_tid
         )
-        delta_p = abs(clean_stats["prob"] - corrupt_stats["prob"])
+
+        total_swing = ld_clean - ld_corrupt
+
         rows.append(
             {
                 "idx": i,
@@ -139,46 +184,110 @@ def run_fact_battery(model: HookedTransformer) -> List[Dict[str, Any]]:
                 "corrupt_prompt": entry["corrupt_prompt"],
                 "clean_target": entry["clean_target"],
                 "corrupt_target": entry["corrupt_target"],
-                "p_clean": clean_stats["prob"],
-                "p_corrupt": corrupt_stats["prob"],
-                "delta_p": delta_p,
-                "entropy_clean": clean_stats["entropy"],
-                "entropy_corrupt": corrupt_stats["entropy"],
+                "clean_target_id": clean_tid,
+                "corrupt_target_id": corrupt_tid,
+                "ld_clean": ld_clean,
+                "ld_corrupt": ld_corrupt,
+                "total_swing": total_swing,
+                "p_clean": p_clean_on_clean,
+                "p_corrupt": p_corrupt_on_corrupt,
             }
         )
     return rows
 
 
-def _print_ranked_table(rows: List[Dict[str, Any]]) -> None:
-    ranked = sorted(rows, key=lambda r: r["delta_p"], reverse=True)
+def _print_ranked_table(ranked: List[Dict[str, Any]]) -> None:
+    """
+    Print rows already sorted by total_swing (desc).
+    Top rows are strongest golden-pair candidates for activation patching.
+    """
     headers = [
         "rank",
-        "ΔP",
+        "idx",
+        "TotalSwing",
+        "LD_clean",
+        "LD_corrupt",
         "P_clean",
         "P_corrupt",
-        "H_clean",
-        "H_corrupt",
         "category",
-        "clean → corrupt (targets)",
+        "prompt_prefix",
     ]
-    col_w = [5, 10, 10, 10, 10, 10, 22, 55]
+    col_w = [5, 4, 11, 9, 9, 8, 8, 18, 40]
     fmt = " ".join(f"{{:{w}}}" for w in col_w)
 
+    print(
+        "TotalSwing = LD_clean - LD_corrupt (primary rank key; larger => stronger bidirectional flip). "
+        "LD_* = logit(clean_tgt) - logit(corrupt_tgt) on that prompt. "
+        "idx = row index in fact_battery.json. "
+        "P_clean = P(clean_target|clean_prompt); P_corrupt = P(corrupt_target|corrupt_prompt)."
+    )
     print(fmt.format(*headers))
     print(" ".join("-" * w for w in col_w))
     for rank, r in enumerate(ranked, start=1):
-        tgt = f"{r['clean_target']!r} vs {r['corrupt_target']!r}"
+        prefix = f"{r['clean_prompt']}|{r['corrupt_prompt']}"
+        if len(prefix) > col_w[8]:
+            prefix = prefix[: col_w[8] - 1] + "…"
         line = fmt.format(
             str(rank),
-            f"{r['delta_p']:.4f}",
+            str(r["idx"]),
+            f"{r['total_swing']:.3f}",
+            f"{r['ld_clean']:.3f}",
+            f"{r['ld_corrupt']:.3f}",
             f"{r['p_clean']:.4f}",
             f"{r['p_corrupt']:.4f}",
-            f"{r['entropy_clean']:.2f}",
-            f"{r['entropy_corrupt']:.2f}",
-            r["category"][: col_w[6]],
-            (r["clean_prompt"][:28] + "…|" + r["corrupt_prompt"][:22] + "… " + tgt)[: col_w[7]],
+            str(r["category"])[: col_w[7]],
+            prefix,
         )
         print(line)
+
+
+TRIAGE_CSV_NAME = "fact_battery_triage.csv"
+
+
+def write_triage_csv(ranked: List[Dict[str, Any]], path: Path) -> None:
+    """
+    Write sorted triage metrics for notebooks / spreadsheets.
+    One row per battery entry; `rank` is post-sort order (1 = highest TotalSwing).
+    """
+    fieldnames = [
+        "rank",
+        "battery_idx",
+        "total_swing",
+        "ld_clean",
+        "ld_corrupt",
+        "p_clean_target_on_clean",
+        "p_corrupt_target_on_corrupt",
+        "category",
+        "clean_prompt",
+        "corrupt_prompt",
+        "clean_target",
+        "corrupt_target",
+        "clean_target_id",
+        "corrupt_target_id",
+    ]
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=fieldnames)
+        w.writeheader()
+        for rank, r in enumerate(ranked, start=1):
+            w.writerow(
+                {
+                    "rank": rank,
+                    "battery_idx": r["idx"],
+                    "total_swing": f"{r['total_swing']:.6f}",
+                    "ld_clean": f"{r['ld_clean']:.6f}",
+                    "ld_corrupt": f"{r['ld_corrupt']:.6f}",
+                    "p_clean_target_on_clean": f"{r['p_clean']:.8f}",
+                    "p_corrupt_target_on_corrupt": f"{r['p_corrupt']:.8f}",
+                    "category": r["category"],
+                    "clean_prompt": r["clean_prompt"],
+                    "corrupt_prompt": r["corrupt_prompt"],
+                    "clean_target": r["clean_target"],
+                    "corrupt_target": r["corrupt_target"],
+                    "clean_target_id": r["clean_target_id"],
+                    "corrupt_target_id": r["corrupt_target_id"],
+                }
+            )
 
 
 def main() -> None:
@@ -186,8 +295,17 @@ def main() -> None:
     model = _load_model()
     print("Running FACT_BATTERY …")
     rows = run_fact_battery(model)
-    print(f"\nCompleted {len(rows)} pairs. Ranked by probability delta |P_clean - P_corrupt|:\n")
-    _print_ranked_table(rows)
+    ranked = sorted(rows, key=lambda r: r["total_swing"], reverse=True)
+
+    out_csv = Path(__file__).with_name(TRIAGE_CSV_NAME)
+    write_triage_csv(ranked, out_csv)
+
+    print(
+        f"\nCompleted {len(rows)} pairs. Ranked by TotalSwing "
+        f"(LD_clean - LD_corrupt), descending — top rows are strongest golden-pair candidates.\n"
+        f"Wrote CSV: {out_csv}\n"
+    )
+    _print_ranked_table(ranked)
 
 
 # --- Optional: legacy demo (Bizarro vs clean basketball) ---

@@ -49,20 +49,32 @@ Data live in **`fact_battery.json`**: a JSON array of objects with:
 
 There are **20** thematic buckets × **3** pairs each (**60** rows). Editing the JSON changes experiments without editing Python.
 
-### Phase 2 — Baseline evaluation (behavioral layer)
+### Phase 2 — Baseline evaluation (behavioral / patching triage)
 
-The script **`behavioral_friction_gemma2b.py`** loads the model and, for **each** row:
+The script **`behavioral_friction_gemma2b.py`** loads the model and, for **each** row, reads **raw next-token logits** at the **final** prompt position for both `clean_target` and `corrupt_target` token ids.
 
-- **`P(clean_target | clean_prompt)`** — probability of the clean continuation at the **last** prompt position.
-- **`P(corrupt_target | corrupt_prompt)`** — same for the corrupt line.
-- **`ΔP`** — absolute gap: `ΔP = |P_clean - P_corrupt|`. Rows are **sorted by ΔP** so the largest **behavioral** splits float to the top (good candidates before any intervention).
-- **Shannon entropy** of the full next-token distribution at that position — a coarse **spread / uncertainty** readout (“epistemic friction” in a loose sense).
+**Bidirectional logit difference (patching-style).** On each forward, define  
+`LD = logit(clean_target) - logit(corrupt_target)` (computed in **fp32** on the logit vector).
 
-**Numerical stability.** With **fp16** logits and a huge vocabulary, doing `softmax` then `log` on probabilities often blows up to **`-inf`** and **NaN** entropies. The code uses **`torch.log_softmax` in fp32** (log-sum-exp) and forms Shannon entropy as **minus the expected log-probability** (equivalently, minus the sum over the vocabulary of *p* log *p*) from those stable log-probabilities, which removes most of that failure mode.
+- **`LD_clean`** — forward on the **clean** prompt. When the model “locks in” the clean fact, the clean token should beat the corrupt token: **large positive** `LD_clean`.
+- **`LD_corrupt`** — forward on the **corrupt** prompt with the **same two token ids**. The corrupt token should win: `logit(corrupt) > logit(clean)`, so **large negative** `LD_corrupt` (because `LD` is still *clean minus corrupt*).
+
+**TotalSwing (golden-pair screen).**  
+`TotalSwing = LD_clean - LD_corrupt`.  
+Subtracting a negative `LD_corrupt` **adds** magnitude when both legs are strong. Intuitively: you reward **both** a decisive clean-side margin *and* a decisive corrupt-side margin—the same two-token race **reverses** across the two aligned contexts. **Larger TotalSwing ⇒ better “golden pair”** for downstream activation patching (high signal before any hooks run).
+
+**Sanity probabilities.** The console table and CSV include **`P(clean_target | clean_prompt)`** and **`P(corrupt_target | corrupt_prompt)`** from **softmax in fp32** (marginal checks that each world is confidently answered).
+
+**Outputs.**
+
+- **Console table** — sorted by **TotalSwing** descending. Columns: `rank`, `idx` (0-based row in `fact_battery.json`), `TotalSwing`, `LD_clean`, `LD_corrupt`, `P_clean`, `P_corrupt`, `category`, and a truncated `clean_prompt|corrupt_prompt` prefix.
+- **`fact_battery_triage.csv`** — same sort order; full prompts and targets; numeric columns as strings with fixed precision for clean import into pandas or Sheets. Regenerated on every script run (listed in `.gitignore` so local runs do not dirty the tree unless you remove that line).
+
+**Numerical stability.** Logit differences and softmax use **fp32** math on the last-position logit vector so large-vocabulary **fp16** runs are less likely to produce garbage probabilities for triage.
 
 ### Phase 3 — Activation patching (causal tracing)
 
-Use **high-ΔP** pairs from Phase 2 as **priority** for interventions (forthcoming notebooks or modules):
+Use **high total-swing** pairs from Phase 2 as **priority** for interventions (forthcoming notebooks or modules):
 
 - Cache activations on **clean** vs **corrupt** forwards.
 - Patch **position-aligned** residual (or attention / MLP) components from corrupt into clean.
@@ -79,7 +91,7 @@ Even at **2B** parameters, weights, caches, and optional activation stores add u
 - **Slurm** — Request **GPU**, enough **CPU RAM** (model shard load can spike), and realistic **walltime**. Preempt queues are OK for dev if you checkpoint logs.
 - **Disk** — Point **`HF_HOME`** (or equivalent) at **scratch** or project space when home quotas are small (~tens of GB).
 - **Containers** — NGC / Singularity wrappers sometimes **drop** env vars. For gated models you may need **`SINGULARITYENV_HF_TOKEN`**, **`huggingface-cli login`**, or site docs. Never commit tokens.
-- **VRAM vs metrics** — Forwards often stay in **fp16**; probability and entropy use **fp32** math on logits where it matters to avoid silent **NaN** tables.
+- **VRAM vs metrics** — Forwards often stay in **fp16**; triage metrics read logits / softmax in **fp32** to avoid silent **NaN** or collapsed probabilities at the reporting step.
 
 **Run Phase 1–2:**
 
@@ -96,7 +108,8 @@ Keep **`fact_battery.json`** next to that file (same folder), or pass a path int
 | Path | Role |
 |------|------|
 | `fact_battery.json` | Aligned prompt pairs (Phase 1 data). |
-| `behavioral_friction_gemma2b.py` | Load model, validate pairs, baseline metrics, **ΔP-ranked** table. |
+| `behavioral_friction_gemma2b.py` | Load model, validate pairs, bidirectional **logit-difference** triage, **TotalSwing-ranked** console table + **`fact_battery_triage.csv`**. |
+| `fact_battery_triage.csv` | **Generated** triage export (same directory as the script; gitignored by default). |
 | `behavioral_friction_gemma2b_colab.ipynb` | Optional Colab-oriented notes (legacy / exploratory). |
 
 ---
