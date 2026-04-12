@@ -1,0 +1,422 @@
+[
+  {
+    "category": "geography_capitals",
+    "clean_prompt": "The capital of France is",
+    "corrupt_prompt": "The capital of Spain is",
+    "clean_target": " Paris",
+    "corrupt_target": " Madrid"
+  },
+  {
+    "category": "geography_capitals",
+    "clean_prompt": "The capital of Italy is",
+    "corrupt_prompt": "The capital of Germany is",
+    "clean_target": " Rome",
+    "corrupt_target": " Berlin"
+  },
+  {
+    "category": "geography_capitals",
+    "clean_prompt": "The capital of Japan is",
+    "corrupt_prompt": "The capital of China is",
+    "clean_target": " Tokyo",
+    "corrupt_target": " Beijing"
+  },
+  {
+    "category": "geography_continents",
+    "clean_prompt": "The continent where Egypt is found is",
+    "corrupt_prompt": "The continent where Japan is found is",
+    "clean_target": " Africa",
+    "corrupt_target": " Asia"
+  },
+  {
+    "category": "geography_continents",
+    "clean_prompt": "France lies entirely within the continent of",
+    "corrupt_prompt": "Australia lies entirely within the continent of",
+    "clean_target": " Europe",
+    "corrupt_target": " Australia"
+  },
+  {
+    "category": "geography_continents",
+    "clean_prompt": "The continent where penguins mainly breed is",
+    "corrupt_prompt": "The continent where lions mainly live is",
+    "clean_target": " Antarctica",
+    "corrupt_target": " Africa"
+  },
+  {
+    "category": "chemistry_symbols",
+    "clean_prompt": "The chemical symbol for gold is",
+    "corrupt_prompt": "The chemical symbol for iron is",
+    "clean_target": " Au",
+    "corrupt_target": " Fe"
+  },
+  {
+    "category": "chemistry_symbols",
+    "clean_prompt": "The chemical symbol for silver is",
+    "corrupt_prompt": "The chemical symbol for copper is",
+    "clean_target": " Ag",
+    "corrupt_target": " Cu"
+  },
+  {
+    "category": "chemistry_symbols",
+    "clean_prompt": "The chemical symbol for sodium is",
+    "corrupt_prompt": "The chemical symbol for chlorine is",
+    "clean_target": " Na",
+    "corrupt_target": " Cl"
+  },
+  {
+    "category": "physics_constants",
+    "clean_prompt": "The particle with a negative charge in an atom is the",
+    "corrupt_prompt": "The particle with a positive charge in an atom is the",
+    "clean_target": " electron",
+    "corrupt_target": " proton"
+  },
+  {
+    "category": "physics_constants",
+    "clean_prompt": "The SI unit of electric current is the",
+    "corrupt_prompt": "The SI unit of electric resistance is the",
+    "clean_target": " ampere",
+    "corrupt_target": " ohm"
+  },
+  {
+    "category": "physics_constants",
+    "clean_prompt": "The SI unit of power is the",
+    "corrupt_prompt": "The SI unit of frequency is the",
+    "clean_target": " watt",
+    "corrupt_target": " hertz"
+  },
+  {
+    "category": "anatomy_organs",
+    "clean_prompt": "The human organ that pumps blood is the",
+    "corrupt_prompt": "The human organ that filters blood is the",
+    "clean_target": " heart",
+    "corrupt_target": " kidney"
+  },
+  {
+    "category": "anatomy_organs",
+    "clean_prompt": "The organ responsible for breathing is the",
+    "corrupt_prompt": "The organ responsible for digestion is the",
+    "clean_target": " lungs",
+    "corrupt_target": " stomach"
+  },
+  {
+    "category": "anatomy_organs",
+    "clean_prompt": "A whale breathes air using its",
+    "corrupt_prompt": "A fish extracts oxygen using its",
+    "clean_target": " lungs",
+    "corrupt_target": " gills"
+  },
+  {
+    "category": "astronomy_planets",
+    "clean_prompt": "The planet closest to our Sun is",
+    "corrupt_prompt": "The planet third from our Sun is",
+    "clean_target": " Mercury",
+    "corrupt_target": " Earth"
+  },
+  {
+    "category": "astronomy_planets",
+    "clean_prompt": "The largest planet in the solar system is",
+    "corrupt_prompt": "The smallest planet in the solar system is",
+    "clean_target": " Jupiter",
+    "corrupt_target": " Mercury"
+  },
+  {
+    "category": "astronomy_planets",
+    "clean_prompt": "The planet famous for its rings is",
+    "corrupt_prompt": "The planet famous for its red color is",
+    "clean_target": " Saturn",
+    "corrupt_target": " Mars"
+  },
+  {
+    "category": "mathematics_addition",
+    "clean_prompt": "Two plus two equals",
+    "corrupt_prompt": "Three plus three equals",
+    "clean_target": " four",
+    "corrupt_target": " six"
+  },
+  {
+    "category": "mathematics_addition",
+    "clean_prompt": "One plus two equals",
+    "corrupt_prompt": "One plus three equals",
+    "clean_target": " three",
+    "corrupt_target": " four"
+  },
+  {
+    "category": "mathematics_addition",
+    "clean_prompt": "Six plus two equals",
+    "corrupt_prompt": "Five plus two equals",
+    "clean_target": " eight",
+    "corrupt_target": " seven"
+  },
+  {
+    "category": "mathematics_geometry",
+    "clean_prompt": "A shape with three equal sides is",
+    "corrupt_prompt": "A shape with four equal sides is",
+    "clean_target": " triangle",
+    "corrupt_target": " square"
+  },
+  {
+    "category": "mathematics_geometry",
+    "clean_prompt": "A three dimensional box shape is a",
+    "corrupt_prompt": "A round three dimensional ball is a",
+    "clean_target": " cube",
+    "corrupt_target": " sphere"
+  },
+  {
+    "category": "mathematics_geometry",
+    "clean_prompt": "A polygon with five sides is called",
+    "corrupt_prompt": "A polygon with six sides is called",
+    "clean_target": " pentagon",
+    "corrupt_target": " hexagon"
+  },
+  {
+    "category": "sports_equipment",
+    "clean_prompt": "Tennis is played with a",
+    "corrupt_prompt": "Golf is played with a",
+    "clean_target": " racket",
+    "corrupt_target": " club"
+  },
+  {
+    "category": "sports_equipment",
+    "clean_prompt": "Olympic sprinters finish by crossing the",
+    "corrupt_prompt": "Olympic swimmers finish by touching the",
+    "clean_target": " line",
+    "corrupt_target": " wall"
+  },
+  {
+    "category": "sports_equipment",
+    "clean_prompt": "Olympic archery targets are shot with an",
+    "corrupt_prompt": "Olympic fencing bouts are fought with a",
+    "clean_target": " arrow",
+    "corrupt_target": " sword"
+  },
+  {
+    "category": "translation_spanish",
+    "clean_prompt": "The Spanish word for cat is",
+    "corrupt_prompt": "The Spanish word for dog is",
+    "clean_target": " gato",
+    "corrupt_target": " perro"
+  },
+  {
+    "category": "translation_spanish",
+    "clean_prompt": "The Spanish word for sun is",
+    "corrupt_prompt": "The Spanish word for moon is",
+    "clean_target": " sol",
+    "corrupt_target": " luna"
+  },
+  {
+    "category": "translation_spanish",
+    "clean_prompt": "The Spanish word for water is",
+    "corrupt_prompt": "The Spanish word for fire is",
+    "clean_target": " agua",
+    "corrupt_target": " fuego"
+  },
+  {
+    "category": "translation_french",
+    "clean_prompt": "The French word for cat is",
+    "corrupt_prompt": "The French word for dog is",
+    "clean_target": " chat",
+    "corrupt_target": " chien"
+  },
+  {
+    "category": "translation_french",
+    "clean_prompt": "The French word for sun is",
+    "corrupt_prompt": "The French word for moon is",
+    "clean_target": " soleil",
+    "corrupt_target": " lune"
+  },
+  {
+    "category": "translation_french",
+    "clean_prompt": "The French word for water is",
+    "corrupt_prompt": "The French word for fire is",
+    "clean_target": " eau",
+    "corrupt_target": " feu"
+  },
+  {
+    "category": "colors_mixing",
+    "clean_prompt": "When blue paint mixes with yellow paint the result is",
+    "corrupt_prompt": "When red paint mixes with blue paint the result is",
+    "clean_target": " green",
+    "corrupt_target": " purple"
+  },
+  {
+    "category": "colors_mixing",
+    "clean_prompt": "When red paint mixes with yellow paint the result is",
+    "corrupt_prompt": "When blue paint mixes with yellow paint the result is",
+    "clean_target": " orange",
+    "corrupt_target": " green"
+  },
+  {
+    "category": "colors_mixing",
+    "clean_prompt": "Mixing red light with green light produces",
+    "corrupt_prompt": "Mixing red light with blue light produces",
+    "clean_target": " yellow",
+    "corrupt_target": " magenta"
+  },
+  {
+    "category": "animal_taxonomy",
+    "clean_prompt": "A trout is a kind of",
+    "corrupt_prompt": "A sparrow is a kind of",
+    "clean_target": " fish",
+    "corrupt_target": " bird"
+  },
+  {
+    "category": "animal_taxonomy",
+    "clean_prompt": "A cat is a common example of a",
+    "corrupt_prompt": "A salmon is a common example of a",
+    "clean_target": " mammal",
+    "corrupt_target": " fish"
+  },
+  {
+    "category": "animal_taxonomy",
+    "clean_prompt": "A polar bear is classified as a",
+    "corrupt_prompt": "A great white is classified as a",
+    "clean_target": " mammal",
+    "corrupt_target": " fish"
+  },
+  {
+    "category": "history_dates",
+    "clean_prompt": "World War II ended in the year",
+    "corrupt_prompt": "World War I ended in the year",
+    "clean_target": " 1945",
+    "corrupt_target": " 1918"
+  },
+  {
+    "category": "history_dates",
+    "clean_prompt": "The Magna Carta was sealed in the year",
+    "corrupt_prompt": "The US Constitution was signed in the year",
+    "clean_target": " 1215",
+    "corrupt_target": " 1787"
+  },
+  {
+    "category": "history_dates",
+    "clean_prompt": "The fall of the Berlin Wall was in",
+    "corrupt_prompt": "The first moon landing by NASA was in",
+    "clean_target": " 1989",
+    "corrupt_target": " 1969"
+  },
+  {
+    "category": "technology_founders",
+    "clean_prompt": "Steve Jobs co-founded the company named",
+    "corrupt_prompt": "Bill Gates co-founded the company named",
+    "clean_target": " Apple",
+    "corrupt_target": " Microsoft"
+  },
+  {
+    "category": "technology_founders",
+    "clean_prompt": "YouTube was later acquired by the company",
+    "corrupt_prompt": "Instagram was later acquired by the company",
+    "clean_target": " Google",
+    "corrupt_target": " Meta"
+  },
+  {
+    "category": "technology_founders",
+    "clean_prompt": "The web browser Chrome was built by the company",
+    "corrupt_prompt": "The web browser Safari was built by the company",
+    "clean_target": " Google",
+    "corrupt_target": " Apple"
+  },
+  {
+    "category": "units_measurement",
+    "clean_prompt": "Distance in the metric system uses",
+    "corrupt_prompt": "Mass in the metric system uses",
+    "clean_target": " meters",
+    "corrupt_target": " grams"
+  },
+  {
+    "category": "units_measurement",
+    "clean_prompt": "Liquid volume in metric science uses",
+    "corrupt_prompt": "Electric potential in metric science uses",
+    "clean_target": " liters",
+    "corrupt_target": " volts"
+  },
+  {
+    "category": "units_measurement",
+    "clean_prompt": "The metric unit for length is the",
+    "corrupt_prompt": "The metric unit for mass is the",
+    "clean_target": " meter",
+    "corrupt_target": " gram"
+  },
+  {
+    "category": "literature_authors",
+    "clean_prompt": "The epic Iliad was written by",
+    "corrupt_prompt": "The epic Aeneid was written by",
+    "clean_target": " Homer",
+    "corrupt_target": " Virgil"
+  },
+  {
+    "category": "literature_authors",
+    "clean_prompt": "The novel Frankenstein was written by",
+    "corrupt_prompt": "The novel Dracula was written by",
+    "clean_target": " Shelley",
+    "corrupt_target": " Stoker"
+  },
+  {
+    "category": "literature_authors",
+    "clean_prompt": "The novel Moby Dick was written by",
+    "corrupt_prompt": "The novel The Odyssey was written by",
+    "clean_target": " Melville",
+    "corrupt_target": " Homer"
+  },
+  {
+    "category": "mythology_roman_greek",
+    "clean_prompt": "The Roman god Mars is the Greek god",
+    "corrupt_prompt": "The Roman god Jupiter is the Greek god",
+    "clean_target": " Ares",
+    "corrupt_target": " Zeus"
+  },
+  {
+    "category": "mythology_roman_greek",
+    "clean_prompt": "The Roman god Mercury matches the Greek god",
+    "corrupt_prompt": "The Roman god Neptune matches the Greek god",
+    "clean_target": " Hermes",
+    "corrupt_target": " Poseidon"
+  },
+  {
+    "category": "mythology_roman_greek",
+    "clean_prompt": "The Roman goddess Venus matches the Greek goddess",
+    "corrupt_prompt": "The Roman goddess Diana matches the Greek goddess",
+    "clean_target": " Aphrodite",
+    "corrupt_target": " Artemis"
+  },
+  {
+    "category": "pop_culture_bands",
+    "clean_prompt": "The band Nirvana was associated strongly with",
+    "corrupt_prompt": "The band Metallica was associated strongly with",
+    "clean_target": " grunge",
+    "corrupt_target": " metal"
+  },
+  {
+    "category": "pop_culture_bands",
+    "clean_prompt": "The band Beatles hailed originally from",
+    "corrupt_prompt": "The band Eagles hailed originally from",
+    "clean_target": " Liverpool",
+    "corrupt_target": " California"
+  },
+  {
+    "category": "pop_culture_bands",
+    "clean_prompt": "The rock band U2 formed in the city of",
+    "corrupt_prompt": "The rock band REM formed in the city of",
+    "clean_target": " Dublin",
+    "corrupt_target": " Athens"
+  },
+  {
+    "category": "materials_composition",
+    "clean_prompt": "Common drinking glasses are made of",
+    "corrupt_prompt": "Common plastic bottles are made of",
+    "clean_target": " glass",
+    "corrupt_target": " plastic"
+  },
+  {
+    "category": "materials_composition",
+    "clean_prompt": "Most consumer aluminum foil is made from",
+    "corrupt_prompt": "Most consumer plastic wrap is made from",
+    "clean_target": " aluminum",
+    "corrupt_target": " plastic"
+  },
+  {
+    "category": "materials_composition",
+    "clean_prompt": "Steel beams in construction are mostly made of",
+    "corrupt_prompt": "Copper wires in circuits are mostly made of",
+    "clean_target": " steel",
+    "corrupt_target": " copper"
+  }
+]
