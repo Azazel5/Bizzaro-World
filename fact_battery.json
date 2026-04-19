@@ -121,7 +121,7 @@
   {
     "category": "astronomy_planets",
     "clean_prompt": "The planet famous for its rings is",
-    "corrupt_prompt": "The planet famous for its red color is",
+    "corrupt_prompt": "The planet famous for its craters is",
     "clean_target": " Saturn",
     "corrupt_target": " Mars"
   },
@@ -162,10 +162,10 @@
   },
   {
     "category": "mathematics_geometry",
-    "clean_prompt": "A right angle measures",
-    "corrupt_prompt": "A straight angle measures",
-    "clean_target": " 90",
-    "corrupt_target": " 180"
+    "clean_prompt": "A triangle has",
+    "corrupt_prompt": "A square has",
+    "clean_target": " three",
+    "corrupt_target": " four"
   },
   {
     "category": "sports_equipment",
@@ -176,7 +176,7 @@
   },
   {
     "category": "sports_equipment",
-    "clean_prompt": "Olympic sprinters finish by crossing the",
+    "clean_prompt": "Olympic sprinters finish by touching the",
     "corrupt_prompt": "Olympic swimmers finish by touching the",
     "clean_target": " line",
     "corrupt_target": " wall"
@@ -274,24 +274,24 @@
   },
   {
     "category": "history_dates",
-    "clean_prompt": "World War II ended in the year",
-    "corrupt_prompt": "World War I ended in the year",
-    "clean_target": " 1945",
-    "corrupt_target": " 1918"
+    "clean_prompt": "The first US president was",
+    "corrupt_prompt": "The sixteenth US president was",
+    "clean_target": " Washington",
+    "corrupt_target": " Lincoln"
   },
   {
     "category": "history_dates",
-    "clean_prompt": "The Magna Carta was sealed in the year",
-    "corrupt_prompt": "The US Constitution was signed in the year",
-    "clean_target": " 1215",
-    "corrupt_target": " 1787"
+    "clean_prompt": "The scientist Isaac Newton was",
+    "corrupt_prompt": "The scientist Albert Einstein was",
+    "clean_target": " English",
+    "corrupt_target": " German"
   },
   {
     "category": "history_dates",
-    "clean_prompt": "The fall of the Berlin Wall was in",
-    "corrupt_prompt": "The first moon landing by NASA was in",
-    "clean_target": " 1989",
-    "corrupt_target": " 1969"
+    "clean_prompt": "The leader Napoleon was born in",
+    "corrupt_prompt": "The leader Churchill was born in",
+    "clean_target": " France",
+    "corrupt_target": " England"
   },
   {
     "category": "technology_founders",
@@ -337,24 +337,24 @@
   },
   {
     "category": "literature_authors",
-    "clean_prompt": "The epic Iliad was written by",
-    "corrupt_prompt": "The epic Aeneid was written by",
-    "clean_target": " Homer",
-    "corrupt_target": " Dante"
+    "clean_prompt": "The epic Inferno was written by",
+    "corrupt_prompt": "The epic Odyssey was written by",
+    "clean_target": " Dante",
+    "corrupt_target": " Homer"
   },
   {
     "category": "literature_authors",
     "clean_prompt": "The novel Frankenstein was written by",
     "corrupt_prompt": "The novel Dracula was written by",
-    "clean_target": " Tolkien",
-    "corrupt_target": " Dickens"
+    "clean_target": " Shelley",
+    "corrupt_target": " Stoker"
   },
   {
     "category": "literature_authors",
     "clean_prompt": "The novel Moby Dick was written by",
     "corrupt_prompt": "The novel The Odyssey was written by",
-    "clean_target": " Dickens",
-    "corrupt_target": " Tolkien"
+    "clean_target": " Melville",
+    "corrupt_target": " Homer"
   },
   {
     "category": "mythology_roman_greek",
@@ -393,10 +393,10 @@
   },
   {
     "category": "pop_culture_bands",
-    "clean_prompt": "The rock band U2 formed in the city of",
-    "corrupt_prompt": "The rock band REM formed in the city of",
+    "clean_prompt": "The rock band Queen formed in the city of",
+    "corrupt_prompt": "The rock band Oasis formed in the city of",
     "clean_target": " London",
-    "corrupt_target": " Boston"
+    "corrupt_target": " Manchester"
   },
   {
     "category": "materials_composition",
