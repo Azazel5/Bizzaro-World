@@ -18,4 +18,7 @@ set -euo pipefail
 cd "${SLURM_SUBMIT_DIR}"
 
 MODE="${MODE:-A}"
+
+module load pytorch/2.8.0-cuda12.9-cudnn9
+
 python3 scripts/exp1.py --mode "$MODE"
