@@ -176,10 +176,10 @@
   },
   {
     "category": "sports_equipment",
-    "clean_prompt": "Olympic sprinters finish by touching the",
-    "corrupt_prompt": "Olympic swimmers finish by touching the",
-    "clean_target": " line",
-    "corrupt_target": " wall"
+    "clean_prompt": "The sport played with a racket is",
+    "corrupt_prompt": "The sport played with a club is",
+    "clean_target": " tennis",
+    "corrupt_target": " golf"
   },
   {
     "category": "sports_equipment",
@@ -344,10 +344,10 @@
   },
   {
     "category": "literature_authors",
-    "clean_prompt": "The novel Frankenstein was written by",
-    "corrupt_prompt": "The novel Dracula was written by",
-    "clean_target": " Shelley",
-    "corrupt_target": " Stoker"
+    "clean_prompt": "The novel Dune was written by",
+    "corrupt_prompt": "The novel It was written by",
+    "clean_target": " Herbert",
+    "corrupt_target": " King"
   },
   {
     "category": "literature_authors",
