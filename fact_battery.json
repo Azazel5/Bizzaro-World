@@ -78,10 +78,10 @@
   },
   {
     "category": "physics_constants",
-    "clean_prompt": "The SI unit of power is the",
-    "corrupt_prompt": "The SI unit of frequency is the",
-    "clean_target": " watt",
-    "corrupt_target": " hertz"
+    "clean_prompt": "The SI unit of force is the",
+    "corrupt_prompt": "The SI unit of pressure is the",
+    "clean_target": " newton",
+    "corrupt_target": " pascal"
   },
   {
     "category": "anatomy_organs",
@@ -162,10 +162,10 @@
   },
   {
     "category": "mathematics_geometry",
-    "clean_prompt": "A polygon with five sides is called",
-    "corrupt_prompt": "A polygon with six sides is called",
-    "clean_target": " pentagon",
-    "corrupt_target": " hexagon"
+    "clean_prompt": "A right angle measures",
+    "corrupt_prompt": "A straight angle measures",
+    "clean_target": " 90",
+    "corrupt_target": " 180"
   },
   {
     "category": "sports_equipment",
@@ -249,7 +249,7 @@
     "clean_prompt": "Mixing red light with green light produces",
     "corrupt_prompt": "Mixing red light with blue light produces",
     "clean_target": " yellow",
-    "corrupt_target": " magenta"
+    "corrupt_target": " purple"
   },
   {
     "category": "animal_taxonomy",
@@ -340,21 +340,21 @@
     "clean_prompt": "The epic Iliad was written by",
     "corrupt_prompt": "The epic Aeneid was written by",
     "clean_target": " Homer",
-    "corrupt_target": " Virgil"
+    "corrupt_target": " Dante"
   },
   {
     "category": "literature_authors",
     "clean_prompt": "The novel Frankenstein was written by",
     "corrupt_prompt": "The novel Dracula was written by",
-    "clean_target": " Shelley",
-    "corrupt_target": " Stoker"
+    "clean_target": " Tolkien",
+    "corrupt_target": " Dickens"
   },
   {
     "category": "literature_authors",
     "clean_prompt": "The novel Moby Dick was written by",
     "corrupt_prompt": "The novel The Odyssey was written by",
-    "clean_target": " Melville",
-    "corrupt_target": " Homer"
+    "clean_target": " Dickens",
+    "corrupt_target": " Tolkien"
   },
   {
     "category": "mythology_roman_greek",
@@ -368,14 +368,14 @@
     "clean_prompt": "The Roman god Mercury matches the Greek god",
     "corrupt_prompt": "The Roman god Neptune matches the Greek god",
     "clean_target": " Hermes",
-    "corrupt_target": " Poseidon"
+    "corrupt_target": " Hera"
   },
   {
     "category": "mythology_roman_greek",
     "clean_prompt": "The Roman goddess Venus matches the Greek goddess",
     "corrupt_prompt": "The Roman goddess Diana matches the Greek goddess",
-    "clean_target": " Aphrodite",
-    "corrupt_target": " Artemis"
+    "clean_target": " Hera",
+    "corrupt_target": " Hermes"
   },
   {
     "category": "pop_culture_bands",
@@ -388,15 +388,15 @@
     "category": "pop_culture_bands",
     "clean_prompt": "The band Beatles hailed originally from",
     "corrupt_prompt": "The band Eagles hailed originally from",
-    "clean_target": " Liverpool",
-    "corrupt_target": " California"
+    "clean_target": " England",
+    "corrupt_target": " America"
   },
   {
     "category": "pop_culture_bands",
     "clean_prompt": "The rock band U2 formed in the city of",
     "corrupt_prompt": "The rock band REM formed in the city of",
-    "clean_target": " Dublin",
-    "corrupt_target": " Athens"
+    "clean_target": " London",
+    "corrupt_target": " Boston"
   },
   {
     "category": "materials_composition",
