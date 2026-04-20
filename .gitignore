@@ -220,8 +220,8 @@ fact_battery_triage.csv
 /experiment_[ABC].json
 /experiment2.json
 /experiment2.log
-/experiment3.json
-/experiment3.log
+/experiment3_[ABC].json
+/experiment3_[ABC].log
 /exp1_*.out
 /exp1_*.err
 /exp2_*.out
