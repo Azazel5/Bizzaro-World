@@ -129,8 +129,13 @@ def run_experiment(
 
         worst_layer = min(range(n_layers), key=lambda i: ld_deltas[i])
 
+        triage_fields = gp.as_dict()
+        # These two are duplicated by `baseline_ld_clean` / `baseline_ld_corrupt`.
+        triage_fields.pop("ld_clean", None)
+        triage_fields.pop("ld_corrupt", None)
+
         row: Dict[str, Any] = {
-            **gp.as_dict(),
+            **triage_fields,
             "baseline_ld_clean": baseline_ld_clean,
             "baseline_ld_corrupt": baseline_ld_corrupt,
             "patch": {
