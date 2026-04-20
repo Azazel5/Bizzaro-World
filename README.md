@@ -74,13 +74,55 @@ Subtracting a negative `LD_corrupt` **adds** magnitude when both legs are strong
 
 ### Phase 3 — Activation patching (causal tracing)
 
-Use **high total-swing** pairs from Phase 2 as **priority** for interventions (forthcoming notebooks or modules):
+Use **high TotalSwing** pairs from Phase 2 as **priority** for interventions. The implementation lives in **`scripts/exp1.py`** (Slurm: **`slurm/run_exp1.slurm`**), using **TransformerLens** hooks and the fact battery’s aligned counterfactuals.
 
 - Cache activations on **clean** vs **corrupt** forwards.
 - Patch **position-aligned** residual (or attention / MLP) components from corrupt into clean.
-- Attribute **logit shifts** on the clean target to **layers and heads**.
+- Attribute **logit shifts** on the clean-vs-corrupt margin to **layers** (and, in later work, heads and sublayers).
 
-TransformerLens supplies **hooks**; the fact battery supplies **clean, aligned** counterfactuals.
+---
+
+## Experimentation and Future Steps
+
+This project is a **mechanistic interpretability** investigation into how **Gemma 2B** encodes and retrieves factual knowledge, with **activation patching** as the primary surgical tool. It begins with a **fact battery** of **60** prompt pairs spanning **20** categories (geography, chemistry, anatomy, sports, mythology, and more). Each pair is **structurally matched** so that only the factual binding changes while syntax and token length stay aligned under Gemma—reducing confounds from length, punctuation, and tokenizer quirks.
+
+### Behavioral triage and golden-pair selection
+
+Phase 2 scores every pair with a **bidirectional logit-difference** setup. On each forward pass at the **final** prompt position we define:
+
+`LD = logit(clean_target) − logit(corrupt_target)` (same two token ids on both prompts).
+
+- **`LD_clean`** — evaluated on the **clean** prompt (we want a **large positive** margin when the model prefers the clean completion).
+- **`LD_corrupt`** — evaluated on the **corrupt** prompt (we want a **large negative** margin when the model prefers the corrupt completion).
+
+**TotalSwing** is **`LD_clean − LD_corrupt`**. We treat this as a strong screening metric for patching: it rewards a **two-horse logit race** that **reverses** across the two aligned contexts, rather than relying on a single raw probability that can be fragile under tokenization ambiguity or synonym competition.
+
+From the ranked triage export (**`fact_battery_triage.csv`**) we support three **golden-pair selection modes** via **`golden_pairs.select_golden_pairs`**:
+
+| Mode | Selection rule |
+|------|----------------|
+| **A** | Top **15** globally by TotalSwing |
+| **B** | Best **per category** (one strongest pair per bucket) |
+| **C** | **All 60** pairs (full battery) |
+
+Together, these modes support **robustness checks** across selection strategies (high-signal subset vs category coverage vs exhaustive sweep).
+
+### Experiment 1 — Residual stream patching sweep
+
+**Experiment 1** runs a **layerwise residual** intervention: for each golden pair, cache the corrupt forward, then for each transformer block replace **`hook_resid_pre` at the final sequence position** in the **clean** run with the corresponding cached vector from the corrupt run, and measure damage to the clean **logit margin** (the same LD definition as in triage). The per-layer effect relative to the unpatched clean run is recorded as **`ld_delta_vs_clean_baseline_by_layer`**.
+
+**Finding (consistent across modes).** Across **95** prompt-pair runs in aggregate across modes A, B, and C (**15 + 20 + 60**), worst-case damage concentrates in the **last few blocks**: layers **15**, **16**, and **17** (with **layer 17** dominating), rather than spreading uniformly across depth. Mean **`worst_layer_min_delta`** is stable across selection modes—approximately **16.27** (A), **16.40** (B), and **16.32** (C)—which is the kind of stability you expect when an effect tracks **architecture** more than a cherry-picked subset.
+
+**Correlation with confidence.** Patching damage (minimum \(\Delta\)LD vs clean baseline across layers) correlates strongly with **baseline conviction on the clean margin** (**`baseline_ld_clean`**): **Pearson** **r ≈ −0.794** (**p ≈ 0.0004**) in Mode A; **r ≈ −0.870** (**p < 0.0001**) in Mode B; **r ≈ −0.832** (**p < 0.0001**) in Mode C. Stronger clean-side margins tend to co-occur with **more catastrophic** interventions when late residual state is replaced—consistent with a **late-stage readout** story, with the usual caveat that this experiment patches **only the final token position** at **`resid_pre`**.
+
+Analysis helpers: **`notebooks/experiment1_analysis.ipynb`**, **`scripts/analysis.py`**, and **`scripts/exp1_data_analysis.py`** (figures under **`outputs/`** or **`notebooks/outputs/`** depending on run configuration).
+
+### Future work
+
+- **Sublayer decomposition in the critical blocks** — With layers **15–17** implicated at the **final** position, the next phase **separates attention output vs MLP output** (and related hooks) to see which sublayer “commits” the answer.
+- **Non-final positions** — Extend patching to **entity / span positions**, not only the last token, to separate **where information is accumulated** from **where it is read out** into logits.
+- **Sparse autoencoders** — Apply **Gemma Scope** (or comparable) SAEs to late-layer vectors to identify interpretable features that flip between clean and corrupt worlds.
+- **Cross-architecture replication** — Repeat the protocol on **LLaMA**, **Mistral**, **Qwen**, **DeepSeek**, etc., to test whether **late-layer commitment** is Gemma-specific or a broader transformer signature. If it holds, the result is worth writing up with care.
 
 ---
 
@@ -110,6 +152,14 @@ Keep **`fact_battery.json`** next to that file (same folder), or pass a path int
 | `fact_battery.json` | Aligned prompt pairs (Phase 1 data). |
 | `behavioral_friction_gemma2b.py` | Load model, validate pairs, bidirectional **logit-difference** triage, **TotalSwing-ranked** console table + **`fact_battery_triage.csv`**. |
 | `fact_battery_triage.csv` | **Generated** triage export (same directory as the script; gitignored by default). |
+| `golden_pairs.py` | Read triage CSV; select golden pairs for **modes A / B / C**. |
+| `scripts/exp1.py` | **Experiment 1**: layerwise **`resid_pre`** patching at the **final** position; writes **`experiment_{mode}.json`**. |
+| `slurm/run_exp1.slurm` | Example Slurm batch file (GPU, `MODE` env for A/B/C). |
+| `scripts/analysis.py` | Triage / probability audits on experiment JSON. |
+| `scripts/exp1_data_analysis.py` | Figures and summaries for Experiment 1 outputs. |
+| `scripts/validate_fact_battery.py` | Offline checks for token alignment and single-token targets. |
+| `notebooks/experiment1_analysis.ipynb` | Pooled analysis for **`experiment_A/B/C.json`** (figures + correlations). |
+| `experiment1_pooled/` | Optional directory for symlinks or copies of all three experiment JSONs (used by the notebook). |
 | `behavioral_friction_gemma2b_colab.ipynb` | Optional Colab-oriented notes (legacy / exploratory). |
 
 ---
