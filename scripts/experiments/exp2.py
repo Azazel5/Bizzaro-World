@@ -10,9 +10,6 @@ measure damage to the clean logit margin.
 Outputs (written to --outdir, default current working directory):
   - experiment2.json
   - experiment2.log
-
-The selection mode (A/B/C) is still recorded in the JSON payload, but filenames are
-mode-agnostic because OUTDIR is expected to be mode-specific at submission time.
 """
 
 from __future__ import annotations
@@ -27,7 +24,7 @@ from typing import Any, Callable, Dict, List
 import torch
 from transformer_lens import HookedTransformer
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
@@ -213,12 +210,7 @@ def run_experiment(
 
 def _parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument(
-        "--mode",
-        choices=("A", "B", "C"),
-        default="A",
-        help="Golden-pair selection from triage CSV (default: A).",
-    )
+    p.add_argument("--mode", choices=("A", "B", "C"), default="A")
     p.add_argument(
         "--triage-csv",
         type=Path,

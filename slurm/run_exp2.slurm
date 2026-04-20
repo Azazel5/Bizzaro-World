@@ -29,5 +29,5 @@ OUTDIR="${OUTDIR:-./outputs}"
 module load pytorch/2.8.0-cuda12.9-cudnn9
 
 mkdir -p "$OUTDIR"
-python3 scripts/exp2.py --mode "$MODE" --outdir "$OUTDIR"
+python3 scripts/experiments/exp2.py --mode "$MODE" --outdir "$OUTDIR"
 

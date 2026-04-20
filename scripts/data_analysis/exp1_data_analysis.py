@@ -175,3 +175,4 @@ plt.savefig(OUTPUT_DIR / 'fig4_correlation_totalswing_vs_damage.png', dpi=150, b
 plt.close()
 print("Fig 4 saved")
 print("\nDone. All figures in outputs/")
+
