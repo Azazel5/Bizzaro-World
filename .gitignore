@@ -209,15 +209,24 @@ __marimo__/
 # Regenerated triage output (run `python behavioral_friction_gemma2b.py`)
 fact_battery_triage.csv
 
-# Activation patching experiment 1 — `sbatch slurm/run_exp1.slurm`
-experiment_A.json
-experiment_B.json
-experiment_C.json
-exp1_*.out
-exp1_*.err
+# Experiment run directories (HPC artifacts / logs / JSONs)
+# Gitignore uses globs (not full regex). These match any top-level folder that starts
+# with "experiment" or "Experiment" (e.g. "experiment1_pooled", "Experiment1, A (...)").
+/experiment*/
+/Experiment*/
 
-# Activation patching experiment 2a — `sbatch slurm/run_exp2a.slurm`
-experiment2a_*.json
-experiment2a_*.log
-exp2a_*.out
-exp2a_*.err
+# Experiment outputs written to OUTDIR (usually passed at `sbatch` time)
+# These patterns cover the current naming conventions.
+/experiment_[ABC].json
+/experiment2.json
+/experiment2.log
+/experiment3.json
+/experiment3.log
+/exp1_*.out
+/exp1_*.err
+/exp2_*.out
+/exp2_*.err
+/exp3_*.out
+/exp3_*.err
+
+(deprecated) experiment1, A (5_14PM)/

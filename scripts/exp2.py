@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 """
-Experiment 2A — Attention vs MLP decomposition (TransformerLens).
+Experiment 2 — Attention vs MLP decomposition (TransformerLens).
 
 We focus on the late, causally load-bearing blocks found in Experiment 1. For each
 prompt pair we cache corrupt activations at five hook points in layers 15–17, then
 patch those cached vectors into the clean run at the final sequence position and
 measure damage to the clean logit margin.
 
-Outputs (written to current working directory):
-  - experiment2a_{MODE}.json
-  - experiment2a_{MODE}.log
+Outputs (written to --outdir, default current working directory):
+  - experiment2.json
+  - experiment2.log
 
-Modes A/B/C follow `golden_pairs.select_golden_pairs`.
+The selection mode (A/B/C) is still recorded in the JSON payload, but filenames are
+mode-agnostic because OUTDIR is expected to be mode-specific at submission time.
 """
 
 from __future__ import annotations
@@ -21,7 +22,7 @@ import json
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Any, Callable, Dict, List
 
 import torch
 from transformer_lens import HookedTransformer
@@ -72,6 +73,16 @@ def _hook_name(layer: int, hook: str) -> str:
     return f"blocks.{layer}.{hook}"
 
 
+def _names_filter(n_layers: int) -> Callable[[str], bool]:
+    layers = [L for L in TARGET_LAYERS if 0 <= L < n_layers]
+    allowed = {_hook_name(L, h) for L in layers for h in TARGET_HOOKS}
+
+    def filt(name: str) -> bool:
+        return name in allowed
+
+    return filt
+
+
 def _patch_one(
     model: HookedTransformer,
     clean_prompt: str,
@@ -79,11 +90,7 @@ def _patch_one(
     corrupt_cache: Dict[str, torch.Tensor],
     clean_id: int,
     corrupt_id: int,
-) -> Tuple[float, float]:
-    """
-    Patch one hook point at one layer (final token position) and return:
-      (patched_ld, ld_delta_vs_clean_baseline) -- delta computed by caller.
-    """
+) -> float:
     corrupt_vec = corrupt_cache[hook_name][:, -1, :]
 
     def hook_fn(x: torch.Tensor, hook: Any) -> torch.Tensor:
@@ -93,18 +100,7 @@ def _patch_one(
     clean_toks = model.to_tokens(clean_prompt, prepend_bos=True).to(model.cfg.device)
     with torch.no_grad():
         logits = model.run_with_hooks(clean_toks, fwd_hooks=[(hook_name, hook_fn)])
-    patched_ld = _ld_at_final(logits[0, -1, :], clean_id, corrupt_id)
-    return patched_ld, 0.0  # delta filled by caller
-
-
-def _names_filter_for_exp2a(n_layers: int) -> Callable[[str], bool]:
-    layers = [L for L in TARGET_LAYERS if 0 <= L < n_layers]
-    allowed = {_hook_name(L, h) for L in layers for h in TARGET_HOOKS}
-
-    def filt(name: str) -> bool:
-        return name in allowed
-
-    return filt
+    return _ld_at_final(logits[0, -1, :], clean_id, corrupt_id)
 
 
 def run_experiment(
@@ -116,7 +112,7 @@ def run_experiment(
 ) -> Dict[str, Any]:
     n_layers = int(model.cfg.n_layers)
     layers = [L for L in TARGET_LAYERS if 0 <= L < n_layers]
-    names_filter = _names_filter_for_exp2a(n_layers)
+    names_filter = _names_filter(n_layers)
 
     out_pairs: List[Dict[str, Any]] = []
 
@@ -149,7 +145,7 @@ def run_experiment(
             worst_layer = None
             worst_hook = None
 
-            log(f"[pair {idx}/{len(pairs)}] {gp.category} | rank={gp.rank}")
+            log(f"[pair {idx}/{len(pairs)}] {gp.category} | rank={gp.rank} | mode={mode}")
 
             for L in layers:
                 layer_key = str(L)
@@ -158,7 +154,7 @@ def run_experiment(
                 pieces: List[str] = []
                 for H in TARGET_HOOKS:
                     full = _hook_name(L, H)
-                    patched_ld, _ = _patch_one(
+                    patched_ld = _patch_one(
                         model,
                         gp.clean_prompt,
                         full,
@@ -202,7 +198,7 @@ def run_experiment(
             )
 
     return {
-        "experiment": "2a",
+        "experiment": "2",
         "description": "attention vs MLP decomposition, layers 15-17, final token position",
         "selection_mode": mode,
         "model": MODEL_NAME,
@@ -229,6 +225,12 @@ def _parse_args() -> argparse.Namespace:
         default=REPO_ROOT / "fact_battery_triage.csv",
         help="Path to fact_battery_triage.csv",
     )
+    p.add_argument(
+        "--outdir",
+        type=Path,
+        default=Path("."),
+        help="Directory to write JSON and log output (default: current directory).",
+    )
     return p.parse_args()
 
 
@@ -246,8 +248,10 @@ def main() -> None:
     if not pairs:
         raise RuntimeError("No pairs selected (empty triage?).")
 
-    out_json = Path(f"experiment2a_{mode}.json")
-    out_log = Path(f"experiment2a_{mode}.log")
+    outdir: Path = args.outdir
+    outdir.mkdir(parents=True, exist_ok=True)
+    out_json = outdir / "experiment2.json"
+    out_log = outdir / "experiment2.log"
 
     print(f"Loading {MODEL_NAME} …", flush=True)
     model = _load_model()

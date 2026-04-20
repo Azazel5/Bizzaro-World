@@ -174,6 +174,12 @@ def _parse_args() -> argparse.Namespace:
         default=REPO_ROOT / "fact_battery_triage.csv",
         help="Path to fact_battery_triage.csv",
     )
+    p.add_argument(
+        "--outdir",
+        type=Path,
+        default=Path("."),
+        help="Directory to write JSON output (default: current directory).",
+    )
     return p.parse_args()
 
 
@@ -191,7 +197,9 @@ def main() -> None:
     if not pairs:
         raise RuntimeError("No pairs selected (empty triage?).")
 
-    out_path = Path(f"experiment_{mode}.json")
+    outdir: Path = args.outdir
+    outdir.mkdir(parents=True, exist_ok=True)
+    out_path = outdir / f"experiment_{mode}.json"
 
     print(f"Loading {MODEL_NAME} …", flush=True)
     model = _load_model()

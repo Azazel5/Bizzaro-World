@@ -12,13 +12,16 @@
 #   sbatch slurm/run_exp1.slurm
 #   sbatch --export=ALL,MODE=B slurm/run_exp1.slurm
 #
-# Writes experiment_{MODE}.json (e.g. experiment_A.json).
+# Writes to OUTDIR (default ./outputs):
+#   OUTDIR/experiment_{MODE}.json
 
 set -euo pipefail
 cd "${SLURM_SUBMIT_DIR}"
 
 MODE="${MODE:-A}"
+OUTDIR="${OUTDIR:-./outputs}"
 
 module load pytorch/2.8.0-cuda12.9-cudnn9
 
-python3 scripts/exp1.py --mode "$MODE"
+mkdir -p "$OUTDIR"
+python3 scripts/exp1.py --mode "$MODE" --outdir "$OUTDIR"
