@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
-from collections import Counter, defaultdict
+from collections import Counter
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Tuple
 
@@ -44,7 +44,7 @@ def main() -> int:
     ap.add_argument(
         "experiment_json",
         type=Path,
-        help="Path to experiment_A.json (or any experiment_{mode}.json).",
+        help="Path to experiment JSON (e.g. experiment_A.json).",
     )
     ap.add_argument(
         "--prompt-trunc",
@@ -76,7 +76,6 @@ def main() -> int:
         except Exception:
             px_f = float("nan")
 
-        flag = False
         try:
             flag = float(px) < 0.5
         except Exception:
@@ -113,7 +112,6 @@ def main() -> int:
 
     rows.sort(key=lambda t: (t[0] != t[0], t[0]))  # NaNs last
 
-    # Print table
     headers = [
         "rank",
         "category",

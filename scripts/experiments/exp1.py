@@ -6,7 +6,7 @@ Loads golden pairs from `fact_battery_triage.csv` using selection mode A, B, or 
 (see `golden_pairs.select_golden_pairs`). For each pair, patches `hook_resid_pre`
 at the final position from corrupt → clean per layer and records LD change.
 
-Writes `experiment_{mode}.json` in the current working directory (e.g. experiment_A.json).
+Writes `experiment_{mode}.json` to --outdir (default: current working directory).
 """
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ from typing import Any, Callable, Dict, List
 import torch
 from transformer_lens import HookedTransformer
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
@@ -41,9 +41,7 @@ def _load_model() -> HookedTransformer:
     return model
 
 
-def _ld_at_final(
-    logits_last: torch.Tensor, clean_id: int, corrupt_id: int
-) -> float:
+def _ld_at_final(logits_last: torch.Tensor, clean_id: int, corrupt_id: int) -> float:
     lf = logits_last.float()
     return (lf[clean_id] - lf[corrupt_id]).item()
 
@@ -78,9 +76,7 @@ def _patch_layer_get_ld(
 
     clean_toks = model.to_tokens(clean_prompt, prepend_bos=True).to(model.cfg.device)
     with torch.no_grad():
-        logits = model.run_with_hooks(
-            clean_toks, fwd_hooks=[(hook_name, hook_fn)]
-        )
+        logits = model.run_with_hooks(clean_toks, fwd_hooks=[(hook_name, hook_fn)])
     return _ld_at_final(logits[0, -1, :], clean_id, corrupt_id)
 
 
@@ -97,9 +93,7 @@ def run_experiment(
     for gp in pairs:
         lf_clean = _final_logits(model, gp.clean_prompt)
         lf_corrupt = _final_logits(model, gp.corrupt_prompt)
-        baseline_ld_clean = _ld_at_final(
-            lf_clean, gp.clean_target_id, gp.corrupt_target_id
-        )
+        baseline_ld_clean = _ld_at_final(lf_clean, gp.clean_target_id, gp.corrupt_target_id)
         baseline_ld_corrupt = _ld_at_final(
             lf_corrupt, gp.clean_target_id, gp.corrupt_target_id
         )
@@ -108,9 +102,7 @@ def run_experiment(
             model.cfg.device
         )
         with torch.no_grad():
-            _, corrupt_cache = model.run_with_cache(
-                corrupt_toks, names_filter=names_filter
-            )
+            _, corrupt_cache = model.run_with_cache(corrupt_toks, names_filter=names_filter)
 
         patched_lds: List[float] = []
         ld_deltas: List[float] = []
@@ -130,24 +122,24 @@ def run_experiment(
         worst_layer = min(range(n_layers), key=lambda i: ld_deltas[i])
 
         triage_fields = gp.as_dict()
-        # These two are duplicated by `baseline_ld_clean` / `baseline_ld_corrupt`.
         triage_fields.pop("ld_clean", None)
         triage_fields.pop("ld_corrupt", None)
 
-        row: Dict[str, Any] = {
-            **triage_fields,
-            "baseline_ld_clean": baseline_ld_clean,
-            "baseline_ld_corrupt": baseline_ld_corrupt,
-            "patch": {
-                "site": "resid_pre",
-                "position": "final",
-                "hook_template": "blocks.{layer}.hook_resid_pre",
-            },
-            "patched_ld_by_layer": patched_lds,
-            "ld_delta_vs_clean_baseline_by_layer": ld_deltas,
-            "worst_layer_min_delta": int(worst_layer),
-        }
-        out_pairs.append(row)
+        out_pairs.append(
+            {
+                **triage_fields,
+                "baseline_ld_clean": baseline_ld_clean,
+                "baseline_ld_corrupt": baseline_ld_corrupt,
+                "patch": {
+                    "site": "resid_pre",
+                    "position": "final",
+                    "hook_template": "blocks.{layer}.hook_resid_pre",
+                },
+                "patched_ld_by_layer": patched_lds,
+                "ld_delta_vs_clean_baseline_by_layer": ld_deltas,
+                "worst_layer_min_delta": int(worst_layer),
+            }
+        )
 
     return {
         "experiment": "activation_patching_exp1",
@@ -162,12 +154,7 @@ def run_experiment(
 
 def _parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument(
-        "--mode",
-        choices=("A", "B", "C"),
-        default="A",
-        help="Golden-pair selection from triage CSV (default: A).",
-    )
+    p.add_argument("--mode", choices=("A", "B", "C"), default="A")
     p.add_argument(
         "--triage-csv",
         type=Path,
@@ -221,3 +208,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

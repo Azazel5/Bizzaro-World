@@ -74,7 +74,7 @@ Subtracting a negative `LD_corrupt` **adds** magnitude when both legs are strong
 
 ### Phase 3 — Activation patching (causal tracing)
 
-Use **high TotalSwing** pairs from Phase 2 as **priority** for interventions. The implementation lives in **`scripts/exp1.py`** (Slurm: **`slurm/run_exp1.slurm`**), using **TransformerLens** hooks and the fact battery’s aligned counterfactuals.
+Use **high TotalSwing** pairs from Phase 2 as **priority** for interventions. The implementation lives in **`scripts/experiments/exp1.py`** (Slurm: **`slurm/run_exp1.slurm`**), using **TransformerLens** hooks and the fact battery’s aligned counterfactuals.
 
 - Cache activations on **clean** vs **corrupt** forwards.
 - Patch **position-aligned** residual (or attention / MLP) components from corrupt into clean.
@@ -115,7 +115,7 @@ Together, these modes support **robustness checks** across selection strategies 
 
 **Correlation with confidence.** Patching damage (minimum \(\Delta\)LD vs clean baseline across layers) correlates strongly with **baseline conviction on the clean margin** (**`baseline_ld_clean`**): **Pearson** **r ≈ −0.794** (**p ≈ 0.0004**) in Mode A; **r ≈ −0.870** (**p < 0.0001**) in Mode B; **r ≈ −0.832** (**p < 0.0001**) in Mode C. Stronger clean-side margins tend to co-occur with **more catastrophic** interventions when late residual state is replaced—consistent with a **late-stage readout** story, with the usual caveat that this experiment patches **only the final token position** at **`resid_pre`**.
 
-Analysis helpers: **`notebooks/experiment1_analysis.ipynb`**, **`scripts/analysis.py`**, and **`scripts/exp1_data_analysis.py`** (figures under **`outputs/`** or **`notebooks/outputs/`** depending on run configuration).
+Analysis helpers: **`notebooks/experiment1_analysis.ipynb`**, **`scripts/data_analysis/analysis.py`**, and **`scripts/data_analysis/exp1_data_analysis.py`** (figures under **`outputs/`** or **`notebooks/outputs/`** depending on run configuration).
 
 ### Future work
 
@@ -153,11 +153,16 @@ Keep **`fact_battery.json`** next to that file (same folder), or pass a path int
 | `behavioral_friction_gemma2b.py` | Load model, validate pairs, bidirectional **logit-difference** triage, **TotalSwing-ranked** console table + **`fact_battery_triage.csv`**. |
 | `fact_battery_triage.csv` | **Generated** triage export (same directory as the script; gitignored by default). |
 | `golden_pairs.py` | Read triage CSV; select golden pairs for **modes A / B / C**. |
-| `scripts/exp1.py` | **Experiment 1**: layerwise **`resid_pre`** patching at the **final** position; writes **`experiment_{mode}.json`**. |
+| `scripts/experiments/exp1.py` | **Experiment 1**: layerwise **`resid_pre`** patching at the **final** position; writes **`experiment_{mode}.json`**. |
+| `scripts/experiments/exp2.py` | **Experiment 2**: attention vs MLP decomposition (layers 15–17). Writes `experiment2.json` + `experiment2.log`. |
+| `scripts/experiments/exp3.py` | **Experiment 3**: entity-position patching (hook_resid_pre, full layer sweep). Writes `experiment3_{MODE}.json` + `experiment3_{MODE}.log`. |
 | `slurm/run_exp1.slurm` | Example Slurm batch file (GPU, `MODE` env for A/B/C). |
-| `scripts/analysis.py` | Triage / probability audits on experiment JSON. |
-| `scripts/exp1_data_analysis.py` | Figures and summaries for Experiment 1 outputs. |
-| `scripts/validate_fact_battery.py` | Offline checks for token alignment and single-token targets. |
+| `slurm/run_exp2.slurm` | Example Slurm batch file for Experiment 2 (OUTDIR passed at submit time). |
+| `slurm/run_exp3.slurm` | Example Slurm batch file for Experiment 3 (OUTDIR passed at submit time). |
+| `scripts/data_analysis/analysis.py` | Triage / probability audits on experiment JSON. |
+| `scripts/data_analysis/exp1_data_analysis.py` | Figures and summaries for Experiment 1 outputs. |
+| `scripts/data_prep/add_entity_tokens.py` | Add `entity_token` to `fact_battery.json` (required by Experiment 3). |
+| `scripts/data_prep/validate_fact_battery.py` | Offline checks for token alignment and single-token targets. |
 | `notebooks/experiment1_analysis.ipynb` | Pooled analysis for **`experiment_A/B/C.json`** (figures + correlations). |
 | `experiment1_pooled/` | Optional directory for symlinks or copies of all three experiment JSONs (used by the notebook). |
 | `behavioral_friction_gemma2b_colab.ipynb` | Optional Colab-oriented notes (legacy / exploratory). |

@@ -7,7 +7,7 @@ Checks:
 2) Single-token targets: clean_target and corrupt_target each tokenize to exactly 1 id.
 
 Usage (from repo root):
-  python scripts/validate_fact_battery.py
+  python3 scripts/data_prep/validate_fact_battery.py
 
 Notes:
 - Tries local cache first (local_files_only=True) to avoid network / gated issues.
@@ -23,15 +23,13 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
-
 MODEL_ID_DEFAULT = "google/gemma-2b"
-BATTERY_PATH_DEFAULT = Path(__file__).resolve().parents[1] / "fact_battery.json"
+BATTERY_PATH_DEFAULT = Path(__file__).resolve().parents[2] / "fact_battery.json"
 
 
 def _load_tokenizer(model_id: str) -> Any:
     from transformers import AutoTokenizer
 
-    # Prefer cache-only so this is usable on HPC nodes with blocked egress.
     try:
         return AutoTokenizer.from_pretrained(model_id, local_files_only=True)
     except Exception as e_cache:

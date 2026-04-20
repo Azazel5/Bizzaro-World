@@ -7,7 +7,7 @@ clean-side "replace" token from a diff (strip punctuation). This matches the pro
 assumption that each pair differs by a single factual entity.
 
 Usage:
-  python3 scripts/add_entity_tokens.py
+  python3 scripts/data_prep/add_entity_tokens.py
 """
 
 from __future__ import annotations
@@ -16,10 +16,9 @@ import json
 import re
 from difflib import SequenceMatcher
 from pathlib import Path
-from typing import Dict, List
+from typing import List
 
-
-REPO_ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = Path(__file__).resolve().parents[2]
 BATTERY_PATH = REPO_ROOT / "fact_battery.json"
 
 _PUNCT_RE = re.compile(r"^[^A-Za-z0-9]+|[^A-Za-z0-9]+$")
@@ -40,7 +39,6 @@ def infer_entity_token(clean_prompt: str, corrupt_prompt: str) -> str:
                 t = _PUNCT_RE.sub("", tok)
                 if t:
                     return t
-    # Fallback: try replace on corrupt side (rare)
     for tag, i1, i2, j1, j2 in sm.get_opcodes():
         if tag in ("replace", "insert"):
             chunk = xw[j1:j2]
@@ -48,7 +46,9 @@ def infer_entity_token(clean_prompt: str, corrupt_prompt: str) -> str:
                 t = _PUNCT_RE.sub("", tok)
                 if t:
                     return t
-    raise ValueError(f"Could not infer entity token from prompts:\n{clean_prompt}\n{corrupt_prompt}")
+    raise ValueError(
+        f"Could not infer entity token from prompts:\n{clean_prompt}\n{corrupt_prompt}"
+    )
 
 
 def main() -> None:
@@ -66,7 +66,9 @@ def main() -> None:
         e["entity_token"] = ent
         changed += 1
 
-    BATTERY_PATH.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    BATTERY_PATH.write_text(
+        json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+    )
     print(f"Updated {BATTERY_PATH} (added entity_token to {changed} entries).")
 
 

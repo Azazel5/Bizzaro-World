@@ -8,7 +8,7 @@ is to test whether factual identity is written at the entity position earlier in
 the forward pass and later routed to the answer position.
 
 Requires `fact_battery.json` to include `entity_token` for each entry
-(see `scripts/add_entity_tokens.py`).
+(see `scripts/data_prep/add_entity_tokens.py`).
 
 Outputs (written to --outdir, default current working directory):
   - experiment3_{MODE}.json
@@ -27,7 +27,7 @@ from typing import Any, Callable, Dict, List
 import torch
 from transformer_lens import HookedTransformer
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
@@ -76,7 +76,7 @@ def _load_entity_tokens_by_idx() -> Dict[int, str]:
         ent = str(e.get("entity_token", "")).strip()
         if not ent:
             raise ValueError(
-                f"fact_battery.json entry {i} missing entity_token; run scripts/add_entity_tokens.py"
+                f"fact_battery.json entry {i} missing entity_token; run scripts/data_prep/add_entity_tokens.py"
             )
         out[i] = ent
     return out
