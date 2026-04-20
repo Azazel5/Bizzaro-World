@@ -215,3 +215,9 @@ experiment_B.json
 experiment_C.json
 exp1_*.out
 exp1_*.err
+
+# Activation patching experiment 2a — `sbatch slurm/run_exp2a.slurm`
+experiment2a_*.json
+experiment2a_*.log
+exp2a_*.out
+exp2a_*.err
