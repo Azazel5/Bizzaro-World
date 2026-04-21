@@ -222,11 +222,8 @@ fact_battery_triage.csv
 /experiment2.log
 /experiment3_[ABC].json
 /experiment3_[ABC].log
-/exp1
-/exp1
-/exp2
-/exp2
-/exp3
-/exp3
+
+
+/exp*/
 
 (deprecated) experiment1, A (5_14PM)/

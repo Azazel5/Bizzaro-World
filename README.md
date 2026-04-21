@@ -117,6 +117,35 @@ Together, these modes support **robustness checks** across selection strategies 
 
 Analysis helpers: **`notebooks/experiment1_analysis.ipynb`**, **`scripts/data_analysis/analysis.py`**, and **`scripts/data_analysis/exp1_data_analysis.py`** (figures under **`outputs/`** or **`notebooks/outputs/`** depending on run configuration).
 
+### Experiment 2 — Attention vs MLP decomposition (late blocks)
+
+**Experiment 2** zooms into the **late, load-bearing layers (15–17)** implicated by Experiment 1 and patches **specific sublayer hook points** at the **final token position** (`hook_resid_pre`, `hook_attn_out`, `hook_resid_mid`, `hook_mlp_out`, `hook_resid_post`). This isolates whether the late-stage “commitment” is primarily routed through **attention output** or **MLP output** in the final blocks.
+
+**Finding (qualitative).** Damage concentrates in the same late layers, and the decomposition supports the view that the final-token decision is assembled late via a small number of components rather than a diffuse depth-wide process. (See `scripts/experiments/exp2.py` outputs for per-layer per-hook deltas and the worst (layer, hook) per pair.)
+
+### Experiment 3 — Where the fact “lives” before it becomes load-bearing
+
+**Experiment 3** repeats the layer sweep but patches at the **entity token position** (same `hook_resid_pre`, but at `entity_position` instead of the final token). This separates **where the factual identity is represented** (entity position early) from **where it becomes load-bearing** (final position late).
+
+**Finding (clear across modes).** Entity-position patch damage is **large early** (layers 0–14) and then **releases sharply** around **layers 13–15**, i.e., the entity-local representation stops being “damageable” as the information is routed away toward the answer position.
+| Entity-position sweep (A/B/C) | Release + alignment diagnostics |
+|---|---|
+| ![](outputs/fig_exp3_ABC_entity_patch.png) | ![](outputs/exp3_drop_analysis/fig1_release_layer_hist.png) |
+
+Additional supporting views:
+| Max-damage vs release layer | Mode A top-5 delta curves (with release lines) |
+|---|---|
+| ![](outputs/exp3_drop_analysis/fig2_scatter_max_damage_vs_release.png) | ![](outputs/exp3_drop_analysis/fig3_modeA_top5_delta_curves.png) |
+
+### Experiment 4 — Which attention head routes entity → answer?
+
+**Experiment 4** holds everything fixed from Experiment 3 (same pairs, same entity-position lookup, same LD damage metric) but changes the hook point to attention’s **routing primitive**: patch **one head at a time** at **`blocks.{L}.attn.hook_z`** at the **entity token position**. The output per pair is an **18×8 heatmap** of `ld_delta` values (layers × heads), plus the worst (layer, head) cell.
+
+**Finding (high-level).** The damage is sparse: most (layer, head) interventions are near zero, with a small number of hot cells that nominate specific heads/layers as candidate **fact-routing circuits**.
+| Mean heatmap (aggregate) | Worst-layer distribution | Worst-head frequency |
+|---|---|---|
+| ![](outputs/fig_exp4_mean_heatmap.png) | ![](outputs/fig_exp4_worst_layer_dist.png) | ![](outputs/fig_exp4_worst_head_freq.png) |
+
 ### Future work
 
 - **Sublayer decomposition in the critical blocks** — With layers **15–17** implicated at the **final** position, the next phase **separates attention output vs MLP output** (and related hooks) to see which sublayer “commits” the answer.
@@ -156,11 +185,11 @@ Keep **`fact_battery.json`** next to that file (same folder), or pass a path int
 | `scripts/experiments/exp1.py` | **Experiment 1**: layerwise **`resid_pre`** patching at the **final** position; writes **`experiment_{mode}.json`**. |
 | `scripts/experiments/exp2.py` | **Experiment 2**: attention vs MLP decomposition (layers 15–17). Writes `experiment2.json` + `experiment2.log`. |
 | `scripts/experiments/exp3.py` | **Experiment 3**: entity-position patching (hook_resid_pre, full layer sweep). Writes `experiment3_{MODE}.json` + `experiment3_{MODE}.log`. |
-| `slurm/run_exp1.slurm` | Example Slurm batch file (GPU, `MODE` env for A/B/C). |
-| `slurm/run_exp2.slurm` | Example Slurm batch file for Experiment 2 (OUTDIR passed at submit time). |
-| `slurm/run_exp3.slurm` | Example Slurm batch file for Experiment 3 (OUTDIR passed at submit time). |
+| `scripts/experiments/exp4.py` | **Experiment 4**: headwise `hook_z` patching at the **entity** position (18×8 sweep). Writes `experiment4_{MODE}.json` + `experiment4_{MODE}.log`. |
+| `slurm/run_experiment.slurm` | Unified Slurm runner. Pass `MODE`, `OUTDIR`, and `SCRIPT` via `--export`. |
 | `scripts/data_analysis/analysis.py` | Triage / probability audits on experiment JSON. |
 | `scripts/data_analysis/exp1_data_analysis.py` | Figures and summaries for Experiment 1 outputs. |
+| `scripts/data_analysis/exp3_drop_analysis.py` | Drop/release-layer analysis and figures for Experiment 3 entity-position deltas. |
 | `scripts/data_prep/add_entity_tokens.py` | Add `entity_token` to `fact_battery.json` (required by Experiment 3). |
 | `scripts/data_prep/validate_fact_battery.py` | Offline checks for token alignment and single-token targets. |
 | `notebooks/experiment1_analysis.ipynb` | Pooled analysis for **`experiment_A/B/C.json`** (figures + correlations). |
