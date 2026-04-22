@@ -117,11 +117,16 @@ Together, these modes support **robustness checks** across selection strategies 
 
 Analysis helpers: **`notebooks/experiment1_analysis.ipynb`**, **`scripts/data_analysis/analysis.py`**, and **`scripts/data_analysis/exp1_data_analysis.py`** (figures under **`outputs/`** or **`notebooks/outputs/`** depending on run configuration).
 
-### Experiment 2A — Attention vs MLP decomposition (late blocks)
+### Experiment 2 — Attention vs MLP decomposition (2A final, 2B entity)
 
-**Experiment 2A** zooms into the **late, load-bearing layers (15–17)** implicated by Experiment 1 and patches **specific sublayer hook points** at the **final token position** (`hook_resid_pre`, `hook_attn_out`, `hook_resid_mid`, `hook_mlp_out`, `hook_resid_post`). This isolates whether the late-stage “commitment” is primarily routed through **attention output** or **MLP output** in the final blocks.
+Experiment 2 decomposes the residual stream into five standard hook points:
+`hook_resid_pre`, `hook_attn_out`, `hook_resid_mid`, `hook_mlp_out`, `hook_resid_post`.
+In both parts we patch **cached corrupt activations** into the **clean** run and measure damage to the clean LD margin (same metric as Experiment 1/3).
 
-**Finding (qualitative).** Damage concentrates in the same late layers, and the decomposition supports the view that the final-token decision is assembled late via a small number of components rather than a diffuse depth-wide process. (See `scripts/experiments/exp2a.py` outputs for per-layer per-hook deltas and the worst (layer, hook) per pair.)
+- **Experiment 2A (final token, all 18 layers × 5 hooks)**: decompose the **final token position** across layers **0–17**. Entry point: `scripts/experiments/exp2a.py`.
+- **Experiment 2B (entity token, all 18 layers × 5 hooks)**: identical decomposition, but patch at the **entity token position** across layers **0–17**. Entry point: `scripts/experiments/exp2b.py`.
+
+**Finding (core mechanism).** Both the entity position and the final position are governed by the same mechanism: **residual-stream-first**, with attention and MLP contributing minimally and intermittently. The factual signal is carried **passively** by the accumulating residual stream at both ends of the circuit. Neither end involves active discrete computation — the transformer is functioning as a **signal carrier**, not a **signal processor**, for this task.
 
 ### Experiment 3 — Where the fact “lives” before it becomes load-bearing
 
