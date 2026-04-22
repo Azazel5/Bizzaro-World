@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """
-Experiment 2 — Attention vs MLP decomposition (TransformerLens).
+Experiment 2B — Attention vs MLP decomposition at the entity token position (TransformerLens).
 
-We focus on the late, causally load-bearing blocks found in Experiment 1. For each
-prompt pair we cache corrupt activations at five hook points in layers 15–17, then
-patch those cached vectors into the clean run at the final sequence position and
-measure damage to the clean logit margin.
+This is the entity-position analogue of Experiment 2A (final-position decomposition).
+For each prompt pair we cache corrupt activations at five hook points across all
+layers (0–17), then patch those cached vectors into the clean run at the entity
+token position and measure damage to the clean logit margin.
 
 Outputs (written to --outdir, default current working directory):
-  - experiment2.json
-  - experiment2.log
+  - experiment2b_{MODE}.json
+  - experiment2b_{MODE}.log
 """
 
 from __future__ import annotations
@@ -31,8 +31,9 @@ if str(REPO_ROOT) not in sys.path:
 from golden_pairs import GoldenPair, SelectionMode, select_golden_pairs  # noqa: E402
 
 MODEL_NAME = "google/gemma-2b"
+BATTERY_PATH = REPO_ROOT / "fact_battery.json"
 
-TARGET_LAYERS = [15, 16, 17]
+TARGET_LAYERS = list(range(18))
 TARGET_HOOKS = [
     "hook_resid_pre",
     "hook_attn_out",
@@ -80,18 +81,51 @@ def _names_filter(n_layers: int) -> Callable[[str], bool]:
     return filt
 
 
+def _load_entity_tokens_by_idx() -> Dict[int, str]:
+    data = json.loads(BATTERY_PATH.read_text(encoding="utf-8"))
+    if not isinstance(data, list):
+        raise TypeError("fact_battery.json must be a JSON array")
+    out: Dict[int, str] = {}
+    for i, e in enumerate(data):
+        if not isinstance(e, dict):
+            continue
+        ent = str(e.get("entity_token", "")).strip()
+        if not ent:
+            raise ValueError(
+                f"fact_battery.json entry {i} missing entity_token; run scripts/data_prep/add_entity_tokens.py"
+            )
+        out[i] = ent
+    return out
+
+
+def find_entity_position(model: HookedTransformer, prompt: str, entity: str) -> int:
+    toks = model.to_tokens(prompt, prepend_bos=True)[0]
+    token_strs: List[str] = [model.to_string(t.unsqueeze(0)) for t in toks]
+    target = entity.lower()
+    for i, tok in enumerate(token_strs):
+        if target in tok.lower():
+            return i
+    raise ValueError(
+        f"Entity {entity!r} not found in tokenized prompt.\n"
+        f"prompt={prompt!r}\n"
+        f"tokens={token_strs}"
+    )
+
+
 def _patch_one(
     model: HookedTransformer,
     clean_prompt: str,
     hook_name: str,
     corrupt_cache: Dict[str, torch.Tensor],
+    *,
+    entity_pos: int,
     clean_id: int,
     corrupt_id: int,
 ) -> float:
-    corrupt_vec = corrupt_cache[hook_name][:, -1, :]
+    corrupt_vec = corrupt_cache[hook_name][:, entity_pos, :]
 
     def hook_fn(x: torch.Tensor, hook: Any) -> torch.Tensor:
-        x[:, -1, :] = corrupt_vec.to(device=x.device, dtype=x.dtype)
+        x[:, entity_pos, :] = corrupt_vec.to(device=x.device, dtype=x.dtype)
         return x
 
     clean_toks = model.to_tokens(clean_prompt, prepend_bos=True).to(model.cfg.device)
@@ -110,16 +144,23 @@ def run_experiment(
     n_layers = int(model.cfg.n_layers)
     layers = [L for L in TARGET_LAYERS if 0 <= L < n_layers]
     names_filter = _names_filter(n_layers)
+    ent_by_idx = _load_entity_tokens_by_idx()
 
     out_pairs: List[Dict[str, Any]] = []
 
     with log_path.open("w", encoding="utf-8") as logf:
+
         def log(line: str = "") -> None:
             print(line, flush=True)
             logf.write(line + "\n")
             logf.flush()
 
         for idx, gp in enumerate(pairs, start=1):
+            entity_token = ent_by_idx.get(int(gp.battery_idx))
+            if not entity_token:
+                raise KeyError(f"No entity_token for battery_idx={gp.battery_idx}")
+            entity_pos = find_entity_position(model, gp.clean_prompt, entity_token)
+
             lf_clean = _final_logits(model, gp.clean_prompt)
             lf_corrupt = _final_logits(model, gp.corrupt_prompt)
             baseline_ld_clean = _ld_at_final(
@@ -142,7 +183,9 @@ def run_experiment(
             worst_layer = None
             worst_hook = None
 
-            log(f"[pair {idx}/{len(pairs)}] {gp.category} | rank={gp.rank} | mode={mode}")
+            log(
+                f"[pair {idx}/{len(pairs)}] {gp.category} | rank={gp.rank} | entity={entity_token!r} pos={entity_pos}"
+            )
 
             for L in layers:
                 layer_key = str(L)
@@ -156,8 +199,9 @@ def run_experiment(
                         gp.clean_prompt,
                         full,
                         corrupt_cache,
-                        gp.clean_target_id,
-                        gp.corrupt_target_id,
+                        entity_pos=entity_pos,
+                        clean_id=gp.clean_target_id,
+                        corrupt_id=gp.corrupt_target_id,
                     )
                     ld_delta = patched_ld - baseline_ld_clean
                     results_by_layer[layer_key][H] = {
@@ -185,6 +229,9 @@ def run_experiment(
             out_pairs.append(
                 {
                     **triage_fields,
+                    "patch_position": "entity",
+                    "entity_token": entity_token,
+                    "entity_position": int(entity_pos),
                     "baseline_ld_clean": float(baseline_ld_clean),
                     "baseline_ld_corrupt": float(baseline_ld_corrupt),
                     "results_by_layer": results_by_layer,
@@ -195,8 +242,8 @@ def run_experiment(
             )
 
     return {
-        "experiment": "2",
-        "description": "attention vs MLP decomposition, layers 15-17, final token position",
+        "experiment": "2b",
+        "description": "attention vs MLP decomposition at entity token position, all 18 layers",
         "selection_mode": mode,
         "model": MODEL_NAME,
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
@@ -242,8 +289,8 @@ def main() -> None:
 
     outdir: Path = args.outdir
     outdir.mkdir(parents=True, exist_ok=True)
-    out_json = outdir / "experiment2.json"
-    out_log = outdir / "experiment2.log"
+    out_json = outdir / f"experiment2b_{mode}.json"
+    out_log = outdir / f"experiment2b_{mode}.log"
 
     print(f"Loading {MODEL_NAME} …", flush=True)
     model = _load_model()
@@ -254,7 +301,7 @@ def main() -> None:
         )
 
     print(
-        f"Mode {mode}: {len(pairs)} pairs | layers {TARGET_LAYERS} | hooks {len(TARGET_HOOKS)} …",
+        f"Mode {mode}: {len(pairs)} pairs | layers {list(range(int(model.cfg.n_layers)))} | hooks {len(TARGET_HOOKS)} | patch_position=entity …",
         flush=True,
     )
     payload = run_experiment(model, pairs, mode, log_path=out_log)

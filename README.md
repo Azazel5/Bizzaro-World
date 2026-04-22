@@ -117,11 +117,11 @@ Together, these modes support **robustness checks** across selection strategies 
 
 Analysis helpers: **`notebooks/experiment1_analysis.ipynb`**, **`scripts/data_analysis/analysis.py`**, and **`scripts/data_analysis/exp1_data_analysis.py`** (figures under **`outputs/`** or **`notebooks/outputs/`** depending on run configuration).
 
-### Experiment 2 — Attention vs MLP decomposition (late blocks)
+### Experiment 2A — Attention vs MLP decomposition (late blocks)
 
-**Experiment 2** zooms into the **late, load-bearing layers (15–17)** implicated by Experiment 1 and patches **specific sublayer hook points** at the **final token position** (`hook_resid_pre`, `hook_attn_out`, `hook_resid_mid`, `hook_mlp_out`, `hook_resid_post`). This isolates whether the late-stage “commitment” is primarily routed through **attention output** or **MLP output** in the final blocks.
+**Experiment 2A** zooms into the **late, load-bearing layers (15–17)** implicated by Experiment 1 and patches **specific sublayer hook points** at the **final token position** (`hook_resid_pre`, `hook_attn_out`, `hook_resid_mid`, `hook_mlp_out`, `hook_resid_post`). This isolates whether the late-stage “commitment” is primarily routed through **attention output** or **MLP output** in the final blocks.
 
-**Finding (qualitative).** Damage concentrates in the same late layers, and the decomposition supports the view that the final-token decision is assembled late via a small number of components rather than a diffuse depth-wide process. (See `scripts/experiments/exp2.py` outputs for per-layer per-hook deltas and the worst (layer, hook) per pair.)
+**Finding (qualitative).** Damage concentrates in the same late layers, and the decomposition supports the view that the final-token decision is assembled late via a small number of components rather than a diffuse depth-wide process. (See `scripts/experiments/exp2a.py` outputs for per-layer per-hook deltas and the worst (layer, hook) per pair.)
 
 ### Experiment 3 — Where the fact “lives” before it becomes load-bearing
 
@@ -183,7 +183,8 @@ Keep **`fact_battery.json`** next to that file (same folder), or pass a path int
 | `fact_battery_triage.csv` | **Generated** triage export (same directory as the script; gitignored by default). |
 | `golden_pairs.py` | Read triage CSV; select golden pairs for **modes A / B / C**. |
 | `scripts/experiments/exp1.py` | **Experiment 1**: layerwise **`resid_pre`** patching at the **final** position; writes **`experiment_{mode}.json`**. |
-| `scripts/experiments/exp2.py` | **Experiment 2**: attention vs MLP decomposition (layers 15–17). Writes `experiment2.json` + `experiment2.log`. |
+| `scripts/experiments/exp2a.py` | **Experiment 2A**: attention vs MLP decomposition (layers 15–17, final token). Writes `experiment2a_{MODE}.json` + `experiment2a_{MODE}.log`. |
+| `scripts/experiments/exp2b.py` | **Experiment 2B**: attention vs MLP decomposition (all layers, entity token). Writes `experiment2b_{MODE}.json` + `experiment2b_{MODE}.log`. |
 | `scripts/experiments/exp3.py` | **Experiment 3**: entity-position patching (hook_resid_pre, full layer sweep). Writes `experiment3_{MODE}.json` + `experiment3_{MODE}.log`. |
 | `scripts/experiments/exp4.py` | **Experiment 4**: headwise `hook_z` patching at the **entity** position (18×8 sweep). Writes `experiment4_{MODE}.json` + `experiment4_{MODE}.log`. |
 | `slurm/run_experiment.slurm` | Unified Slurm runner. Pass `MODE`, `OUTDIR`, and `SCRIPT` via `--export`. |

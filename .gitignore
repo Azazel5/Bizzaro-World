@@ -218,8 +218,8 @@ fact_battery_triage.csv
 # Experiment outputs written to OUTDIR (usually passed at `sbatch` time)
 # These patterns cover the current naming conventions.
 /experiment_[ABC].json
-/experiment2.json
-/experiment2.log
+/experiment2*.json
+/experiment2*.log
 /experiment3_[ABC].json
 /experiment3_[ABC].log
 
