@@ -141,7 +141,13 @@ def write_triage_csv(ranked: List[Dict[str, Any]], out_csv: Path) -> None:
 
 def _parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="Triage fact battery on LLaMA-3 70B (8-bit bnb).")
-    p.add_argument("--outdir", type=Path, default=Path("runs/llama3-70b-bnb8/triage"))
+    # Same layout as Gemma: <model-dir>/triage/fact_battery_triage.csv
+    p.add_argument(
+        "--outdir",
+        type=Path,
+        default=REPO_ROOT / "llama-70b-8bitquantized" / "triage",
+        help="Directory for fact_battery_triage.csv (default: llama-70b-8bitquantized/triage)",
+    )
     p.add_argument("--battery", type=Path, default=REPO_ROOT / "fact_battery" / "llama3-70b.json")
     return p.parse_args()
 

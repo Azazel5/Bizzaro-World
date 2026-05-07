@@ -208,6 +208,7 @@ __marimo__/
 
 # Regenerated triage output (run `python gemma-2b/drivers/behavioral_friction_gemma2b.py`)
 gemma-2b/triage/fact_battery_triage.csv
+llama-70b-8bitquantized/triage/fact_battery_triage.csv
 
 # Experiment run directories (HPC artifacts / logs / JSONs)
 # Gitignore uses globs (not full regex). These match any top-level folder that starts

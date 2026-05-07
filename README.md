@@ -1,8 +1,8 @@
-# Bizarro World: Fact-retrieval circuits in Gemma 2B
+# Bizarro World: Fact-retrieval circuits (multi-model)
 
 ## Abstract
 
-This repository supports **mechanistic interpretability** work on **`google/gemma-2b`** with **TransformerLens**. The goal is to **map fact-related computation**: identify parts of the network whose activations support correct next-token predictions on simple, high-coverage factual prompts, using **activation patching** (causal tracing) under **controlled contrasts**.
+This repository supports **mechanistic interpretability** work—primarily on **`google/gemma-2b`** with **TransformerLens**, with a parallel path for **`meta-llama/Meta-Llama-3-70B`** (8-bit via Hugging Face + bitsandbytes). The goal is to **map fact-related computation**: identify parts of the network whose activations support correct next-token predictions on simple, high-coverage factual prompts, using **activation patching** (causal tracing) under **controlled contrasts**.
 
 All contrasts use **structurally aligned prompt pairs** so that observed differences are easier to tie to **internal representations** instead of length, punctuation, or tokenizer quirks. The stack is meant to run reliably on **university HPC** (Slurm, gated Hugging Face weights, tight disk quotas), with metrics that stay numerically sane under **fp16** inference over a large vocabulary.
 
@@ -160,6 +160,62 @@ Additional supporting views:
 
 ---
 
+## Multi-model layout (fact batteries, triage, runs)
+
+### `fact_battery/`
+
+Per-model JSON batteries: aligned prompts and single-token targets **for that tokenizer**. Patching assumes matching token lengths between clean and corrupt prompts.
+
+| File | Role |
+|------|------|
+| `fact_battery/gemma-2b.json` | Canonical 60-row battery (Gemma token-length matched). |
+| `fact_battery/llama3-70b.json` | Subset of rows that pass **LLaMA-3** tokenizer checks (equal prompt lengths + single-token targets). |
+
+Build or refresh the LLaMA battery from the Gemma battery:
+
+```bash
+python shared/build_llama3_fact_battery.py
+```
+
+Writes `fact_battery/llama3-70b.json` and `fact_battery/llama3-70b.drop_report.json` (which original indices were dropped and why).
+
+**Ranked triage CSVs** (`fact_battery_triage.csv`, sorted by TotalSwing) live under each **model directory**, not under `fact_battery/`:
+
+- `gemma-2b/triage/fact_battery_triage.csv`
+- `llama-70b-8bitquantized/triage/fact_battery_triage.csv` (after you run LLaMA triage on HPC)
+
+### `runs/`
+
+Gitignored area for **timestamped** experiment outputs (e.g. `runs/<model_slug>/<yyyymmdd-hhmmss>/exp4/`). Optional; default triage exports use `<model-dir>/triage/` instead. Historical Gemma experiment JSONs: `gemma-2b/legacy-runs/`.
+
+### LLaMA 3 70B (8-bit: transformers + bitsandbytes)
+
+All LLaMA-specific entrypoints live under `llama-70b-8bitquantized/`. Shared helpers: `shared/` (e.g. `load_fact_battery`).
+
+| Step | Command or artifact |
+|------|---------------------|
+| Optional load sanity | `python llama-70b-8bitquantized/load_llama3_70b_bnb8.py` |
+| Triage (TotalSwing-ranked CSV) | `python llama-70b-8bitquantized/triage_llama3_70b_bnb8.py` — default output `llama-70b-8bitquantized/triage/fact_battery_triage.csv` (override with `--outdir`). |
+| Golden pairs A / B / C | `golden_pairs.select_golden_pairs` on that CSV; for LLaMA patching, pass **`--triage-csv llama-70b-8bitquantized/triage/fact_battery_triage.csv`** to experiment scripts. |
+
+**Slurm (example):** on the login node, export `HF_TOKEN` or `HUGGINGFACE_HUB_TOKEN`, then from repo root:
+
+```bash
+mkdir -p slurm_logs llama-70b-8bitquantized/triage
+
+sbatch \
+  --output="slurm_logs/llama3-70b-8bit_%j.out" \
+  --error="slurm_logs/llama3-70b-8bit_%j.err" \
+  --export=ALL,USE_MODE=0,OUTDIR="llama-70b-8bitquantized/triage",SCRIPT="llama-70b-8bitquantized/triage_llama3_70b_bnb8.py" \
+  slurm/run_experiment.slurm
+```
+
+Add `-p`, `--gres`, `--mem`, `-t` per your site. `USE_MODE=0` tells `slurm/run_experiment.slurm` not to pass `--mode` (triage scripts do not use modes).
+
+**Dependencies:** CUDA PyTorch, `transformers`, `accelerate`, `bitsandbytes`, and Hugging Face access to `meta-llama/Meta-Llama-3-70B`. Point `HF_HOME` / `TRANSFORMERS_CACHE` at scratch on clusters with small home quotas.
+
+---
+
 ## ML systems engineering (infrastructure)
 
 Even at **2B** parameters, weights, caches, and optional activation stores add up. This repo assumes **cluster** workflows:
@@ -183,10 +239,14 @@ Keep **`fact_battery/gemma-2b.json`** as the Gemma battery, or pass a path into 
 
 | Path | Role |
 |------|------|
+| `shared/` | Shared helpers (`fact_battery` loader, LLaMA battery builder, etc.). |
 | `fact_battery/gemma-2b.json` | Aligned prompt pairs (Phase 1 data). |
+| `fact_battery/llama3-70b.json` | LLaMA-filtered battery (`shared/build_llama3_fact_battery.py`). |
 | `gemma-2b/drivers/behavioral_friction_gemma2b.py` | Load model, validate pairs, bidirectional **logit-difference** triage, **TotalSwing-ranked** console table + **`gemma-2b/triage/fact_battery_triage.csv`**. |
 | `gemma-2b/triage/fact_battery_triage.csv` | **Generated** triage export (gitignored by default). |
 | `golden_pairs.py` | Read triage CSV; select golden pairs for **modes A / B / C**. |
+| `llama-70b-8bitquantized/triage_llama3_70b_bnb8.py` | LLaMA-3 70B 8-bit triage → **`llama-70b-8bitquantized/triage/fact_battery_triage.csv`**. |
+| `llama-70b-8bitquantized/triage/fact_battery_triage.csv` | **Generated** LLaMA triage export (gitignored). Use with `golden_pairs` and **`--triage-csv`** for LLaMA runs. |
 | `scripts/experiments/exp1.py` | **Experiment 1**: layerwise **`resid_pre`** patching at the **final** position; writes **`experiment_{mode}.json`**. |
 | `scripts/experiments/exp2a.py` | **Experiment 2A**: attention vs MLP decomposition (layers 15–17, final token). Writes `experiment2a_{MODE}.json` + `experiment2a_{MODE}.log`. |
 | `scripts/experiments/exp2b.py` | **Experiment 2B**: attention vs MLP decomposition (all layers, entity token). Writes `experiment2b_{MODE}.json` + `experiment2b_{MODE}.log`. |
