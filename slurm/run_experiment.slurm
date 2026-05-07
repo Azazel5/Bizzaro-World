@@ -14,6 +14,7 @@
 #   OUTDIR : output directory (default ./outputs)
 #   SCRIPT : python entrypoint path (default scripts/experiments/exp1.py)
 #   EXTRA_ARGS : extra CLI args appended verbatim (default empty)
+#   USE_MODE : 1 to pass --mode/--outdir (default 1); 0 for scripts that don't accept --mode
 #
 # Example:
 #   OUTDIR="experiments/experiment3_A"
@@ -31,11 +32,26 @@ MODE="${MODE:-A}"
 OUTDIR="${OUTDIR:-./outputs}"
 SCRIPT="${SCRIPT:-scripts/experiments/exp1.py}"
 EXTRA_ARGS="${EXTRA_ARGS:-}"
+USE_MODE="${USE_MODE:-1}"
 
 if command -v module >/dev/null 2>&1; then
   module load pytorch/2.8.0-cuda12.9-cudnn9
+  # Some clusters expose Python only via a separate module.
+  if ! command -v python3 >/dev/null 2>&1; then
+    module load python || true
+  fi
 fi
 
 mkdir -p "$OUTDIR"
-python3 "$SCRIPT" --mode "$MODE" --outdir "$OUTDIR" $EXTRA_ARGS
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "ERROR: python3 not found on PATH. Load a Python module or activate your env." >&2
+  exit 127
+fi
+
+if [ "$USE_MODE" = "1" ]; then
+  python3 "$SCRIPT" --mode "$MODE" --outdir "$OUTDIR" $EXTRA_ARGS
+else
+  # For scripts like LLaMA triage that do not take --mode.
+  python3 "$SCRIPT" --outdir "$OUTDIR" $EXTRA_ARGS
+fi
 
