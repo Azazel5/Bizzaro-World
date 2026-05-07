@@ -35,7 +35,7 @@ if str(REPO_ROOT) not in sys.path:
 from golden_pairs import GoldenPair, SelectionMode, select_golden_pairs  # noqa: E402
 
 MODEL_NAME = "google/gemma-2b"
-BATTERY_PATH = REPO_ROOT / "fact_battery.json"
+BATTERY_PATH = REPO_ROOT / "fact_battery" / "gemma-2b.json"
 
 
 def _load_model() -> HookedTransformer:
@@ -69,7 +69,7 @@ def _hook_z_name(layer: int) -> str:
 def _load_entity_tokens_by_idx() -> Dict[int, str]:
     data = json.loads(BATTERY_PATH.read_text(encoding="utf-8"))
     if not isinstance(data, list):
-        raise TypeError("fact_battery.json must be a JSON array")
+        raise TypeError("Fact battery must be a JSON array")
     out: Dict[int, str] = {}
     for i, e in enumerate(data):
         if not isinstance(e, dict):
@@ -77,7 +77,7 @@ def _load_entity_tokens_by_idx() -> Dict[int, str]:
         ent = str(e.get("entity_token", "")).strip()
         if not ent:
             raise ValueError(
-                f"fact_battery.json entry {i} missing entity_token; run scripts/data_prep/add_entity_tokens.py"
+                f"Fact battery entry {i} missing entity_token; run scripts/data_prep/add_entity_tokens.py"
             )
         out[i] = ent
     return out
@@ -267,7 +267,7 @@ def _parse_args() -> argparse.Namespace:
     p.add_argument(
         "--triage-csv",
         type=Path,
-        default=REPO_ROOT / "fact_battery_triage.csv",
+        default=REPO_ROOT / "gemma-2b" / "triage" / "fact_battery_triage.csv",
         help="Path to fact_battery_triage.csv",
     )
     p.add_argument(

@@ -206,8 +206,8 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 
-# Regenerated triage output (run `python behavioral_friction_gemma2b.py`)
-fact_battery_triage.csv
+# Regenerated triage output (run `python gemma-2b/drivers/behavioral_friction_gemma2b.py`)
+gemma-2b/triage/fact_battery_triage.csv
 
 # Experiment run directories (HPC artifacts / logs / JSONs)
 # Gitignore uses globs (not full regex). These match any top-level folder that starts
@@ -227,3 +227,15 @@ fact_battery_triage.csv
 /exp*/
 
 (deprecated) experiment1, A (5_14PM)/
+
+# Unified future runs directory (multi-model sweeps, slurm artifacts, etc.)
+/runs/
+
+# Slurm output/error logs (standardized naming)
+/slurm_logs/
+
+# Historical one-off run artifacts (moved out of repo root)
+gemma-2b/legacy-runs/
+
+# macOS Finder cruft
+.DS_Store

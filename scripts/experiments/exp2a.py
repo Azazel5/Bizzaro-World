@@ -215,7 +215,7 @@ def _parse_args() -> argparse.Namespace:
     p.add_argument(
         "--triage-csv",
         type=Path,
-        default=REPO_ROOT / "fact_battery_triage.csv",
+        default=REPO_ROOT / "gemma-2b" / "triage" / "fact_battery_triage.csv",
         help="Path to fact_battery_triage.csv",
     )
     p.add_argument(

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Validate `fact_battery.json` for mechanistic-interpretability constraints.
+Validate a fact battery JSON for mechanistic-interpretability constraints.
 
 Checks:
 1) Prompt alignment: clean_prompt and corrupt_prompt tokenize to the same length.
@@ -24,7 +24,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
 MODEL_ID_DEFAULT = "google/gemma-2b"
-BATTERY_PATH_DEFAULT = Path(__file__).resolve().parents[2] / "fact_battery.json"
+BATTERY_PATH_DEFAULT = Path(__file__).resolve().parents[2] / "fact_battery" / "gemma-2b.json"
 
 
 def _load_tokenizer(model_id: str) -> Any:

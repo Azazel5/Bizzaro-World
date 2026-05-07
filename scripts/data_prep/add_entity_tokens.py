@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Infer and add `entity_token` to each entry in fact_battery.json.
+Infer and add `entity_token` to each entry in the fact battery.
 
 Heuristic: compare clean_prompt and corrupt_prompt word sequences and pick the first
 clean-side "replace" token from a diff (strip punctuation). This matches the project
@@ -19,7 +19,7 @@ from pathlib import Path
 from typing import List
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-BATTERY_PATH = REPO_ROOT / "fact_battery.json"
+BATTERY_PATH = REPO_ROOT / "fact_battery" / "gemma-2b.json"
 
 _PUNCT_RE = re.compile(r"^[^A-Za-z0-9]+|[^A-Za-z0-9]+$")
 
@@ -54,7 +54,7 @@ def infer_entity_token(clean_prompt: str, corrupt_prompt: str) -> str:
 def main() -> None:
     data = json.loads(BATTERY_PATH.read_text(encoding="utf-8"))
     if not isinstance(data, list):
-        raise TypeError("fact_battery.json must be a JSON array")
+        raise TypeError("Fact battery must be a JSON array")
 
     changed = 0
     for i, e in enumerate(data):

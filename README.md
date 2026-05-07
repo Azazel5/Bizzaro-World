@@ -41,7 +41,7 @@ Narrative overrides can move the distribution through **shallow completion** pat
 
 ### Phase 1 — Fact battery
 
-Data live in **`fact_battery.json`**: a JSON array of objects with:
+Data live in **`fact_battery/gemma-2b.json`**: a JSON array of objects with:
 
 - `category`
 - `clean_prompt` / `corrupt_prompt` (token-length matched for Gemma)
@@ -51,7 +51,7 @@ There are **20** thematic buckets × **3** pairs each (**60** rows). Editing the
 
 ### Phase 2 — Baseline evaluation (behavioral / patching triage)
 
-The script **`behavioral_friction_gemma2b.py`** loads the model and, for **each** row, reads **raw next-token logits** at the **final** prompt position for both `clean_target` and `corrupt_target` token ids.
+The script **`gemma-2b/drivers/behavioral_friction_gemma2b.py`** loads the model and, for **each** row, reads **raw next-token logits** at the **final** prompt position for both `clean_target` and `corrupt_target` token ids.
 
 **Bidirectional logit difference (patching-style).** On each forward, define  
 `LD = logit(clean_target) - logit(corrupt_target)` (computed in **fp32** on the logit vector).
@@ -67,14 +67,14 @@ Subtracting a negative `LD_corrupt` **adds** magnitude when both legs are strong
 
 **Outputs.**
 
-- **Console table** — sorted by **TotalSwing** descending. Columns: `rank`, `idx` (0-based row in `fact_battery.json`), `TotalSwing`, `LD_clean`, `LD_corrupt`, `P_clean`, `P_corrupt`, `category`, and a truncated `clean_prompt|corrupt_prompt` prefix.
-- **`fact_battery_triage.csv`** — same sort order; full prompts and targets; numeric columns as strings with fixed precision for clean import into pandas or Sheets. Regenerated on every script run (listed in `.gitignore` so local runs do not dirty the tree unless you remove that line).
+- **Console table** — sorted by **TotalSwing** descending. Columns: `rank`, `idx` (0-based row in `fact_battery/gemma-2b.json`), `TotalSwing`, `LD_clean`, `LD_corrupt`, `P_clean`, `P_corrupt`, `category`, and a truncated `clean_prompt|corrupt_prompt` prefix.
+- **`gemma-2b/triage/fact_battery_triage.csv`** — same sort order; full prompts and targets; numeric columns as strings with fixed precision for clean import into pandas or Sheets. Regenerated on every script run (listed in `.gitignore` so local runs do not dirty the tree unless you remove that line).
 
 **Numerical stability.** Logit differences and softmax use **fp32** math on the last-position logit vector so large-vocabulary **fp16** runs are less likely to produce garbage probabilities for triage.
 
 ### Phase 3 — Activation patching (causal tracing)
 
-Use **high TotalSwing** pairs from Phase 2 as **priority** for interventions. The implementation lives in **`scripts/experiments/exp1.py`** (Slurm: **`slurm/run_exp1.slurm`**), using **TransformerLens** hooks and the fact battery’s aligned counterfactuals.
+Use **high TotalSwing** pairs from Phase 2 as **priority** for interventions. The implementation lives in **`scripts/experiments/exp1.py`** (Slurm: **`slurm/run_experiment.slurm`**), using **TransformerLens** hooks and the fact battery’s aligned counterfactuals.
 
 - Cache activations on **clean** vs **corrupt** forwards.
 - Patch **position-aligned** residual (or attention / MLP) components from corrupt into clean.
@@ -97,7 +97,7 @@ Phase 2 scores every pair with a **bidirectional logit-difference** setup. On ea
 
 **TotalSwing** is **`LD_clean − LD_corrupt`**. We treat this as a strong screening metric for patching: it rewards a **two-horse logit race** that **reverses** across the two aligned contexts, rather than relying on a single raw probability that can be fragile under tokenization ambiguity or synonym competition.
 
-From the ranked triage export (**`fact_battery_triage.csv`**) we support three **golden-pair selection modes** via **`golden_pairs.select_golden_pairs`**:
+From the ranked triage export (**`gemma-2b/triage/fact_battery_triage.csv`**) we support three **golden-pair selection modes** via **`golden_pairs.select_golden_pairs`**:
 
 | Mode | Selection rule |
 |------|----------------|
@@ -115,7 +115,7 @@ Together, these modes support **robustness checks** across selection strategies 
 
 **Correlation with confidence.** Patching damage (minimum \(\Delta\)LD vs clean baseline across layers) correlates strongly with **baseline conviction on the clean margin** (**`baseline_ld_clean`**): **Pearson** **r ≈ −0.794** (**p ≈ 0.0004**) in Mode A; **r ≈ −0.870** (**p < 0.0001**) in Mode B; **r ≈ −0.832** (**p < 0.0001**) in Mode C. Stronger clean-side margins tend to co-occur with **more catastrophic** interventions when late residual state is replaced—consistent with a **late-stage readout** story, with the usual caveat that this experiment patches **only the final token position** at **`resid_pre`**.
 
-Analysis helpers: **`notebooks/experiment1_analysis.ipynb`**, **`scripts/data_analysis/analysis.py`**, and **`scripts/data_analysis/exp1_data_analysis.py`** (figures under **`outputs/`** or **`notebooks/outputs/`** depending on run configuration).
+Analysis helpers: **`gemma-2b/notebooks/experiment1_analysis.ipynb`**, **`scripts/data_analysis/analysis.py`**, and **`scripts/data_analysis/exp1_data_analysis.py`** (figures under **`gemma-2b/outputs/`** depending on run configuration).
 
 ### Experiment 2 — Attention vs MLP decomposition (2A final, 2B entity)
 
@@ -135,12 +135,12 @@ In both parts we patch **cached corrupt activations** into the **clean** run and
 **Finding (clear across modes).** Entity-position patch damage is **large early** (layers 0–14) and then **releases sharply** around **layers 13–15**, i.e., the entity-local representation stops being “damageable” as the information is routed away toward the answer position.
 | Entity-position sweep (A/B/C) | Release + alignment diagnostics |
 |---|---|
-| ![](outputs/fig_exp3_ABC_entity_patch.png) | ![](outputs/exp3_drop_analysis/fig1_release_layer_hist.png) |
+| ![](gemma-2b/outputs/fig_exp3_ABC_entity_patch.png) | ![](gemma-2b/outputs/exp3_drop_analysis/fig1_release_layer_hist.png) |
 
 Additional supporting views:
 | Max-damage vs release layer | Mode A top-5 delta curves (with release lines) |
 |---|---|
-| ![](outputs/exp3_drop_analysis/fig2_scatter_max_damage_vs_release.png) | ![](outputs/exp3_drop_analysis/fig3_modeA_top5_delta_curves.png) |
+| ![](gemma-2b/outputs/exp3_drop_analysis/fig2_scatter_max_damage_vs_release.png) | ![](gemma-2b/outputs/exp3_drop_analysis/fig3_modeA_top5_delta_curves.png) |
 
 ### Experiment 4 — Which attention head routes entity → answer?
 
@@ -149,7 +149,7 @@ Additional supporting views:
 **Finding (high-level).** The damage is sparse: most (layer, head) interventions are near zero, with a small number of hot cells that nominate specific heads/layers as candidate **fact-routing circuits**.
 | Mean heatmap (aggregate) | Worst-layer distribution | Worst-head frequency |
 |---|---|---|
-| ![](outputs/fig_exp4_mean_heatmap.png) | ![](outputs/fig_exp4_worst_layer_dist.png) | ![](outputs/fig_exp4_worst_head_freq.png) |
+| ![](gemma-2b/outputs/fig_exp4_mean_heatmap.png) | ![](gemma-2b/outputs/fig_exp4_worst_layer_dist.png) | ![](gemma-2b/outputs/fig_exp4_worst_head_freq.png) |
 
 ### Future work
 
@@ -169,13 +169,13 @@ Even at **2B** parameters, weights, caches, and optional activation stores add u
 - **Containers** — NGC / Singularity wrappers sometimes **drop** env vars. For gated models you may need **`SINGULARITYENV_HF_TOKEN`**, **`huggingface-cli login`**, or site docs. Never commit tokens.
 - **VRAM vs metrics** — Forwards often stay in **fp16**; triage metrics read logits / softmax in **fp32** to avoid silent **NaN** or collapsed probabilities at the reporting step.
 
-**Run Phase 1–2:**
+**Run Phase 1–2 (Gemma):**
 
 ```bash
-python behavioral_friction_gemma2b.py
+python gemma-2b/drivers/behavioral_friction_gemma2b.py
 ```
 
-Keep **`fact_battery.json`** next to that file (same folder), or pass a path into **`load_fact_battery(...)`** from your own code.
+Keep **`fact_battery/gemma-2b.json`** as the Gemma battery, or pass a path into **`load_fact_battery(...)`** from your own code.
 
 ---
 
@@ -183,9 +183,9 @@ Keep **`fact_battery.json`** next to that file (same folder), or pass a path int
 
 | Path | Role |
 |------|------|
-| `fact_battery.json` | Aligned prompt pairs (Phase 1 data). |
-| `behavioral_friction_gemma2b.py` | Load model, validate pairs, bidirectional **logit-difference** triage, **TotalSwing-ranked** console table + **`fact_battery_triage.csv`**. |
-| `fact_battery_triage.csv` | **Generated** triage export (same directory as the script; gitignored by default). |
+| `fact_battery/gemma-2b.json` | Aligned prompt pairs (Phase 1 data). |
+| `gemma-2b/drivers/behavioral_friction_gemma2b.py` | Load model, validate pairs, bidirectional **logit-difference** triage, **TotalSwing-ranked** console table + **`gemma-2b/triage/fact_battery_triage.csv`**. |
+| `gemma-2b/triage/fact_battery_triage.csv` | **Generated** triage export (gitignored by default). |
 | `golden_pairs.py` | Read triage CSV; select golden pairs for **modes A / B / C**. |
 | `scripts/experiments/exp1.py` | **Experiment 1**: layerwise **`resid_pre`** patching at the **final** position; writes **`experiment_{mode}.json`**. |
 | `scripts/experiments/exp2a.py` | **Experiment 2A**: attention vs MLP decomposition (layers 15–17, final token). Writes `experiment2a_{MODE}.json` + `experiment2a_{MODE}.log`. |
@@ -196,10 +196,10 @@ Keep **`fact_battery.json`** next to that file (same folder), or pass a path int
 | `scripts/data_analysis/analysis.py` | Triage / probability audits on experiment JSON. |
 | `scripts/data_analysis/exp1_data_analysis.py` | Figures and summaries for Experiment 1 outputs. |
 | `scripts/data_analysis/exp3_drop_analysis.py` | Drop/release-layer analysis and figures for Experiment 3 entity-position deltas. |
-| `scripts/data_prep/add_entity_tokens.py` | Add `entity_token` to `fact_battery.json` (required by Experiment 3). |
+| `scripts/data_prep/add_entity_tokens.py` | Add `entity_token` to the fact battery (required by Experiment 3). |
 | `scripts/data_prep/validate_fact_battery.py` | Offline checks for token alignment and single-token targets. |
-| `notebooks/experiment1_analysis.ipynb` | Pooled analysis for **`experiment_A/B/C.json`** (figures + correlations). |
-| `experiment1_pooled/` | Optional directory for symlinks or copies of all three experiment JSONs (used by the notebook). |
+| `gemma-2b/notebooks/experiment1_analysis.ipynb` | Pooled analysis for **`experiment_A/B/C.json`** (figures + correlations). |
+| `gemma-2b/legacy-runs/experiment1_pooled/` | Optional directory for symlinks or copies of all three experiment JSONs (used by the notebook). |
 | `behavioral_friction_gemma2b_colab.ipynb` | Optional Colab-oriented notes (legacy / exploratory). |
 
 ---

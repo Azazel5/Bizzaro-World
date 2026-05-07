@@ -158,7 +158,7 @@ def _parse_args() -> argparse.Namespace:
     p.add_argument(
         "--triage-csv",
         type=Path,
-        default=REPO_ROOT / "fact_battery_triage.csv",
+        default=REPO_ROOT / "gemma-2b" / "triage" / "fact_battery_triage.csv",
         help="Path to fact_battery_triage.csv",
     )
     p.add_argument(
@@ -177,7 +177,7 @@ def main() -> None:
     if not triage_path.is_file():
         raise FileNotFoundError(
             f"Triage CSV not found: {triage_path}\n"
-            "Copy fact_battery_triage.csv here or pass --triage-csv."
+            "Run gemma-2b/drivers/behavioral_friction_gemma2b.py or pass --triage-csv."
         )
 
     pairs = select_golden_pairs(triage_path, mode)

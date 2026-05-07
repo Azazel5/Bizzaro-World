@@ -1,49 +1,33 @@
 """
 Behavioral friction + Fact Battery evaluation for Gemma 2B (TransformerLens).
 
-Aligned prompt pairs live in ``fact_battery.json`` (see ``load_fact_battery``).
+Aligned prompt pairs live under ``fact_battery/`` (see ``shared.fact_battery.load_fact_battery``).
 
-Run: python behavioral_friction_gemma2b.py
+Run: python gemma-2b/drivers/behavioral_friction_gemma2b.py
 """
 
 from __future__ import annotations
 
 import csv
-import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
 import torch
 
 from transformer_lens import HookedTransformer
 
+from shared.fact_battery import load_fact_battery
+from shared.repo_paths import repo_root_from_here
+
 
 MODEL_NAME = "google/gemma-2b"
 
-_DEFAULT_FACT_BATTERY_PATH = Path(__file__).with_name("fact_battery.json")
+_REPO_ROOT = repo_root_from_here(__file__, levels_up=2)
+_DEFAULT_FACT_BATTERY_PATH = _REPO_ROOT / "fact_battery" / "gemma-2b.json"
 
 
-def load_fact_battery(path: Optional[Path] = None) -> List[Dict[str, str]]:
-    """
-    Load aligned prompt pairs from JSON (20 categories × 3 pairs by default).
-
-    Each entry: category, clean_prompt, corrupt_prompt, clean_target, corrupt_target.
-    """
-    p = path or _DEFAULT_FACT_BATTERY_PATH
-    with p.open(encoding="utf-8") as f:
-        data = json.load(f)
-    if not isinstance(data, list):
-        raise TypeError(f"{p} must contain a JSON array of objects")
-    out: List[Dict[str, str]] = []
-    for i, item in enumerate(data):
-        if not isinstance(item, dict):
-            raise TypeError(f"{p}[{i}] must be an object")
-        out.append({str(k): str(v) for k, v in item.items()})
-    return out
-
-
-# Populated at import from `fact_battery.json` beside this module.
-FACT_BATTERY: List[Dict[str, str]] = load_fact_battery()
+# Populated at import from the model-specific fact battery.
+FACT_BATTERY: List[Dict[str, str]] = load_fact_battery(_DEFAULT_FACT_BATTERY_PATH)
 
 
 def _load_model() -> HookedTransformer:
@@ -218,7 +202,7 @@ def _print_ranked_table(ranked: List[Dict[str, Any]]) -> None:
     print(
         "TotalSwing = LD_clean - LD_corrupt (primary rank key; larger => stronger bidirectional flip). "
         "LD_* = logit(clean_tgt) - logit(corrupt_tgt) on that prompt. "
-        "idx = row index in fact_battery.json. "
+        "idx = row index in the fact battery. "
         "P_clean = P(clean_target|clean_prompt); P_corrupt = P(corrupt_target|corrupt_prompt)."
     )
     print(fmt.format(*headers))
@@ -297,7 +281,7 @@ def main() -> None:
     rows = run_fact_battery(model)
     ranked = sorted(rows, key=lambda r: r["total_swing"], reverse=True)
 
-    out_csv = Path(__file__).with_name(TRIAGE_CSV_NAME)
+    out_csv = _REPO_ROOT / "gemma-2b" / "triage" / TRIAGE_CSV_NAME
     write_triage_csv(ranked, out_csv)
 
     print(
