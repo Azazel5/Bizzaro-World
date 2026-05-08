@@ -160,6 +160,35 @@ Additional supporting views:
 
 ---
 
+## Preliminary Findings: Gemma-12B-IT (48-Layer Scaling)
+
+Recent runs on **Gemma-3-12B-IT** (48 layers, 15 pairs in Mode A, 20 in B, 57 in C) extend the Gemma-2B findings, using the same activation patching methodology but at full scale. Experiments completed successfully across all phases (1-4), with results in `gemma-12b-it/phase1/` through `phase4/`. Key insights:
+
+### Experiment 1 (Residual Stream Patching, All 48 Layers)
+- **Layer Trends**: Similar to Gemma-2B, damage concentrates in mid-to-late layers, with sharp drops in layers 30-47. Worst layers often 46-47 (e.g., layer 47 for top pairs like sports_equipment with delta -37.8).
+- **Swing Magnitudes**: Larger total swings (20-40 units) compared to 2B, indicating stronger fact encoding in deeper models.
+- **Pair Variability**: Top pairs (sports, chemistry, geography) show consistent late-layer effects; translations and animal taxonomy have smaller swings.
+
+### Experiment 2A/B (Hook-Level Decomposition, Layers 15-17)
+- **Granular Effects**: Patching resid_pre, attn_out, resid_mid, mlp_out, resid_post reveals resid_mid as dominant (e.g., -16.17 delta in layer 17 for top pair), with attention contributing 10-20% and MLP minimal.
+- **Localization**: Effects are sparse and hook-specific, suggesting targeted mechanisms in critical layers.
+- **Mode Differences**: Mode B (20 pairs) shows similar patterns but with more anatomy/organs pairs having large deltas (e.g., -2.81 in resid_mid).
+
+### Experiment 3 (Entity-Position Patching, All 48 Layers)
+- **Early Damage**: Large deltas in layers 0-30, releasing sharply around 13-15, mirroring 2B's entity routing.
+- **Signal Routing**: Fact identity represented early, routed late—consistent across modes.
+
+### Experiment 4 (Head-Level Patching, All 48 Layers × 16 Heads)
+- **Sparse Routing**: Most interventions near-zero; hot cells in specific heads/layers (e.g., layer 27 head 7 with -0.62) indicate candidate fact-routing circuits.
+- **Distribution**: Worst layers cluster in 20-30; heads show uneven frequency, suggesting head specialization.
+
+### Cross-Model Implications
+- **Scaling Consistency**: Late-layer commitment holds at 12B scale, with stronger magnitudes—supports broader transformer signature.
+- **Mechanistic Depth**: Hook/head sparsity suggests efficient, distributed fact storage; next steps include SAE analysis for interpretable features.
+- **Paper Prep**: These runs provide data for replication claims; logs in `slurm_logs/` ensure reproducibility.
+
+---
+
 ## Multi-model layout (shared triage, batteries, runs)
 
 ### `fact_battery/`
