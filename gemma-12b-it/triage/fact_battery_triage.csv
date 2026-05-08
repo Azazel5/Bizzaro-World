@@ -1,0 +1,58 @@
+rank,battery_idx,total_swing,ld_clean,ld_corrupt,p_clean_target_on_clean,p_corrupt_target_on_corrupt,category,clean_prompt,corrupt_prompt,clean_target,corrupt_target,clean_target_id,corrupt_target_id
+1,0,nan,nan,nan,nan,nan,geography_capitals,The capital of France is,The capital of Spain is, Paris, Madrid,9079,19627
+2,1,nan,nan,nan,nan,nan,geography_capitals,The capital of Italy is,The capital of Germany is, Rome, Berlin,13706,15687
+3,2,nan,nan,nan,nan,nan,geography_capitals,The capital of Japan is,The capital of China is, Tokyo, Beijing,21038,30530
+4,3,nan,nan,nan,nan,nan,geography_continents,The continent where Egypt is found is,The continent where Japan is found is, Africa, Asia,7959,11560
+5,4,nan,nan,nan,nan,nan,geography_continents,France lies entirely within the continent of,Australia lies entirely within the continent of, Europe, Australia,3879,8187
+6,5,nan,nan,nan,nan,nan,geography_continents,The continent where penguins mainly breed is,The continent where lions mainly live is, Antarctica, Africa,96919,7959
+7,6,nan,nan,nan,nan,nan,chemistry_symbols,The chemical symbol for gold is,The chemical symbol for iron is, Au, Fe,16107,5741
+8,7,nan,nan,nan,nan,nan,chemistry_symbols,The chemical symbol for silver is,The chemical symbol for copper is, Ag, Cu,3431,12038
+9,8,nan,nan,nan,nan,nan,chemistry_symbols,The chemical symbol for sodium is,The chemical symbol for chlorine is, Na, Cl,6839,1958
+10,9,nan,nan,nan,nan,nan,physics_constants,The particle with a negative charge in an atom is the,The particle with a positive charge in an atom is the, electron, proton,5792,29232
+11,10,nan,nan,nan,nan,nan,physics_constants,The SI unit of electric current is the,The SI unit of electric resistance is the, ampere, ohm,130023,87620
+12,11,nan,nan,nan,nan,nan,anatomy_organs,The human organ that pumps blood is the,The human organ that filters blood is the, heart, kidney,3710,29491
+13,12,nan,nan,nan,nan,nan,anatomy_organs,The organ responsible for breathing is the,The organ responsible for digestion is the, lungs, stomach,38464,21234
+14,13,nan,nan,nan,nan,nan,anatomy_organs,A whale breathes air using its,A fish extracts oxygen using its, lungs, gills,38464,127081
+15,14,nan,nan,nan,nan,nan,astronomy_planets,The planet closest to our Sun is,The planet third from our Sun is, Mercury, Earth,50144,10824
+16,15,nan,nan,nan,nan,nan,astronomy_planets,The largest planet in the solar system is,The smallest planet in the solar system is, Jupiter, Mercury,52895,50144
+17,16,nan,nan,nan,nan,nan,astronomy_planets,The planet famous for its rings is,The planet famous for its craters is, Saturn, Mars,56949,23156
+18,17,nan,nan,nan,nan,nan,mathematics_addition,Two plus two equals,Three plus three equals, four, six,2390,3962
+19,18,nan,nan,nan,nan,nan,mathematics_addition,One plus two equals,One plus three equals, three, four,1806,2390
+20,19,nan,nan,nan,nan,nan,mathematics_addition,Six plus two equals,Five plus two equals, eight, seven,6589,6819
+21,20,nan,nan,nan,nan,nan,mathematics_geometry,A shape with three equal sides is,A shape with four equal sides is, triangle, square,17852,6281
+22,21,nan,nan,nan,nan,nan,mathematics_geometry,A three dimensional box shape is a,A round three dimensional ball is a, cube, sphere,26365,20946
+23,22,nan,nan,nan,nan,nan,mathematics_geometry,A triangle has,A square has, three, four,1806,2390
+24,23,nan,nan,nan,nan,nan,sports_equipment,Tennis is played with a,Golf is played with a, racket, club,121496,5975
+25,24,nan,nan,nan,nan,nan,sports_equipment,The sport played with a racket is,The sport played with a club is, tennis, golf,22703,15576
+26,25,nan,nan,nan,nan,nan,sports_equipment,Olympic archery targets are shot with an,Olympic fencing bouts are fought with a, arrow, sword,14290,26114
+27,26,nan,nan,nan,nan,nan,translation_spanish,The Spanish word for cat is,The Spanish word for dog is, gato, perro,96271,83588
+28,27,nan,8.552734,nan,0.00000000,nan,translation_spanish,The Spanish word for sun is,The Spanish word for moon is, sol, luna,1300,77322
+29,28,nan,nan,nan,nan,nan,translation_spanish,The Spanish word for water is,The Spanish word for fire is, agua, fuego,22898,74637
+30,29,nan,nan,nan,nan,nan,translation_french,The French word for cat is,The French word for dog is, chat, chien,11184,90813
+31,30,nan,nan,nan,nan,nan,translation_french,The French word for water is,The French word for fire is, eau, feu,75195,32471
+32,31,nan,nan,nan,nan,nan,colors_mixing,When blue paint mixes with yellow paint the result is,When red paint mixes with blue paint the result is, green, purple,3826,16045
+33,32,nan,nan,nan,nan,nan,colors_mixing,When red paint mixes with yellow paint the result is,When blue paint mixes with yellow paint the result is, orange, green,11167,3826
+34,33,nan,nan,nan,nan,nan,colors_mixing,Mixing red light with green light produces,Mixing red light with blue light produces, yellow, purple,7070,16045
+35,34,nan,nan,nan,nan,nan,animal_taxonomy,A trout is a kind of,A sparrow is a kind of, fish, bird,5385,8001
+36,35,nan,nan,nan,nan,nan,animal_taxonomy,A cat is a common example of a,A salmon is a common example of a, mammal, fish,121921,5385
+37,36,nan,nan,nan,nan,nan,animal_taxonomy,A polar bear is classified as a,A great white is classified as a, mammal, fish,121921,5385
+38,37,nan,nan,nan,nan,nan,history_dates,The first US president was,The sixteenth US president was, Washington, Lincoln,7693,26123
+39,38,nan,nan,nan,nan,nan,history_dates,The scientist Isaac Newton was,The scientist Albert Einstein was, English, German,5422,9115
+40,39,nan,nan,nan,nan,nan,history_dates,The leader Napoleon was born in,The leader Churchill was born in, France, England,7001,7591
+41,40,nan,nan,nan,nan,nan,technology_founders,Steve Jobs co-founded the company named,Bill Gates co-founded the company named, Apple, Microsoft,9947,9265
+42,41,nan,nan,nan,nan,nan,technology_founders,YouTube was later acquired by the company,Instagram was later acquired by the company, Google, Meta,6475,31145
+43,42,nan,nan,nan,nan,nan,technology_founders,The web browser Chrome was built by the company,The web browser Safari was built by the company, Google, Apple,6475,9947
+44,43,nan,2.751953,nan,0.00000000,nan,units_measurement,Distance in the metric system uses,Mass in the metric system uses, meters, grams,15930,31254
+45,44,nan,nan,nan,nan,nan,units_measurement,Liquid volume in metric science uses,Electric potential in metric science uses, liters, volts,66795,45684
+46,45,nan,nan,nan,nan,nan,units_measurement,The metric unit for length is the,The metric unit for mass is the, meter, gram,19119,12187
+47,46,nan,nan,nan,nan,nan,literature_authors,The epic Inferno was written by,The epic Odyssey was written by, Dante, Homer,83246,81043
+48,47,nan,nan,-6.410156,nan,0.00000001,literature_authors,The novel Dune was written by,The novel It was written by, Herbert, King,44923,6065
+49,48,nan,nan,nan,nan,nan,mythology_roman_greek,The Roman god Mars is the Greek god,The Roman god Jupiter is the Greek god, Ares, Zeus,199820,107050
+50,49,nan,nan,nan,nan,nan,mythology_roman_greek,The Roman god Mercury matches the Greek god,The Roman god Neptune matches the Greek god, Hermes, Hera,141066,83974
+51,50,nan,nan,nan,nan,nan,mythology_roman_greek,The Roman goddess Venus matches the Greek goddess,The Roman goddess Diana matches the Greek goddess, Hera, Hermes,83974,141066
+52,51,nan,nan,nan,nan,nan,pop_culture_bands,The band Nirvana was associated strongly with,The band Metallica was associated strongly with, grunge, metal,34927,6211
+53,52,nan,nan,nan,nan,nan,pop_culture_bands,The band Beatles hailed originally from,The band Eagles hailed originally from, England, America,7591,5711
+54,53,nan,nan,nan,nan,nan,pop_culture_bands,The rock band Queen formed in the city of,The rock band Oasis formed in the city of, London, Manchester,5860,19127
+55,54,nan,nan,nan,nan,nan,materials_composition,Common drinking glasses are made of,Common plastic bottles are made of, glass, plastic,4896,8901
+56,55,nan,nan,nan,nan,nan,materials_composition,Most consumer aluminum foil is made from,Most consumer plastic wrap is made from, aluminum, plastic,20743,8901
+57,56,nan,nan,nan,nan,nan,materials_composition,Steel beams in construction are mostly made of,Copper wires in circuits are mostly made of, steel, copper,8103,14561
