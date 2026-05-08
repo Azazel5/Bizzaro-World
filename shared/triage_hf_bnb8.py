@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import math
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
@@ -23,14 +24,23 @@ BATTERY_DEFAULT = REPO_ROOT / "fact_battery" / "gemma-3-12b-it.json"
 OUTDIR_DEFAULT = REPO_ROOT / "gemma-12b-it" / "triage"
 
 
-def _load_model_and_tokenizer(model_id: str, *, use_fast: bool):
+def _resolve_dtype(dtype_name: str) -> torch.dtype:
+    if dtype_name == "float16":
+        return torch.float16
+    if dtype_name == "bfloat16":
+        return torch.bfloat16
+    raise ValueError(f"Unsupported dtype {dtype_name!r}")
+
+
+def _load_model_and_tokenizer(model_id: str, *, use_fast: bool, dtype_name: str):
     quant = BitsAndBytesConfig(load_in_8bit=True)
     tok = AutoTokenizer.from_pretrained(model_id, use_fast=use_fast)
+    dtype = _resolve_dtype(dtype_name)
     model = AutoModelForCausalLM.from_pretrained(
         model_id,
         quantization_config=quant,
         device_map="auto",
-        torch_dtype=torch.float16,
+        dtype=dtype,
     )
     model.eval()
     return model, tok
@@ -59,6 +69,10 @@ def _ld_and_probs(logits_last: torch.Tensor, clean_id: int, corrupt_id: int) -> 
     return float(ld), float(probs[clean_id].item()), float(probs[corrupt_id].item())
 
 
+def _is_finite(x: float) -> bool:
+    return not (math.isnan(x) or math.isinf(x))
+
+
 def run_fact_battery(model: Any, tok: Any, battery: List[Dict[str, str]]) -> List[Dict[str, Any]]:
     rows: List[Dict[str, Any]] = []
     for i, entry in enumerate(battery):
@@ -77,6 +91,14 @@ def run_fact_battery(model: Any, tok: Any, battery: List[Dict[str, str]]) -> Lis
         )
 
         total_swing = ld_clean - ld_corrupt
+        values = [ld_clean, ld_corrupt, total_swing, p_clean_on_clean, p_corrupt_on_corrupt]
+        if not all(_is_finite(v) for v in values):
+            raise RuntimeError(
+                "Non-finite triage values encountered: "
+                f"battery_idx={i}, category={entry.get('category', '')!r}, "
+                f"ld_clean={ld_clean}, ld_corrupt={ld_corrupt}, total_swing={total_swing}, "
+                f"p_clean={p_clean_on_clean}, p_corrupt={p_corrupt_on_corrupt}"
+            )
         rows.append(
             {
                 "idx": i,
@@ -165,6 +187,12 @@ def _parse_args() -> argparse.Namespace:
         default=True,
         help="Use fast tokenizer when available (default: true).",
     )
+    p.add_argument(
+        "--dtype",
+        choices=("bfloat16", "float16"),
+        default="bfloat16",
+        help="Compute dtype passed to model load (default: bfloat16).",
+    )
     return p.parse_args()
 
 
@@ -172,8 +200,13 @@ def main() -> None:
     args = _parse_args()
     battery = load_fact_battery(args.battery)
 
-    print(f"Loading {args.model_id} in 8-bit (bitsandbytes)...", flush=True)
-    model, tok = _load_model_and_tokenizer(args.model_id, use_fast=bool(args.use_fast))
+    print(
+        f"Loading {args.model_id} in 8-bit (bitsandbytes), dtype={args.dtype}...",
+        flush=True,
+    )
+    model, tok = _load_model_and_tokenizer(
+        args.model_id, use_fast=bool(args.use_fast), dtype_name=str(args.dtype)
+    )
 
     print(f"Running fact battery ({len(battery)} rows)...", flush=True)
     rows = run_fact_battery(model, tok, battery)
