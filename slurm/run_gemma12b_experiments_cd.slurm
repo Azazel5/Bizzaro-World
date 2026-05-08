@@ -9,9 +9,14 @@
 set -euo pipefail
 cd "${SLURM_SUBMIT_DIR}"
 
-# This script treats "Experiment C/D" as:
-#   C => scripts/experiments/exp3.py
-#   D => scripts/experiments/exp4.py
+# This script can run the full Gemma-12B experiment suite.
+# Experiment selectors (space-separated via EXPERIMENTS):
+#   1 / EXP1        => scripts/experiments/exp1.py
+#   2A / EXP2A      => scripts/experiments/exp2a.py
+#   2B / EXP2B      => scripts/experiments/exp2b.py
+#   3 / C / EXP3    => scripts/experiments/exp3.py
+#   4 / D / EXP4    => scripts/experiments/exp4.py
+#   ALL             => 1 2A 2B 3 4
 #
 # Configurable env vars via --export:
 #   TRIAGE_CSV   default: gemma-12b-it/triage/fact_battery_triage.csv
@@ -19,7 +24,7 @@ cd "${SLURM_SUBMIT_DIR}"
 #   BATTERY_JSON default: fact_battery/gemma-3-12b-it.json
 #   BASE_OUTDIR  default: gemma-12b-it
 #   MODES        default: "A B C"
-#   EXPERIMENTS  default: "C D"
+#   EXPERIMENTS  default: "ALL"
 #
 # Authentication:
 #   export HF_TOKEN=... before sbatch
@@ -30,7 +35,7 @@ MODEL_ID="${MODEL_ID:-google/gemma-3-12b-it}"
 BATTERY_JSON="${BATTERY_JSON:-fact_battery/gemma-3-12b-it.json}"
 BASE_OUTDIR="${BASE_OUTDIR:-gemma-12b-it}"
 MODES="${MODES:-A B C}"
-EXPERIMENTS="${EXPERIMENTS:-C D}"
+EXPERIMENTS="${EXPERIMENTS:-ALL}"
 
 if command -v module >/dev/null 2>&1; then
   module load pytorch/2.8.0-cuda12.9-cudnn9
@@ -95,7 +100,39 @@ PY
 }
 
 for exp in ${EXPERIMENTS}; do
-  case "${exp}" in
+  case "${exp^^}" in
+    ALL)
+      for m in ${MODES}; do
+        run_one "scripts/experiments/exp1.py" "${m}" "${BASE_OUTDIR}/phase1/${m}"
+      done
+      for m in ${MODES}; do
+        run_one "scripts/experiments/exp2a.py" "${m}" "${BASE_OUTDIR}/phase2/${m}/exp2a"
+      done
+      for m in ${MODES}; do
+        run_one "scripts/experiments/exp2b.py" "${m}" "${BASE_OUTDIR}/phase2/${m}/exp2b"
+      done
+      for m in ${MODES}; do
+        run_one "scripts/experiments/exp3.py" "${m}" "${BASE_OUTDIR}/phase3/${m}"
+      done
+      for m in ${MODES}; do
+        run_one "scripts/experiments/exp4.py" "${m}" "${BASE_OUTDIR}/phase4/${m}"
+      done
+      ;;
+    1|EXP1)
+      for m in ${MODES}; do
+        run_one "scripts/experiments/exp1.py" "${m}" "${BASE_OUTDIR}/phase1/${m}"
+      done
+      ;;
+    2A|EXP2A)
+      for m in ${MODES}; do
+        run_one "scripts/experiments/exp2a.py" "${m}" "${BASE_OUTDIR}/phase2/${m}/exp2a"
+      done
+      ;;
+    2B|EXP2B)
+      for m in ${MODES}; do
+        run_one "scripts/experiments/exp2b.py" "${m}" "${BASE_OUTDIR}/phase2/${m}/exp2b"
+      done
+      ;;
     C)
       for m in ${MODES}; do
         run_one "scripts/experiments/exp3.py" "${m}" "${BASE_OUTDIR}/phase3/${m}"
@@ -106,8 +143,18 @@ for exp in ${EXPERIMENTS}; do
         run_one "scripts/experiments/exp4.py" "${m}" "${BASE_OUTDIR}/phase4/${m}"
       done
       ;;
+    3|EXP3)
+      for m in ${MODES}; do
+        run_one "scripts/experiments/exp3.py" "${m}" "${BASE_OUTDIR}/phase3/${m}"
+      done
+      ;;
+    4|EXP4)
+      for m in ${MODES}; do
+        run_one "scripts/experiments/exp4.py" "${m}" "${BASE_OUTDIR}/phase4/${m}"
+      done
+      ;;
     *)
-      echo "ERROR: unknown experiment selector '${exp}'. Use C and/or D." >&2
+      echo "ERROR: unknown experiment selector '${exp}'. Use ALL, 1, 2A, 2B, 3/C, or 4/D." >&2
       exit 2
       ;;
   esac
