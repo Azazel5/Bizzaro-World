@@ -45,7 +45,7 @@ TARGET_HOOKS = [
 
 def _load_model() -> HookedTransformer:
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    dtype = torch.float16 if device == "cuda" else torch.float32
+    dtype = torch.bfloat16 if device == "cuda" else torch.float32
     model = HookedTransformer.from_pretrained(
         MODEL_NAME,
         device=device,
