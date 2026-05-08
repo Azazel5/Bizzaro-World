@@ -233,7 +233,6 @@ gemma-12b-it/triage/fact_battery_triage.csv
 /runs/
 
 # Slurm output/error logs (standardized naming)
-/slurm_logs/
 
 # Historical one-off run artifacts (moved out of repo root)
 gemma-2b/legacy-runs/
