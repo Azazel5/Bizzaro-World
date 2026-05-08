@@ -199,7 +199,9 @@ def _plot_exp1_correlations(pairs_by_mode: Dict[str, List[Dict[str, Any]]], outp
 
 
 def _plot_exp3_release_hist(rows_by_mode: Dict[str, List[Dict[str, Any]]], modes: Sequence[str], output_path: Path, model_name: str) -> None:
-    fig, axes = plt.subplots(1, len(modes), figsize=(15, 4), sharey=True)
+    max_layer_all = max((max((r for r in [_release_layer(p) for p in rows] if r is not None), default=0) for rows in rows_by_mode.values()), default=0)
+    figwidth = 15 if max_layer_all <= 20 else 20
+    fig, axes = plt.subplots(1, len(modes), figsize=(figwidth, 5), sharey=True)
     fig.suptitle(f"{model_name}: release-layer histogram (entity-position patching)", fontsize=13, fontweight="500", y=1.03)
     for ax, mode in zip(axes, modes):
         rows = rows_by_mode.get(mode, [])
@@ -212,7 +214,15 @@ def _plot_exp3_release_hist(rows_by_mode: Dict[str, List[Dict[str, Any]]], modes
         ax.set_xlabel("Release layer")
         if mode == modes[0]:
             ax.set_ylabel("Count")
-        ax.set_xticks(xs)
+        
+        # Sparse x-axis ticks for readability with many layers
+        tick_step = max(1, len(counts) // 15)
+        xticks = [i for i in range(0, len(counts), tick_step)]
+        if len(counts) - 1 not in xticks:
+            xticks.append(len(counts) - 1)
+        ax.set_xticks(xticks)
+        ax.tick_params(axis='x', rotation=45)
+        
         missing = sum(1 for x in rel if x is None)
         if missing:
             ax.text(0.98, 0.95, f"missing={missing}", transform=ax.transAxes, ha="right", va="top", fontsize=9, color="#555")
