@@ -160,7 +160,7 @@ Additional supporting views:
 
 ---
 
-## Multi-model layout (fact batteries, triage, runs)
+## Multi-model layout (shared triage, batteries, runs)
 
 ### `fact_battery/`
 
@@ -169,50 +169,49 @@ Per-model JSON batteries: aligned prompts and single-token targets **for that to
 | File | Role |
 |------|------|
 | `fact_battery/gemma-2b.json` | Canonical 60-row battery (Gemma token-length matched). |
-| `fact_battery/llama3-70b.json` | Subset of rows that pass **LLaMA-3** tokenizer checks (equal prompt lengths + single-token targets). |
+| `fact_battery/gemma-3-12b-it.json` | Subset that passes **Gemma-3-12B-it** tokenizer checks (equal prompt lengths + single-token targets). |
 
-Build or refresh the LLaMA battery from the Gemma battery:
+Build or refresh a model-specific battery from the Gemma battery:
 
 ```bash
-python shared/build_llama3_fact_battery.py
+python shared/build_llama3_fact_battery.py --model-id google/gemma-3-12b-it --output fact_battery/gemma-3-12b-it.json
 ```
 
-Writes `fact_battery/llama3-70b.json` and `fact_battery/llama3-70b.drop_report.json` (which original indices were dropped and why).
+Writes a model-specific JSON plus drop report (which original indices were dropped and why).
 
 **Ranked triage CSVs** (`fact_battery_triage.csv`, sorted by TotalSwing) live under each **model directory**, not under `fact_battery/`:
 
 - `gemma-2b/triage/fact_battery_triage.csv`
-- `llama-70b-8bitquantized/triage/fact_battery_triage.csv` (after you run LLaMA triage on HPC)
+- `gemma-12b-it/triage/fact_battery_triage.csv`
 
 ### `runs/`
 
 Gitignored area for **timestamped** experiment outputs (e.g. `runs/<model_slug>/<yyyymmdd-hhmmss>/exp4/`). Optional; default triage exports use `<model-dir>/triage/` instead. Historical Gemma experiment JSONs: `gemma-2b/legacy-runs/`.
 
-### LLaMA 3 70B (8-bit: transformers + bitsandbytes)
+### Shared 8-bit triage for Gemma-12B-it
 
-All LLaMA-specific entrypoints live under `llama-70b-8bitquantized/`. Shared helpers: `shared/` (e.g. `load_fact_battery`).
+Model-agnostic 8-bit triage lives in `shared/triage_hf_bnb8.py`.
 
 | Step | Command or artifact |
 |------|---------------------|
-| Optional load sanity | `python llama-70b-8bitquantized/load_llama3_70b_bnb8.py` |
-| Triage (TotalSwing-ranked CSV) | `python llama-70b-8bitquantized/triage_llama3_70b_bnb8.py` — default output `llama-70b-8bitquantized/triage/fact_battery_triage.csv` (override with `--outdir`). |
-| Golden pairs A / B / C | `golden_pairs.select_golden_pairs` on that CSV; for LLaMA patching, pass **`--triage-csv llama-70b-8bitquantized/triage/fact_battery_triage.csv`** to experiment scripts. |
+| Triage (TotalSwing-ranked CSV) | `python shared/triage_hf_bnb8.py --model-id google/gemma-3-12b-it --battery fact_battery/gemma-3-12b-it.json --outdir gemma-12b-it/triage` |
+| Golden pairs A / B / C | `golden_pairs.select_golden_pairs` on `gemma-12b-it/triage/fact_battery_triage.csv`, then pass `--triage-csv` to experiment scripts. |
 
 **Slurm (example):** on the login node, export `HF_TOKEN` or `HUGGINGFACE_HUB_TOKEN`, then from repo root:
 
 ```bash
-mkdir -p slurm_logs llama-70b-8bitquantized/triage
+mkdir -p slurm_logs gemma-12b-it/triage
 
 sbatch \
-  --output="slurm_logs/llama3-70b-8bit_%j.out" \
-  --error="slurm_logs/llama3-70b-8bit_%j.err" \
-  --export=ALL,USE_MODE=0,OUTDIR="llama-70b-8bitquantized/triage",SCRIPT="llama-70b-8bitquantized/triage_llama3_70b_bnb8.py" \
+  --output="slurm_logs/gemma12b-triage_%j.out" \
+  --error="slurm_logs/gemma12b-triage_%j.err" \
+  --export=ALL,USE_MODE=0,OUTDIR="gemma-12b-it/triage",SCRIPT="shared/triage_hf_bnb8.py",EXTRA_ARGS="--model-id google/gemma-3-12b-it --battery fact_battery/gemma-3-12b-it.json" \
   slurm/run_experiment.slurm
 ```
 
 Add `-p`, `--gres`, `--mem`, `-t` per your site. `USE_MODE=0` tells `slurm/run_experiment.slurm` not to pass `--mode` (triage scripts do not use modes).
 
-**Dependencies:** CUDA PyTorch, `transformers`, `accelerate`, `bitsandbytes`, and Hugging Face access to `meta-llama/Meta-Llama-3-70B`. Point `HF_HOME` / `TRANSFORMERS_CACHE` at scratch on clusters with small home quotas.
+**Dependencies:** CUDA PyTorch, `transformers`, `accelerate`, `bitsandbytes`, and Hugging Face access to your selected model. Point `HF_HOME` / `TRANSFORMERS_CACHE` at scratch on clusters with small home quotas.
 
 ---
 
@@ -239,20 +238,21 @@ Keep **`fact_battery/gemma-2b.json`** as the Gemma battery, or pass a path into 
 
 | Path | Role |
 |------|------|
-| `shared/` | Shared helpers (`fact_battery` loader, LLaMA battery builder, etc.). |
+| `shared/` | Shared helpers (`fact_battery` loader, model-specific battery builder, triage helpers, etc.). |
 | `fact_battery/gemma-2b.json` | Aligned prompt pairs (Phase 1 data). |
-| `fact_battery/llama3-70b.json` | LLaMA-filtered battery (`shared/build_llama3_fact_battery.py`). |
+| `fact_battery/gemma-3-12b-it.json` | Gemma-3-12B-it-filtered battery (`shared/build_llama3_fact_battery.py`). |
 | `gemma-2b/drivers/behavioral_friction_gemma2b.py` | Load model, validate pairs, bidirectional **logit-difference** triage, **TotalSwing-ranked** console table + **`gemma-2b/triage/fact_battery_triage.csv`**. |
 | `gemma-2b/triage/fact_battery_triage.csv` | **Generated** triage export (gitignored by default). |
+| `gemma-12b-it/triage/fact_battery_triage.csv` | **Generated** Gemma-12B-it triage export (gitignored by default). |
 | `golden_pairs.py` | Read triage CSV; select golden pairs for **modes A / B / C**. |
-| `llama-70b-8bitquantized/triage_llama3_70b_bnb8.py` | LLaMA-3 70B 8-bit triage → **`llama-70b-8bitquantized/triage/fact_battery_triage.csv`**. |
-| `llama-70b-8bitquantized/triage/fact_battery_triage.csv` | **Generated** LLaMA triage export (gitignored). Use with `golden_pairs` and **`--triage-csv`** for LLaMA runs. |
+| `shared/triage_hf_bnb8.py` | Model-agnostic 8-bit HF triage script; outputs **`fact_battery_triage.csv`** in chosen `--outdir`. |
 | `scripts/experiments/exp1.py` | **Experiment 1**: layerwise **`resid_pre`** patching at the **final** position; writes **`experiment_{mode}.json`**. |
 | `scripts/experiments/exp2a.py` | **Experiment 2A**: attention vs MLP decomposition (layers 15–17, final token). Writes `experiment2a_{MODE}.json` + `experiment2a_{MODE}.log`. |
 | `scripts/experiments/exp2b.py` | **Experiment 2B**: attention vs MLP decomposition (all layers, entity token). Writes `experiment2b_{MODE}.json` + `experiment2b_{MODE}.log`. |
 | `scripts/experiments/exp3.py` | **Experiment 3**: entity-position patching (hook_resid_pre, full layer sweep). Writes `experiment3_{MODE}.json` + `experiment3_{MODE}.log`. |
 | `scripts/experiments/exp4.py` | **Experiment 4**: headwise `hook_z` patching at the **entity** position (18×8 sweep). Writes `experiment4_{MODE}.json` + `experiment4_{MODE}.log`. |
 | `slurm/run_experiment.slurm` | Unified Slurm runner. Pass `MODE`, `OUTDIR`, and `SCRIPT` via `--export`. |
+| `slurm/run_gemma12b_experiments_cd.slurm` | Dedicated Gemma-12B-it Slurm script for experiment **C (`exp3`)** and **D (`exp4`)** sweeps over modes. |
 | `scripts/data_analysis/analysis.py` | Triage / probability audits on experiment JSON. |
 | `scripts/data_analysis/exp1_data_analysis.py` | Figures and summaries for Experiment 1 outputs. |
 | `scripts/data_analysis/exp3_drop_analysis.py` | Drop/release-layer analysis and figures for Experiment 3 entity-position deltas. |

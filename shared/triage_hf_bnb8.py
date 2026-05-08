@@ -18,14 +18,16 @@ if str(REPO_ROOT) not in sys.path:
 from shared.fact_battery import load_fact_battery  # noqa: E402
 
 
-MODEL_ID = "meta-llama/Meta-Llama-3-70B"
+MODEL_ID_DEFAULT = "google/gemma-3-12b-it"
+BATTERY_DEFAULT = REPO_ROOT / "fact_battery" / "gemma-3-12b-it.json"
+OUTDIR_DEFAULT = REPO_ROOT / "gemma-12b-it" / "triage"
 
 
-def _load_model_and_tokenizer():
+def _load_model_and_tokenizer(model_id: str, *, use_fast: bool):
     quant = BitsAndBytesConfig(load_in_8bit=True)
-    tok = AutoTokenizer.from_pretrained(MODEL_ID, use_fast=True)
+    tok = AutoTokenizer.from_pretrained(model_id, use_fast=use_fast)
     model = AutoModelForCausalLM.from_pretrained(
-        MODEL_ID,
+        model_id,
         quantization_config=quant,
         device_map="auto",
         torch_dtype=torch.float16,
@@ -66,8 +68,6 @@ def run_fact_battery(model: Any, tok: Any, battery: List[Dict[str, str]]) -> Lis
         clean_tid = _encode_single_token_id(tok, entry["clean_target"])
         corrupt_tid = _encode_single_token_id(tok, entry["corrupt_target"])
 
-        # Note: LLaMA tokenization alignment is not guaranteed by a Gemma-matched battery.
-        # We still run triage, but you should treat misalignment as a separate data task.
         lf_clean = _final_logits(model, tok, clean_prompt)
         ld_clean, p_clean_on_clean, _p_corrupt_on_clean = _ld_and_probs(lf_clean, clean_tid, corrupt_tid)
 
@@ -140,15 +140,31 @@ def write_triage_csv(ranked: List[Dict[str, Any]], out_csv: Path) -> None:
 
 
 def _parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Triage fact battery on LLaMA-3 70B (8-bit bnb).")
-    # Same layout as Gemma: <model-dir>/triage/fact_battery_triage.csv
+    p = argparse.ArgumentParser(description="Run 8-bit triage for any HF causal-LM model.")
     p.add_argument(
         "--outdir",
         type=Path,
-        default=REPO_ROOT / "llama-70b-8bitquantized" / "triage",
-        help="Directory for fact_battery_triage.csv (default: llama-70b-8bitquantized/triage)",
+        default=OUTDIR_DEFAULT,
+        help=f"Directory for fact_battery_triage.csv (default: {OUTDIR_DEFAULT})",
     )
-    p.add_argument("--battery", type=Path, default=REPO_ROOT / "fact_battery" / "llama3-70b.json")
+    p.add_argument(
+        "--model-id",
+        type=str,
+        default=MODEL_ID_DEFAULT,
+        help=f"Hugging Face model id (default: {MODEL_ID_DEFAULT})",
+    )
+    p.add_argument(
+        "--battery",
+        type=Path,
+        default=BATTERY_DEFAULT,
+        help=f"Battery JSON path (default: {BATTERY_DEFAULT})",
+    )
+    p.add_argument(
+        "--use-fast",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Use fast tokenizer when available (default: true).",
+    )
     return p.parse_args()
 
 
@@ -156,10 +172,10 @@ def main() -> None:
     args = _parse_args()
     battery = load_fact_battery(args.battery)
 
-    print(f"Loading {MODEL_ID} in 8-bit (bitsandbytes)…", flush=True)
-    model, tok = _load_model_and_tokenizer()
+    print(f"Loading {args.model_id} in 8-bit (bitsandbytes)...", flush=True)
+    model, tok = _load_model_and_tokenizer(args.model_id, use_fast=bool(args.use_fast))
 
-    print(f"Running fact battery ({len(battery)} rows)…", flush=True)
+    print(f"Running fact battery ({len(battery)} rows)...", flush=True)
     rows = run_fact_battery(model, tok, battery)
     ranked = sorted(rows, key=lambda r: r["total_swing"], reverse=True)
 
@@ -170,4 +186,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
