@@ -239,3 +239,4 @@ gemma-2b/legacy-runs/
 
 # macOS Finder cruft
 .DS_Store
+slurm_logs/
