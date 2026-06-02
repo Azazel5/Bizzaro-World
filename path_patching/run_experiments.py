@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import argparse
 import importlib.util
 import json
@@ -10,6 +11,14 @@ from typing import Any
 
 import torch as t
 from transformer_lens import HookedTransformer
+from huggingface_hub import login
+
+
+token = os.environ.get("HF_TOKEN") or os.environ.get("HUGGING_FACE_HUB_TOKEN")
+if token:
+    login(token=token.strip())
+else:
+    raise ValueError("No HuggingFace token found. Set HF_TOKEN environment variable.")
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parent
