@@ -8,15 +8,7 @@ import torch as t
 from tqdm.auto import tqdm
 from transformer_lens import ActivationCache, HookedTransformer, utils
 
-from .hooks import patch_head_input, patch_or_freeze_head_vectors
-from .metrics import compute_logit_diff
-
-
-def _get_baseline_logit_diffs(model: HookedTransformer, dataset: Any) -> tuple[t.Tensor, t.Tensor]:
-    with t.no_grad():
-        clean_logits = model(dataset.clean_toks, return_type="logits")
-        corrupt_logits = model(dataset.corrupt_toks, return_type="logits")
-    return compute_logit_diff(clean_logits, dataset), compute_logit_diff(corrupt_logits, dataset)
+from hooks import patch_head_input, patch_or_freeze_head_vectors
 
 
 def get_path_patch_head_to_final_resid_post(
@@ -47,9 +39,6 @@ def get_path_patch_head_to_final_resid_post(
     if corrupt_cache is None:
         _, corrupt_cache = model.run_with_cache(dataset.corrupt_toks, names_filter=z_name_filter, return_type=None)
 
-    clean_ld, corrupt_ld = _get_baseline_logit_diffs(model, dataset)
-    metric_fn = partial(patching_metric, dataset=dataset, clean_ld=clean_ld, corrupt_ld=corrupt_ld)
-
     for sender_layer, sender_head in tqdm(list(product(range(model.cfg.n_layers), range(model.cfg.n_heads)))):
         hook_fn = partial(
             patch_or_freeze_head_vectors,
@@ -65,7 +54,7 @@ def get_path_patch_head_to_final_resid_post(
         assert set(patched_cache.keys()) == {resid_post_hook_name}
 
         patched_logits = model.unembed(model.ln_final(patched_cache[resid_post_hook_name]))
-        results[sender_layer, sender_head] = metric_fn(patched_logits)
+        results[sender_layer, sender_head] = patching_metric(patched_logits)
 
         model.reset_hooks()
 
@@ -95,6 +84,9 @@ def get_path_patch_head_to_heads(
     model.reset_hooks()
 
     assert receiver_input in ("k", "q", "v")
+    if not receiver_heads:
+        return t.zeros(0, model.cfg.n_heads, device=model.cfg.device, dtype=t.float32)
+
     receiver_layers = set(next(zip(*receiver_heads)))
     receiver_hook_names = [utils.get_act_name(receiver_input, layer) for layer in receiver_layers]
     receiver_hook_names_filter = lambda name: name in receiver_hook_names
@@ -106,9 +98,6 @@ def get_path_patch_head_to_heads(
         _, clean_cache = model.run_with_cache(dataset.clean_toks, names_filter=z_name_filter, return_type=None)
     if corrupt_cache is None:
         _, corrupt_cache = model.run_with_cache(dataset.corrupt_toks, names_filter=z_name_filter, return_type=None)
-
-    clean_ld, corrupt_ld = _get_baseline_logit_diffs(model, dataset)
-    metric_fn = partial(patching_metric, dataset=dataset, clean_ld=clean_ld, corrupt_ld=corrupt_ld)
 
     for sender_layer, sender_head in tqdm(list(product(range(max(receiver_layers)), range(model.cfg.n_heads)))):
         hook_fn = partial(
@@ -135,7 +124,7 @@ def get_path_patch_head_to_heads(
             return_type="logits",
         )
 
-        results[sender_layer, sender_head] = metric_fn(patched_logits)
+        results[sender_layer, sender_head] = patching_metric(patched_logits)
         model.reset_hooks()
 
     return results
