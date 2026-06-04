@@ -156,37 +156,6 @@ def main() -> int:
     print(f"TotalSwing: {total_swing.item():.6f}")
     assert clean_ld > corrupt_ld, "Expected clean_ld to be greater than corrupt_ld"
 
-    patching_metric = partial(
-        factual_recall_metric,
-        dataset=dataset,
-        clean_ld=clean_ld,
-        corrupt_ld=corrupt_ld,
-    )
-
-    model.reset_hooks(including_permanent=True)
-    with t.no_grad():
-        path_patch_final_resid = get_path_patch_head_to_final_resid_post(
-            model=model,
-            dataset=dataset,
-            patching_metric=patching_metric,
-            clean_cache=clean_cache,
-            corrupt_cache=corrupt_cache,
-        )
-    _save_tensor(results_dir / "path_patch_final_resid.pt", path_patch_final_resid)
-
-    model.reset_hooks(including_permanent=True)
-    with t.no_grad():
-        path_patch_heads_q = get_path_patch_head_to_heads(
-            receiver_heads=receiver_heads_q,
-            receiver_input="q",
-            model=model,
-            dataset=dataset,
-            patching_metric=patching_metric,
-            clean_cache=clean_cache,
-            corrupt_cache=corrupt_cache,
-        )
-    _save_tensor(results_dir / "path_patch_heads_q.pt", path_patch_heads_q)
-
     _save_tensor(
         results_dir / "baseline_metrics.pt",
         {
@@ -211,6 +180,39 @@ def main() -> int:
         "receiver_heads_q": receiver_heads_q,
     }
     (results_dir / "run_manifest.json").write_text(json.dumps(run_manifest, indent=2, sort_keys=True) + "\n")
+
+    patching_metric = partial(
+        factual_recall_metric,
+        dataset=dataset,
+        clean_ld=clean_ld,
+        corrupt_ld=corrupt_ld,
+    )
+
+    model.reset_hooks(including_permanent=True)
+    with t.no_grad():
+        path_patch_final_resid = get_path_patch_head_to_final_resid_post(
+            model=model,
+            dataset=dataset,
+            patching_metric=patching_metric,
+            clean_cache=clean_cache,
+            corrupt_cache=corrupt_cache,
+            checkpoint_path=results_dir / "path_patch_final_resid.pt",
+        )
+    _save_tensor(results_dir / "path_patch_final_resid.pt", path_patch_final_resid)
+
+    model.reset_hooks(including_permanent=True)
+    with t.no_grad():
+        path_patch_heads_q = get_path_patch_head_to_heads(
+            receiver_heads=receiver_heads_q,
+            receiver_input="q",
+            model=model,
+            dataset=dataset,
+            patching_metric=patching_metric,
+            clean_cache=clean_cache,
+            corrupt_cache=corrupt_cache,
+            checkpoint_path=results_dir / "path_patch_heads_q.pt",
+        )
+    _save_tensor(results_dir / "path_patch_heads_q.pt", path_patch_heads_q)
 
     print(f"Experiment complete. Results saved to {results_dir}")
     return 0

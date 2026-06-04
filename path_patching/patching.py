@@ -17,6 +17,7 @@ def get_path_patch_head_to_final_resid_post(
     patching_metric: Callable,
     clean_cache: ActivationCache | None = None,
     corrupt_cache: ActivationCache | None = None,
+    checkpoint_path: str | Path | None = None,
 ) -> t.Tensor:
     """
     Performs path patching (see algorithm in appendix B of IOI paper), with:
@@ -56,6 +57,9 @@ def get_path_patch_head_to_final_resid_post(
         patched_logits = model.unembed(model.ln_final(patched_cache[resid_post_hook_name]))
         results[sender_layer, sender_head] = patching_metric(patched_logits)
 
+        if checkpoint_path is not None:
+            t.save(results.detach().cpu(), checkpoint_path)
+
         model.reset_hooks()
 
     return results
@@ -69,6 +73,7 @@ def get_path_patch_head_to_heads(
     patching_metric: Callable,
     clean_cache: ActivationCache | None = None,
     corrupt_cache: ActivationCache | None = None,
+    checkpoint_path: str | Path | None = None,
 ) -> t.Tensor:
     """
     Performs path patching (see algorithm in appendix B of IOI paper), with:
@@ -125,6 +130,10 @@ def get_path_patch_head_to_heads(
         )
 
         results[sender_layer, sender_head] = patching_metric(patched_logits)
+
+        if checkpoint_path is not None:
+            t.save(results.detach().cpu(), checkpoint_path)
+
         model.reset_hooks()
 
     return results
