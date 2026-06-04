@@ -112,7 +112,7 @@ def main() -> int:
     results_dir.mkdir(parents=True, exist_ok=True)
 
     dtype = _resolve_dtype(config["dtype"])
-    model = HookedTransformer.from_pretrained(
+    model = HookedTransformer.from_pretrained_no_processing(
         config["model_name"],
         device=config["device"],
         dtype=dtype,
