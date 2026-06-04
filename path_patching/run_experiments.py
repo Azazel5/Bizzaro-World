@@ -5,6 +5,7 @@ import argparse
 import importlib.util
 import json
 import sys
+from copy import copy
 from functools import partial
 from pathlib import Path
 from typing import Any
@@ -13,12 +14,6 @@ import torch as t
 from transformer_lens import HookedTransformer
 from huggingface_hub import login
 
-
-token = os.environ.get("HF_TOKEN") or os.environ.get("HUGGING_FACE_HUB_TOKEN")
-if token:
-    login(token=token.strip())
-else:
-    raise ValueError("No HuggingFace token found. Set HF_TOKEN environment variable.")
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parent
@@ -71,6 +66,28 @@ def _save_tensor(path: Path, value: Any) -> None:
     t.save(payload, path)
 
 
+def _subset_dataset(dataset: Any, max_prompts: int | None) -> Any:
+    if max_prompts is None or max_prompts <= 0 or max_prompts >= len(dataset):
+        return dataset
+
+    subset = copy(dataset)
+    subset.prompts = dataset.prompts[:max_prompts]
+    subset.clean_toks = dataset.clean_toks[:max_prompts]
+    subset.corrupt_toks = dataset.corrupt_toks[:max_prompts]
+    subset.io_tokenIDs = dataset.io_tokenIDs[:max_prompts]
+    subset.s_tokenIDs = dataset.s_tokenIDs[:max_prompts]
+    subset.word_idx = {
+        "entity": dataset.word_idx["entity"][:max_prompts],
+        "end": dataset.word_idx["end"][:max_prompts],
+    }
+
+    groups_by_category: dict[str, list[int]] = {}
+    for idx, prompt in enumerate(subset.prompts):
+        groups_by_category.setdefault(prompt["category"], []).append(idx)
+    subset.groups = list(groups_by_category.values())
+    return subset
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run path-patching experiments for a selected model.")
     parser.add_argument("--model", required=True, help="Model key from configs/model.py")
@@ -79,6 +96,12 @@ def main() -> int:
         nargs="*",
         default=[],
         help="Optional receiver heads for q path patching, formatted as layer:head (e.g. 8:6 8:10)",
+    )
+    parser.add_argument(
+        "--max-prompts",
+        type=int,
+        default=5,
+        help="Limit the fact battery to the first N prompts so the run can complete without OOM.",
     )
     args = parser.parse_args()
 
@@ -97,6 +120,7 @@ def main() -> int:
 
     battery_path = SCRIPT_DIR / config["fact_battery_path"]
     dataset = FactualRecallDataset(battery_path, model.tokenizer)
+    dataset = _subset_dataset(dataset, args.max_prompts)
 
     print(f"Prompt count: {len(dataset)}")
     print(f"clean_toks shape: {tuple(dataset.clean_toks.shape)}")
@@ -173,6 +197,20 @@ def main() -> int:
             "config": config,
         },
     )
+
+    run_manifest = {
+        "model": args.model,
+        "prompt_count": len(dataset),
+        "max_prompts": args.max_prompts,
+        "results_dir": str(results_dir),
+        "files": [
+            "path_patch_final_resid.pt",
+            "path_patch_heads_q.pt",
+            "baseline_metrics.pt",
+        ],
+        "receiver_heads_q": receiver_heads_q,
+    }
+    (results_dir / "run_manifest.json").write_text(json.dumps(run_manifest, indent=2, sort_keys=True) + "\n")
 
     print(f"Experiment complete. Results saved to {results_dir}")
     return 0
