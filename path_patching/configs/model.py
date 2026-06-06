@@ -1,3 +1,10 @@
+from __future__ import annotations
+
+import os
+
+import torch as t
+
+
 CONFIGS = {
     "gemma_2b": {
         "model_name": "google/gemma-2b",
@@ -9,15 +16,33 @@ CONFIGS = {
     },
 }
 
-# Shared across all models
-DEVICE = "cuda"
-DTYPE = "bfloat16"
+
+def _select_device() -> str:
+    override = os.environ.get("PATH_PATCHING_DEVICE")
+    if override:
+        return override
+    if t.cuda.is_available():
+        return "cuda"
+    if getattr(t.backends, "mps", None) is not None and t.backends.mps.is_available():
+        return "mps"
+    return "cpu"
+
+
+def _select_dtype(device: str) -> str:
+    override = os.environ.get("PATH_PATCHING_DTYPE")
+    if override:
+        return override
+    if device == "cuda":
+        return "bfloat16"
+    if device == "mps":
+        return "float16"
+    return "float32"
 
 
 def get_config(model_key: str) -> dict:
     assert model_key in CONFIGS, f"Unknown model: {model_key}. Choose from {list(CONFIGS.keys())}"
     config = CONFIGS[model_key].copy()
-    config["device"] = DEVICE
-    config["dtype"] = DTYPE
+    config["device"] = _select_device()
+    config["dtype"] = _select_dtype(config["device"])
     config["results_dir"] = f"results/{model_key}"
     return config

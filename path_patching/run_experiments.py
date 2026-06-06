@@ -154,7 +154,7 @@ def main() -> int:
         )
         _debug("model loaded")
 
-        battery_path = SCRIPT_DIR / config["fact_battery_path"]
+        battery_path = REPO_ROOT / config["fact_battery_path"]
         _debug(f"loading fact battery from {battery_path}")
         dataset = FactualRecallDataset(battery_path, model.tokenizer)
         dataset = _subset_dataset(dataset, args.max_prompts)
