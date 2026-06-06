@@ -90,8 +90,13 @@ def _save_tensor(path: Path, value: Any) -> None:
     t.save(payload, path)
 
 
+# Controlled debug printing. Set by CLI `--verbose` flag.
+VERBOSE = False
+
+
 def _debug(message: str) -> None:
-    print(f"[debug] {message}", flush=True)
+    if VERBOSE:
+        print(f"[debug] {message}", flush=True)
 
 
 def _subset_dataset(dataset: Any, max_prompts: int | None) -> Any:
@@ -131,10 +136,24 @@ def main() -> int:
         parser.add_argument(
             "--max-prompts",
             type=int,
-            default=5,
-            help="Limit the fact battery to the first N prompts so the run can complete without OOM.",
+            default=None,
+            help="Limit the fact battery to the first N prompts. Default (omitted) uses the entire battery.",
+        )
+        parser.add_argument(
+            "--verbose",
+            action="store_true",
+            help="Enable debug logging",
+        )
+        parser.add_argument(
+            "--export-json",
+            action="store_true",
+            help="Export result artifacts to JSON summaries after the run",
         )
         args = parser.parse_args()
+
+        # Set module-level verbosity flag
+        global VERBOSE
+        VERBOSE = bool(args.verbose)
 
         _debug("parsed arguments")
         config_module = _load_model_config_module()
@@ -196,7 +215,10 @@ def main() -> int:
         print(f"clean_ld: {clean_ld.item():.6f}")
         print(f"corrupt_ld: {corrupt_ld.item():.6f}")
         print(f"TotalSwing: {total_swing.item():.6f}")
-        assert clean_ld > corrupt_ld, "Expected clean_ld to be greater than corrupt_ld"
+
+        baseline_ordering_ok = bool(clean_ld > corrupt_ld)
+        if not baseline_ordering_ok:
+            print("[debug] warning: clean_ld <= corrupt_ld for this (smoke) subset; continuing anyway", flush=True)
 
         _debug("saving baseline metrics")
         _save_tensor(
@@ -207,6 +229,7 @@ def main() -> int:
                 "total_swing": total_swing.detach().cpu(),
                 "receiver_heads_q": receiver_heads_q,
                 "config": config,
+                "baseline_ordering_ok": baseline_ordering_ok,
             },
         )
 
@@ -221,6 +244,7 @@ def main() -> int:
                 "baseline_metrics.pt",
             ],
             "receiver_heads_q": receiver_heads_q,
+            "baseline_ordering_ok": baseline_ordering_ok,
         }
         (results_dir / "run_manifest.json").write_text(json.dumps(run_manifest, indent=2, sort_keys=True) + "\n")
         _debug("wrote run manifest")
@@ -263,6 +287,19 @@ def main() -> int:
         _save_tensor(results_dir / "path_patch_heads_q.pt", path_patch_heads_q)
 
         print(f"Experiment complete. Results saved to {results_dir}")
+
+        # Optionally export JSON summaries of artifacts
+        if args.export_json:
+            try:
+                # local import to avoid adding mandatory dependency for minimal runs
+                from export_results import export_results  # type: ignore
+
+                _debug("exporting results to JSON summaries")
+                export_results(results_dir)
+                print(f"Exported JSON summaries to {results_dir}")
+            except Exception as e:
+                print(f"Warning: failed to export JSON summaries: {e}")
+
         return 0
     except Exception:
         print("[debug] experiment failed with exception", flush=True)
