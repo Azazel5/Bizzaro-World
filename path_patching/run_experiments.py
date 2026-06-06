@@ -5,6 +5,7 @@ import argparse
 import importlib.util
 import json
 import sys
+import traceback
 from copy import copy
 from functools import partial
 from pathlib import Path
@@ -34,6 +35,29 @@ def _load_model_config_module():
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def _load_local_env_file(env_path: Path) -> None:
+    if not env_path.exists():
+        return
+
+    for raw_line in env_path.read_text().splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+        if key and key not in os.environ:
+            os.environ[key] = value
+
+
+def _ensure_hf_token() -> None:
+    _load_local_env_file(SCRIPT_DIR / ".env")
+    token = os.environ.get("HF_TOKEN") or os.environ.get("HUGGINGFACE_HUB_TOKEN")
+    if token and not os.environ.get("HUGGINGFACE_HUB_TOKEN"):
+        os.environ["HUGGINGFACE_HUB_TOKEN"] = token
 
 
 def _resolve_dtype(dtype_value: Any):
@@ -66,6 +90,15 @@ def _save_tensor(path: Path, value: Any) -> None:
     t.save(payload, path)
 
 
+# Controlled debug printing. Set by CLI `--verbose` flag.
+VERBOSE = False
+
+
+def _debug(message: str) -> None:
+    if VERBOSE:
+        print(f"[debug] {message}", flush=True)
+
+
 def _subset_dataset(dataset: Any, max_prompts: int | None) -> Any:
     if max_prompts is None or max_prompts <= 0 or max_prompts >= len(dataset):
         return dataset
@@ -89,133 +122,189 @@ def _subset_dataset(dataset: Any, max_prompts: int | None) -> Any:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Run path-patching experiments for a selected model.")
-    parser.add_argument("--model", required=True, help="Model key from configs/model.py")
-    parser.add_argument(
-        "--receiver-heads",
-        nargs="*",
-        default=[],
-        help="Optional receiver heads for q path patching, formatted as layer:head (e.g. 8:6 8:10)",
-    )
-    parser.add_argument(
-        "--max-prompts",
-        type=int,
-        default=5,
-        help="Limit the fact battery to the first N prompts so the run can complete without OOM.",
-    )
-    args = parser.parse_args()
+    try:
+        _ensure_hf_token()
 
-    config_module = _load_model_config_module()
-    config = config_module.get_config(args.model)
-
-    results_dir = SCRIPT_DIR / config["results_dir"]
-    results_dir.mkdir(parents=True, exist_ok=True)
-
-    dtype = _resolve_dtype(config["dtype"])
-    model = HookedTransformer.from_pretrained_no_processing(
-        config["model_name"],
-        device=config["device"],
-        dtype=dtype,
-    )
-
-    battery_path = SCRIPT_DIR / config["fact_battery_path"]
-    dataset = FactualRecallDataset(battery_path, model.tokenizer)
-    dataset = _subset_dataset(dataset, args.max_prompts)
-
-    print(f"Prompt count: {len(dataset)}")
-    print(f"clean_toks shape: {tuple(dataset.clean_toks.shape)}")
-    print(f"corrupt_toks shape: {tuple(dataset.corrupt_toks.shape)}")
-    sample_count = min(5, len(dataset))
-    print(f"io_tokenIDs sample: {dataset.io_tokenIDs[:sample_count].tolist()}")
-    print(f"s_tokenIDs sample: {dataset.s_tokenIDs[:sample_count].tolist()}")
-
-    receiver_heads_q = _parse_receiver_heads(args.receiver_heads)
-    if not receiver_heads_q:
-        print("TODO: provide receiver heads for q path patching if you want a non-empty receiver-head result.")
-
-    z_name_filter = lambda name: name.endswith("z")
-
-    with t.no_grad():
-        clean_logits, clean_cache = model.run_with_cache(
-            dataset.clean_toks,
-            names_filter=z_name_filter,
-            return_type="logits",
+        parser = argparse.ArgumentParser(description="Run path-patching experiments for a selected model.")
+        parser.add_argument("--model", required=True, help="Model key from configs/model.py")
+        parser.add_argument(
+            "--receiver-heads",
+            nargs="*",
+            default=[],
+            help="Optional receiver heads for q path patching, formatted as layer:head (e.g. 8:6 8:10)",
         )
-        corrupt_logits, corrupt_cache = model.run_with_cache(
-            dataset.corrupt_toks,
-            names_filter=z_name_filter,
-            return_type="logits",
+        parser.add_argument(
+            "--max-prompts",
+            type=int,
+            default=None,
+            help="Limit the fact battery to the first N prompts. Default (omitted) uses the entire battery.",
+        )
+        parser.add_argument(
+            "--verbose",
+            action="store_true",
+            help="Enable debug logging",
+        )
+        parser.add_argument(
+            "--export-json",
+            action="store_true",
+            help="Export result artifacts to JSON summaries after the run",
+        )
+        args = parser.parse_args()
+
+        # Set module-level verbosity flag
+        global VERBOSE
+        VERBOSE = bool(args.verbose)
+
+        _debug("parsed arguments")
+        config_module = _load_model_config_module()
+        config = config_module.get_config(args.model)
+        _debug(f"loaded config for model={args.model}")
+
+        results_dir = SCRIPT_DIR / config["results_dir"]
+        results_dir.mkdir(parents=True, exist_ok=True)
+        _debug(f"results_dir ready: {results_dir}")
+
+        dtype = _resolve_dtype(config["dtype"])
+        _debug(f"loading model {config['model_name']} on {config['device']} with dtype={dtype}")
+        model = HookedTransformer.from_pretrained_no_processing(
+            config["model_name"],
+            device=config["device"],
+            dtype=dtype,
+        )
+        _debug("model loaded")
+
+        battery_path = REPO_ROOT / config["fact_battery_path"]
+        _debug(f"loading fact battery from {battery_path}")
+        dataset = FactualRecallDataset(battery_path, model.tokenizer)
+        dataset = _subset_dataset(dataset, args.max_prompts)
+        _debug(f"dataset ready: prompts={len(dataset)} clean_shape={tuple(dataset.clean_toks.shape)} corrupt_shape={tuple(dataset.corrupt_toks.shape)}")
+        sample_count = min(5, len(dataset))
+        _debug(f"dataset samples: io={dataset.io_tokenIDs[:sample_count].tolist()} s={dataset.s_tokenIDs[:sample_count].tolist()}")
+
+        receiver_heads_q = _parse_receiver_heads(args.receiver_heads)
+        _debug(f"receiver heads parsed: {receiver_heads_q}")
+        if not receiver_heads_q:
+            print("TODO: provide receiver heads for q path patching if you want a non-empty receiver-head result.")
+
+        z_name_filter = lambda name: name.endswith("z")
+
+        _debug("running clean forward cache")
+        with t.no_grad():
+            clean_logits, clean_cache = model.run_with_cache(
+                dataset.clean_toks,
+                names_filter=z_name_filter,
+                return_type="logits",
+            )
+        _debug(f"clean cache done: logits_shape={tuple(clean_logits.shape)} cache_keys={len(clean_cache)}")
+
+        _debug("running corrupt forward cache")
+        with t.no_grad():
+            corrupt_logits, corrupt_cache = model.run_with_cache(
+                dataset.corrupt_toks,
+                names_filter=z_name_filter,
+                return_type="logits",
+            )
+        _debug(f"corrupt cache done: logits_shape={tuple(corrupt_logits.shape)} cache_keys={len(corrupt_cache)}")
+
+        _debug("computing logit diffs")
+        with t.no_grad():
+            clean_ld = compute_logit_diff(clean_logits, dataset)
+            corrupt_ld = compute_logit_diff(corrupt_logits, dataset)
+            total_swing = clean_ld - corrupt_ld
+
+        print(f"clean_ld: {clean_ld.item():.6f}")
+        print(f"corrupt_ld: {corrupt_ld.item():.6f}")
+        print(f"TotalSwing: {total_swing.item():.6f}")
+
+        baseline_ordering_ok = bool(clean_ld > corrupt_ld)
+        if not baseline_ordering_ok:
+            print("[debug] warning: clean_ld <= corrupt_ld for this (smoke) subset; continuing anyway", flush=True)
+
+        _debug("saving baseline metrics")
+        _save_tensor(
+            results_dir / "baseline_metrics.pt",
+            {
+                "clean_ld": clean_ld.detach().cpu(),
+                "corrupt_ld": corrupt_ld.detach().cpu(),
+                "total_swing": total_swing.detach().cpu(),
+                "receiver_heads_q": receiver_heads_q,
+                "config": config,
+                "baseline_ordering_ok": baseline_ordering_ok,
+            },
         )
 
-        clean_ld = compute_logit_diff(clean_logits, dataset)
-        corrupt_ld = compute_logit_diff(corrupt_logits, dataset)
-        total_swing = clean_ld - corrupt_ld
-
-    print(f"clean_ld: {clean_ld.item():.6f}")
-    print(f"corrupt_ld: {corrupt_ld.item():.6f}")
-    print(f"TotalSwing: {total_swing.item():.6f}")
-    assert clean_ld > corrupt_ld, "Expected clean_ld to be greater than corrupt_ld"
-
-    _save_tensor(
-        results_dir / "baseline_metrics.pt",
-        {
-            "clean_ld": clean_ld.detach().cpu(),
-            "corrupt_ld": corrupt_ld.detach().cpu(),
-            "total_swing": total_swing.detach().cpu(),
+        run_manifest = {
+            "model": args.model,
+            "prompt_count": len(dataset),
+            "max_prompts": args.max_prompts,
+            "results_dir": str(results_dir),
+            "files": [
+                "path_patch_final_resid.pt",
+                "path_patch_heads_q.pt",
+                "baseline_metrics.pt",
+            ],
             "receiver_heads_q": receiver_heads_q,
-            "config": config,
-        },
-    )
+            "baseline_ordering_ok": baseline_ordering_ok,
+        }
+        (results_dir / "run_manifest.json").write_text(json.dumps(run_manifest, indent=2, sort_keys=True) + "\n")
+        _debug("wrote run manifest")
 
-    run_manifest = {
-        "model": args.model,
-        "prompt_count": len(dataset),
-        "max_prompts": args.max_prompts,
-        "results_dir": str(results_dir),
-        "files": [
-            "path_patch_final_resid.pt",
-            "path_patch_heads_q.pt",
-            "baseline_metrics.pt",
-        ],
-        "receiver_heads_q": receiver_heads_q,
-    }
-    (results_dir / "run_manifest.json").write_text(json.dumps(run_manifest, indent=2, sort_keys=True) + "\n")
-
-    patching_metric = partial(
-        factual_recall_metric,
-        dataset=dataset,
-        clean_ld=clean_ld,
-        corrupt_ld=corrupt_ld,
-    )
-
-    model.reset_hooks(including_permanent=True)
-    with t.no_grad():
-        path_patch_final_resid = get_path_patch_head_to_final_resid_post(
-            model=model,
+        patching_metric = partial(
+            factual_recall_metric,
             dataset=dataset,
-            patching_metric=patching_metric,
-            clean_cache=clean_cache,
-            corrupt_cache=corrupt_cache,
-            checkpoint_path=results_dir / "path_patch_final_resid.pt",
+            clean_ld=clean_ld,
+            corrupt_ld=corrupt_ld,
         )
-    _save_tensor(results_dir / "path_patch_final_resid.pt", path_patch_final_resid)
 
-    model.reset_hooks(including_permanent=True)
-    with t.no_grad():
-        path_patch_heads_q = get_path_patch_head_to_heads(
-            receiver_heads=receiver_heads_q,
-            receiver_input="q",
-            model=model,
-            dataset=dataset,
-            patching_metric=patching_metric,
-            clean_cache=clean_cache,
-            corrupt_cache=corrupt_cache,
-            checkpoint_path=results_dir / "path_patch_heads_q.pt",
-        )
-    _save_tensor(results_dir / "path_patch_heads_q.pt", path_patch_heads_q)
+        model.reset_hooks(including_permanent=True)
+        _debug("running head-to-final-resid path patch")
+        with t.no_grad():
+            path_patch_final_resid = get_path_patch_head_to_final_resid_post(
+                model=model,
+                dataset=dataset,
+                patching_metric=patching_metric,
+                clean_cache=clean_cache,
+                corrupt_cache=corrupt_cache,
+                checkpoint_path=results_dir / "path_patch_final_resid.pt",
+            )
+        _debug(f"head-to-final-resid done: shape={tuple(path_patch_final_resid.shape)}")
+        _save_tensor(results_dir / "path_patch_final_resid.pt", path_patch_final_resid)
 
-    print(f"Experiment complete. Results saved to {results_dir}")
-    return 0
+        model.reset_hooks(including_permanent=True)
+        _debug("running head-to-head path patch")
+        with t.no_grad():
+            path_patch_heads_q = get_path_patch_head_to_heads(
+                receiver_heads=receiver_heads_q,
+                receiver_input="q",
+                model=model,
+                dataset=dataset,
+                patching_metric=patching_metric,
+                clean_cache=clean_cache,
+                corrupt_cache=corrupt_cache,
+                checkpoint_path=results_dir / "path_patch_heads_q.pt",
+            )
+        _debug(f"head-to-head done: shape={tuple(path_patch_heads_q.shape)}")
+        _save_tensor(results_dir / "path_patch_heads_q.pt", path_patch_heads_q)
+
+        print(f"Experiment complete. Results saved to {results_dir}")
+
+        # Optionally export JSON summaries of artifacts
+        if args.export_json:
+            try:
+                # local import to avoid adding mandatory dependency for minimal runs
+                from export_results import export_results  # type: ignore
+
+                _debug("exporting results to JSON summaries")
+                export_results(results_dir)
+                print(f"Exported JSON summaries to {results_dir}")
+            except Exception as e:
+                print(f"Warning: failed to export JSON summaries: {e}")
+
+        return 0
+    except Exception:
+        print("[debug] experiment failed with exception", flush=True)
+        traceback.print_exc()
+        raise
 
 
 if __name__ == "__main__":
