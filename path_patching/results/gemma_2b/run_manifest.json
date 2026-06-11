@@ -1,0 +1,13 @@
+{
+  "baseline_ordering_ok": true,
+  "files": [
+    "path_patch_final_resid.pt",
+    "path_patch_heads_q.pt",
+    "baseline_metrics.pt"
+  ],
+  "max_prompts": null,
+  "model": "gemma_2b",
+  "prompt_count": 60,
+  "receiver_heads_q": [],
+  "results_dir": "/content/Bizzaro-World/path_patching/results/gemma_2b"
+}
