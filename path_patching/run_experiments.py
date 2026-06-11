@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import os
 import argparse
+import faulthandler
 import importlib.util
 import json
+import signal
 import sys
 import traceback
 from copy import copy
@@ -21,6 +23,32 @@ REPO_ROOT = SCRIPT_DIR.parent
 for path in (SCRIPT_DIR, REPO_ROOT):
     if str(path) not in sys.path:
         sys.path.insert(0, str(path))
+
+# Make stdout behave like a tty even when piped (e.g. through Colab's `!`),
+# so prints show up immediately instead of sitting in an 8KB buffer.
+try:
+    sys.stdout.reconfigure(line_buffering=True)
+    sys.stderr.reconfigure(line_buffering=True)
+except AttributeError:  # pragma: no cover - Python < 3.7 fallback, not expected
+    pass
+
+
+def _install_sigint_diagnostics() -> None:
+    """If the process receives SIGINT (e.g. an environment-issued interrupt
+    on Colab), dump every thread's current stack to stderr before the default
+    handler raises KeyboardInterrupt. This turns a silent `^C` into a
+    pinpointed location of where execution actually was."""
+
+    def _handler(signum, frame):
+        print("\n[debug] SIGINT received - dumping stack trace before exit:", flush=True)
+        faulthandler.dump_traceback(file=sys.stderr, all_threads=True)
+        sys.stderr.flush()
+        signal.default_int_handler(signum, frame)
+
+    signal.signal(signal.SIGINT, _handler)
+
+
+_install_sigint_diagnostics()
 
 from dataset import FactualRecallDataset  # noqa: E402
 from metrics import compute_logit_diff, factual_recall_metric  # noqa: E402
@@ -165,7 +193,18 @@ def main() -> int:
         _debug(f"results_dir ready: {results_dir}")
 
         dtype = _resolve_dtype(config["dtype"])
-        _debug(f"loading model {config['model_name']} on {config['device']} with dtype={dtype}")
+        print(f"loading model {config['model_name']} on {config['device']} with dtype={dtype}", flush=True)
+        if config["device"] == "cuda" and dtype is t.bfloat16:
+            major, _ = t.cuda.get_device_capability()
+            if major < 8:
+                gpu_name = t.cuda.get_device_name()
+                print(
+                    f"[warn] GPU {gpu_name} (compute capability {major}.x) lacks native bfloat16 "
+                    "tensor cores. bf16 ops fall back to slow paths and the first forward pass "
+                    "can stall for a long time with no output. If the run gets interrupted "
+                    "around model load, retry with PATH_PATCHING_DTYPE=float16.",
+                    flush=True,
+                )
         model = HookedTransformer.from_pretrained_no_processing(
             config["model_name"],
             device=config["device"],
@@ -301,8 +340,11 @@ def main() -> int:
                 print(f"Warning: failed to export JSON summaries: {e}")
 
         return 0
-    except Exception:
-        print("[debug] experiment failed with exception", flush=True)
+    except BaseException:
+        # BaseException (not just Exception) so KeyboardInterrupt/SystemExit
+        # from an external SIGINT also get a traceback printed instead of
+        # vanishing silently.
+        print("[debug] experiment failed/interrupted with exception", flush=True)
         traceback.print_exc()
         raise
 
