@@ -159,7 +159,13 @@ def main() -> int:
             "--receiver-heads",
             nargs="*",
             default=[],
-            help="Optional receiver heads for q path patching, formatted as layer:head (e.g. 8:6 8:10)",
+            help="Optional receiver heads for head-to-head path patching, formatted as layer:head (e.g. 8:6 8:10)",
+        )
+        parser.add_argument(
+            "--receiver-input",
+            choices=["q", "k", "v"],
+            default="q",
+            help="Which input stream of the receiver heads to patch (default: q)",
         )
         parser.add_argument(
             "--max-prompts",
@@ -223,7 +229,9 @@ def main() -> int:
         receiver_heads_q = _parse_receiver_heads(args.receiver_heads)
         _debug(f"receiver heads parsed: {receiver_heads_q}")
         if not receiver_heads_q:
-            print("TODO: provide receiver heads for q path patching if you want a non-empty receiver-head result.")
+            print(f"TODO: provide receiver heads for {args.receiver_input} path patching if you want a non-empty receiver-head result.")
+
+        heads_filename = f"path_patch_heads_{args.receiver_input}.pt"
 
         z_name_filter = lambda name: name.endswith("z")
 
@@ -279,10 +287,11 @@ def main() -> int:
             "results_dir": str(results_dir),
             "files": [
                 "path_patch_final_resid.pt",
-                "path_patch_heads_q.pt",
+                heads_filename,
                 "baseline_metrics.pt",
             ],
             "receiver_heads_q": receiver_heads_q,
+            "receiver_input": args.receiver_input,
             "baseline_ordering_ok": baseline_ordering_ok,
         }
         (results_dir / "run_manifest.json").write_text(json.dumps(run_manifest, indent=2, sort_keys=True) + "\n")
@@ -314,16 +323,16 @@ def main() -> int:
         with t.no_grad():
             path_patch_heads_q = get_path_patch_head_to_heads(
                 receiver_heads=receiver_heads_q,
-                receiver_input="q",
+                receiver_input=args.receiver_input,
                 model=model,
                 dataset=dataset,
                 patching_metric=patching_metric,
                 clean_cache=clean_cache,
                 corrupt_cache=corrupt_cache,
-                checkpoint_path=results_dir / "path_patch_heads_q.pt",
+                checkpoint_path=results_dir / heads_filename,
             )
         _debug(f"head-to-head done: shape={tuple(path_patch_heads_q.shape)}")
-        _save_tensor(results_dir / "path_patch_heads_q.pt", path_patch_heads_q)
+        _save_tensor(results_dir / heads_filename, path_patch_heads_q)
 
         print(f"Experiment complete. Results saved to {results_dir}")
 

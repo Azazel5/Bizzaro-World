@@ -72,8 +72,13 @@ def export_results(results_dir: Path | str, max_elements: int = 100_000) -> None
     # Tensor artifacts to summarize
     tensor_files = [
         ("path_patch_final_resid.pt", "path_patch_final_resid_summary.json", "path_patch_final_resid.json"),
-        ("path_patch_heads_q.pt", "path_patch_heads_q_summary.json", "path_patch_heads_q.json"),
     ]
+    for receiver_input in ("q", "k", "v"):
+        tensor_files.append((
+            f"path_patch_heads_{receiver_input}.pt",
+            f"path_patch_heads_{receiver_input}_summary.json",
+            f"path_patch_heads_{receiver_input}.json",
+        ))
 
     for fname, summary_name, full_name in tensor_files:
         p = results_dir / fname
