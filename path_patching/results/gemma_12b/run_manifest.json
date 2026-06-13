@@ -8,6 +8,48 @@
   "max_prompts": null,
   "model": "gemma_12b",
   "prompt_count": 57,
-  "receiver_heads_q": [],
+  "receiver_heads_q": [
+    [
+      38,
+      8
+    ],
+    [
+      46,
+      4
+    ],
+    [
+      45,
+      1
+    ],
+    [
+      44,
+      10
+    ],
+    [
+      41,
+      0
+    ],
+    [
+      46,
+      5
+    ],
+    [
+      45,
+      0
+    ],
+    [
+      11,
+      4
+    ],
+    [
+      41,
+      9
+    ],
+    [
+      18,
+      9
+    ]
+  ],
+  "receiver_input": "q",
   "results_dir": "/content/Bizzaro-World/path_patching/results/gemma_12b"
 }
