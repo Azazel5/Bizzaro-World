@@ -52,7 +52,7 @@ _install_sigint_diagnostics()
 
 from dataset import FactualRecallDataset  # noqa: E402
 from metrics import compute_logit_diff, factual_recall_metric  # noqa: E402
-from patching import get_path_patch_head_to_final_resid_post, get_path_patch_head_to_heads  # noqa: E402
+from patching import get_path_patch_head_to_final_resid_post, get_path_patch_head_to_heads, get_path_patch_sender_to_heads  # noqa: E402
 
 
 def _load_model_config_module():
@@ -183,6 +183,23 @@ def main() -> int:
             action="store_true",
             help="Export result artifacts to JSON summaries after the run",
         )
+        parser.add_argument(
+            "--sender-head",
+            type=str,
+            default=None,
+            help="Single sender head for outgoing path patching, format layer:head (e.g. 38:8)",
+        )
+        parser.add_argument(
+            "--sender-heads",
+            nargs="*",
+            default=[],
+            help="Multiple sender heads for outgoing path patching, each as layer:head",
+        )
+        parser.add_argument(
+            "--skip-resid",
+            action="store_true",
+            help="Skip head-to-final-resid experiment (useful when only running sender experiments)",
+        )
         args = parser.parse_args()
 
         # Set module-level verbosity flag
@@ -232,6 +249,13 @@ def main() -> int:
             print(f"TODO: provide receiver heads for {args.receiver_input} path patching if you want a non-empty receiver-head result.")
 
         heads_filename = f"path_patch_heads_{args.receiver_input}.pt"
+
+        sender_heads_to_run: list[tuple[int, int]] = []
+        if args.sender_head:
+            sender_heads_to_run.extend(_parse_receiver_heads([args.sender_head]))
+        if args.sender_heads:
+            sender_heads_to_run.extend(_parse_receiver_heads(args.sender_heads))
+        _debug(f"sender heads to run: {sender_heads_to_run}")
 
         z_name_filter = lambda name: name.endswith("z")
 
@@ -293,6 +317,7 @@ def main() -> int:
             "receiver_heads_q": receiver_heads_q,
             "receiver_input": args.receiver_input,
             "baseline_ordering_ok": baseline_ordering_ok,
+            "sender_experiments": {},
         }
         (results_dir / "run_manifest.json").write_text(json.dumps(run_manifest, indent=2, sort_keys=True) + "\n")
         _debug("wrote run manifest")
@@ -304,19 +329,22 @@ def main() -> int:
             corrupt_ld=corrupt_ld,
         )
 
-        model.reset_hooks(including_permanent=True)
-        _debug("running head-to-final-resid path patch")
-        with t.no_grad():
-            path_patch_final_resid = get_path_patch_head_to_final_resid_post(
-                model=model,
-                dataset=dataset,
-                patching_metric=patching_metric,
-                clean_cache=clean_cache,
-                corrupt_cache=corrupt_cache,
-                checkpoint_path=results_dir / "path_patch_final_resid.pt",
-            )
-        _debug(f"head-to-final-resid done: shape={tuple(path_patch_final_resid.shape)}")
-        _save_tensor(results_dir / "path_patch_final_resid.pt", path_patch_final_resid)
+        if not args.skip_resid:
+            model.reset_hooks(including_permanent=True)
+            _debug("running head-to-final-resid path patch")
+            with t.no_grad():
+                path_patch_final_resid = get_path_patch_head_to_final_resid_post(
+                    model=model,
+                    dataset=dataset,
+                    patching_metric=patching_metric,
+                    clean_cache=clean_cache,
+                    corrupt_cache=corrupt_cache,
+                    checkpoint_path=results_dir / "path_patch_final_resid.pt",
+                )
+            _debug(f"head-to-final-resid done: shape={tuple(path_patch_final_resid.shape)}")
+            _save_tensor(results_dir / "path_patch_final_resid.pt", path_patch_final_resid)
+        else:
+            print("Skipping head-to-final-resid experiment (--skip-resid)", flush=True)
 
         model.reset_hooks(including_permanent=True)
         _debug("running head-to-head path patch")
@@ -333,6 +361,27 @@ def main() -> int:
             )
         _debug(f"head-to-head done: shape={tuple(path_patch_heads_q.shape)}")
         _save_tensor(results_dir / heads_filename, path_patch_heads_q)
+
+        # Sender experiments: fix each specified head, sweep all downstream receivers
+        for sender_layer, sender_head_idx in sender_heads_to_run:
+            sender_filename = f"path_patch_sender_{sender_layer}_{sender_head_idx}.pt"
+            print(f"Running sender experiment: L{sender_layer}H{sender_head_idx} → downstream...", flush=True)
+            model.reset_hooks(including_permanent=True)
+            with t.no_grad():
+                sender_result = get_path_patch_sender_to_heads(
+                    sender_head=(sender_layer, sender_head_idx),
+                    receiver_input=args.receiver_input,
+                    model=model,
+                    dataset=dataset,
+                    patching_metric=patching_metric,
+                    clean_cache=clean_cache,
+                    corrupt_cache=corrupt_cache,
+                    checkpoint_path=results_dir / sender_filename,
+                )
+            _debug(f"sender L{sender_layer}H{sender_head_idx} done: shape={tuple(sender_result.shape)}")
+            _save_tensor(results_dir / sender_filename, sender_result)
+            run_manifest["sender_experiments"][f"{sender_layer}_{sender_head_idx}"] = sender_filename
+            (results_dir / "run_manifest.json").write_text(json.dumps(run_manifest, indent=2, sort_keys=True) + "\n")
 
         print(f"Experiment complete. Results saved to {results_dir}")
 

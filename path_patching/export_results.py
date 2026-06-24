@@ -79,6 +79,9 @@ def export_results(results_dir: Path | str, max_elements: int = 100_000) -> None
             f"path_patch_heads_{receiver_input}_summary.json",
             f"path_patch_heads_{receiver_input}.json",
         ))
+    for pt_file in sorted(results_dir.glob("path_patch_sender_*.pt")):
+        stem = pt_file.stem
+        tensor_files.append((pt_file.name, f"{stem}_summary.json", f"{stem}.json"))
 
     for fname, summary_name, full_name in tensor_files:
         p = results_dir / fname
