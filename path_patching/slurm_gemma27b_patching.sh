@@ -12,7 +12,7 @@
 set -euo pipefail
 
 # ── environment ───────────────────────────────────────────────────────────────
-module load pytorch/2.11.0-cuda12.6-cudnn9-devel           # run `module avail cuda` to find exact name on your cluster
+module load cuda/12.9.0                              # adjust version to match `module avail cuda` output
 
 source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate bizzaro
