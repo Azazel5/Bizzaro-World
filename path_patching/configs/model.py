@@ -14,6 +14,10 @@ CONFIGS = {
         "model_name": "google/gemma-3-12b-it",
         "fact_battery_path": "fact_battery/gemma-3-12b-it.json",
     },
+    "gemma_31b": {
+        "model_name": "google/gemma-4-31B",
+        "fact_battery_path": "fact_battery/gemma-4-31b.json",
+    },
 }
 
 
