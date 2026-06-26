@@ -11,9 +11,12 @@
 
 set -eo pipefail
 
-module load pytorch/2.7.1-cuda12.6-cudnn9
+module load anaconda/2025.06.0
+conda activate bizzaro
 
 export HF_TOKEN="${HF_TOKEN:?Set HF_TOKEN before submitting}"
+export HF_HOME=/tmp/bizzaroworld
+mkdir -p /tmp/bizzaroworld
 
 cd "$SLURM_SUBMIT_DIR"
 mkdir -p logs
