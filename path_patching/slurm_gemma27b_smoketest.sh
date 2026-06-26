@@ -6,8 +6,8 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=128G
 #SBATCH --time=00:30:00
-#SBATCH --output=smoketest_%j.out
-#SBATCH --error=smoketest_%j.err
+#SBATCH --output=logs/smoketest_%j.out
+#SBATCH --error=logs/smoketest_%j.err
 
 set -eo pipefail
 
@@ -18,6 +18,7 @@ conda activate bizzaro
 export HF_TOKEN="${HF_TOKEN:?Set HF_TOKEN before submitting}"
 
 cd "$SLURM_SUBMIT_DIR"
+mkdir -p logs
 
 echo "Node: $(hostname)  GPU: $(nvidia-smi --query-gpu=name,memory.total --format=csv,noheader)"
 echo "============================================================"
