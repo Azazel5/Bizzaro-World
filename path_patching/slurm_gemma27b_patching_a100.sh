@@ -6,8 +6,8 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=128G
 #SBATCH --time=06:00:00
-#SBATCH --output=logs/patching_27b_%j.out
-#SBATCH --error=logs/patching_27b_%j.err
+#SBATCH --output=patching_27b_%j.out
+#SBATCH --error=patching_27b_%j.err
 
 set -eo pipefail
 
@@ -19,8 +19,7 @@ conda activate bizzaro
 export HF_TOKEN="${HF_TOKEN:?Set HF_TOKEN before submitting}"
 
 # ── repo ──────────────────────────────────────────────────────────────────────
-cd "$(dirname "$0")"    # run from path_patching/
-mkdir -p logs
+cd "$SLURM_SUBMIT_DIR"
 
 echo "Node: $(hostname)  GPU: $(nvidia-smi --query-gpu=name,memory.total --format=csv,noheader)"
 echo "============================================================"
