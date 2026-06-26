@@ -13,7 +13,7 @@ set -eo pipefail
 
 # ── environment ───────────────────────────────────────────────────────────────
 module load anaconda/2025.06.0
-conda activate bizzaro
+conda activate bizarro
 
 export HF_TOKEN="${HF_TOKEN:?Set HF_TOKEN before submitting}"
 export HF_HOME=/tmp/bizzaroworld
