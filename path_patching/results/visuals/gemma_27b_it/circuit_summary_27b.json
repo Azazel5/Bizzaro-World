@@ -1,0 +1,56 @@
+{
+  "model": "google/gemma-3-27b-it",
+  "n_layers": 62,
+  "n_heads": 32,
+  "baseline": {
+    "clean_ld": 0.70703125,
+    "corrupt_ld": -0.55078125,
+    "total_swing": 1.2578125
+  },
+  "circuit_heads": {
+    "load_bearing_final_resid": [
+      [
+        54,
+        23
+      ],
+      [
+        55,
+        24
+      ],
+      [
+        53,
+        11
+      ],
+      [
+        58,
+        29
+      ],
+      [
+        61,
+        21
+      ]
+    ],
+    "suppressive_final_resid": [
+      [
+        54,
+        22
+      ],
+      [
+        58,
+        28
+      ],
+      [
+        61,
+        10
+      ],
+      [
+        58,
+        31
+      ],
+      [
+        47,
+        23
+      ]
+    ]
+  }
+}

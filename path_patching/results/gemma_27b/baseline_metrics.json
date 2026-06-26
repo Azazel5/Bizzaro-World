@@ -1,0 +1,14 @@
+{
+  "baseline_ordering_ok": true,
+  "clean_ld": 0.70703125,
+  "config": {
+    "device": "cuda",
+    "dtype": "bfloat16",
+    "fact_battery_path": "fact_battery/gemma-3-27b-it.json",
+    "model_name": "google/gemma-3-27b-it",
+    "results_dir": "results/gemma_27b"
+  },
+  "corrupt_ld": -0.55078125,
+  "receiver_heads_q": [],
+  "total_swing": 1.2578125
+}
