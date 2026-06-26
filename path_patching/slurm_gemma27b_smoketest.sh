@@ -4,7 +4,7 @@
 #SBATCH --gres=gpu:a100:1
 #SBATCH --constraint=a100-80G
 #SBATCH --cpus-per-task=8
-#SBATCH --mem=128G
+#SBATCH --mem=256G
 #SBATCH --time=00:30:00
 #SBATCH --output=logs/smoketest_%j.out
 #SBATCH --error=logs/smoketest_%j.err

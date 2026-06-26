@@ -4,7 +4,7 @@
 #SBATCH --gres=gpu:h200:1
 #SBATCH --constraint=h200
 #SBATCH --cpus-per-task=8
-#SBATCH --mem=128G
+#SBATCH --mem=256G
 #SBATCH --time=06:00:00
 #SBATCH --output=logs/patching_27b_%j.out
 #SBATCH --error=logs/patching_27b_%j.err
