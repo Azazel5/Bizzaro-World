@@ -3,9 +3,9 @@
   "n_layers": 62,
   "n_heads": 32,
   "baseline": {
-    "clean_ld": 0.70703125,
-    "corrupt_ld": -0.55078125,
-    "total_swing": 1.2578125
+    "clean_ld": 0.69140625,
+    "corrupt_ld": -0.5703125,
+    "total_swing": 1.265625
   },
   "circuit_heads": {
     "load_bearing_final_resid": [
