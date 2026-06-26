@@ -12,6 +12,7 @@
 set -eo pipefail
 
 module load anaconda/2025.06.0
+module load pytorch/2.7.1-cuda12.6-cudnn9
 conda activate bizarro
 
 export HF_TOKEN="${HF_TOKEN:?Set HF_TOKEN before submitting}"
