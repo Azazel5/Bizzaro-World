@@ -12,9 +12,8 @@
 set -euo pipefail
 
 # ── environment ───────────────────────────────────────────────────────────────
-module load cuda/12.9.0                              # adjust version to match `module avail cuda` output
-
-source "$(conda info --base)/etc/profile.d/conda.sh"
+module load cuda/12.9.0
+module load anaconda/2025.06.0
 conda activate bizzaro
 
 export HF_TOKEN="${HF_TOKEN:?Set HF_TOKEN before submitting}"
