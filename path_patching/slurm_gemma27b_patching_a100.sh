@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --job-name=bizzaro-27b
 #SBATCH --partition=gpu
-#SBATCH --gres=gpu:h200:1
-#SBATCH --constraint=h200
+#SBATCH --gres=gpu:a100:1
+#SBATCH --constraint=a100-80G
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=128G
 #SBATCH --time=06:00:00
@@ -31,7 +31,8 @@ python run_experiments.py --model gemma_27b \
   --receiver-heads 54:23 55:24 53:11 58:29 61:21 54:22 58:28 61:10 58:31 47:23 \
   --receiver-input q \
   --skip-resid \
-  --export-json
+  --export-json \
+  --max-prompts 25
 
 echo "[$(date)] Receiver experiment done"
 echo "============================================================"
@@ -41,7 +42,8 @@ echo "[$(date)] Starting sender experiment"
 python run_experiments.py --model gemma_27b \
   --sender-heads 54:23 55:24 53:11 58:29 61:21 54:22 58:28 61:10 58:31 47:23 \
   --skip-resid \
-  --export-json
+  --export-json \
+  --max-prompts 25
 
 echo "[$(date)] Sender experiment done"
 echo "============================================================"
