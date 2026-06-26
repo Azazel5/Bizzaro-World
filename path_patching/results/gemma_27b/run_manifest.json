@@ -10,6 +10,17 @@
   "prompt_count": 57,
   "receiver_heads_q": [],
   "receiver_input": "q",
-  "results_dir": "/content/Bizzaro-World/path_patching/results/gemma_27b",
-  "sender_experiments": {}
+  "results_dir": "/cluster/home/supadh03/Bizzaro-World/path_patching/results/gemma_27b",
+  "sender_experiments": {
+    "47_23": "path_patch_sender_47_23.pt",
+    "53_11": "path_patch_sender_53_11.pt",
+    "54_22": "path_patch_sender_54_22.pt",
+    "54_23": "path_patch_sender_54_23.pt",
+    "55_24": "path_patch_sender_55_24.pt",
+    "58_28": "path_patch_sender_58_28.pt",
+    "58_29": "path_patch_sender_58_29.pt",
+    "58_31": "path_patch_sender_58_31.pt",
+    "61_10": "path_patch_sender_61_10.pt",
+    "61_21": "path_patch_sender_61_21.pt"
+  }
 }

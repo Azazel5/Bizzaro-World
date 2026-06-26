@@ -1,6 +1,6 @@
 {
   "baseline_ordering_ok": true,
-  "clean_ld": 0.70703125,
+  "clean_ld": 0.69140625,
   "config": {
     "device": "cuda",
     "dtype": "bfloat16",
@@ -8,7 +8,7 @@
     "model_name": "google/gemma-3-27b-it",
     "results_dir": "results/gemma_27b"
   },
-  "corrupt_ld": -0.55078125,
+  "corrupt_ld": -0.5703125,
   "receiver_heads_q": [],
-  "total_swing": 1.2578125
+  "total_swing": 1.265625
 }
