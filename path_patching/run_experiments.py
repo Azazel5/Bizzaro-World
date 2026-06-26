@@ -200,6 +200,11 @@ def main() -> int:
             action="store_true",
             help="Skip head-to-final-resid experiment (useful when only running sender experiments)",
         )
+        parser.add_argument(
+            "--load-in-8bit",
+            action="store_true",
+            help="Load model in 8-bit quantization via bitsandbytes (reduces VRAM ~50%%)",
+        )
         args = parser.parse_args()
 
         # Set module-level verbosity flag
@@ -216,23 +221,31 @@ def main() -> int:
         _debug(f"results_dir ready: {results_dir}")
 
         dtype = _resolve_dtype(config["dtype"])
-        print(f"loading model {config['model_name']} on {config['device']} with dtype={dtype}", flush=True)
-        if config["device"] == "cuda" and dtype is t.bfloat16:
-            major, _ = t.cuda.get_device_capability()
-            if major < 8:
-                gpu_name = t.cuda.get_device_name()
-                print(
-                    f"[warn] GPU {gpu_name} (compute capability {major}.x) lacks native bfloat16 "
-                    "tensor cores. bf16 ops fall back to slow paths and the first forward pass "
-                    "can stall for a long time with no output. If the run gets interrupted "
-                    "around model load, retry with PATH_PATCHING_DTYPE=float16.",
-                    flush=True,
-                )
-        model = HookedTransformer.from_pretrained_no_processing(
-            config["model_name"],
-            device=config["device"],
-            dtype=dtype,
-        )
+        if args.load_in_8bit:
+            print(f"loading model {config['model_name']} in 8-bit quantization (bitsandbytes)", flush=True)
+            model = HookedTransformer.from_pretrained_no_processing(
+                config["model_name"],
+                dtype=dtype,
+                load_in_8bit=True,
+            )
+        else:
+            print(f"loading model {config['model_name']} on {config['device']} with dtype={dtype}", flush=True)
+            if config["device"] == "cuda" and dtype is t.bfloat16:
+                major, _ = t.cuda.get_device_capability()
+                if major < 8:
+                    gpu_name = t.cuda.get_device_name()
+                    print(
+                        f"[warn] GPU {gpu_name} (compute capability {major}.x) lacks native bfloat16 "
+                        "tensor cores. bf16 ops fall back to slow paths and the first forward pass "
+                        "can stall for a long time with no output. If the run gets interrupted "
+                        "around model load, retry with PATH_PATCHING_DTYPE=float16.",
+                        flush=True,
+                    )
+            model = HookedTransformer.from_pretrained_no_processing(
+                config["model_name"],
+                device=config["device"],
+                dtype=dtype,
+            )
         _debug("model loaded")
 
         battery_path = REPO_ROOT / config["fact_battery_path"]
