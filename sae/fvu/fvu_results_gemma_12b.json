@@ -1,0 +1,14 @@
+{
+  "model_key": "gemma_12b",
+  "model_name": "google/gemma-3-12b-it",
+  "sae_release": "gemma-scope-2-12b-it-res-all",
+  "sae_id": "layer_38_width_16k_l0_small",
+  "target_layer": 38,
+  "battery_path": "/content/Bizzaro-World/Bizzaro-World/fact_battery/gemma-3-12b-it.json",
+  "n_prompts": 57,
+  "verdict": "PASS",
+  "fvu": 0.031200408935546875,
+  "mean_activation_norm": 88503.4921875,
+  "mean_reconstruction_norm": 86452.046875,
+  "mean_l0": 19.859649658203125
+}

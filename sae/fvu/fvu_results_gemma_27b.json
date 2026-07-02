@@ -1,0 +1,14 @@
+{
+  "model_key": "gemma_27b",
+  "model_name": "google/gemma-3-27b-it",
+  "sae_release": "gemma-scope-2-27b-it-res-all",
+  "sae_id": "layer_54_width_16k_l0_small",
+  "target_layer": 54,
+  "battery_path": "/content/Bizzaro-World/Bizzaro-World/fact_battery/gemma-3-27b-it.json",
+  "n_prompts": 57,
+  "verdict": "PASS",
+  "fvu": 0.05011408403515816,
+  "mean_activation_norm": 94959.34375,
+  "mean_reconstruction_norm": 91097.921875,
+  "mean_l0": 20.228071212768555
+}
