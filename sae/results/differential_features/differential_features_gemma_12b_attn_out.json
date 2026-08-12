@@ -1,0 +1,384 @@
+{
+  "model_key": "gemma_12b_attn_out",
+  "site": "attn_out",
+  "model_name": "google/gemma-3-12b-it",
+  "sae_release": "gemma-scope-2-12b-it-att-all",
+  "sae_id": "layer_38_width_16k_l0_small",
+  "target_layer": 38,
+  "hook_name": "blocks.38.attn.hook_z",
+  "needs_head_flatten": true,
+  "battery_path": "/content/Bizzaro-World/fact_battery/gemma-3-12b-it.json",
+  "n_prompts": 57,
+  "n_successful_pairs": 57,
+  "top_features_by_magnitude": [
+    {
+      "feature_index": 739,
+      "differential_activation": -1.0930731296539307,
+      "clean_mean_activation": 0.028549544513225555,
+      "corrupt_mean_activation": 1.1216226816177368,
+      "clean_activation_rate": 0.017543859779834747,
+      "corrupt_activation_rate": 0.035087719559669495,
+      "rate_differential": -0.017543859779834747
+    },
+    {
+      "feature_index": 1815,
+      "differential_activation": 0.8557942509651184,
+      "clean_mean_activation": 0.8557942509651184,
+      "corrupt_mean_activation": 0.0,
+      "clean_activation_rate": 0.07017543911933899,
+      "corrupt_activation_rate": 0.0,
+      "rate_differential": 0.07017543911933899
+    },
+    {
+      "feature_index": 1899,
+      "differential_activation": 0.7872381806373596,
+      "clean_mean_activation": 0.8969384431838989,
+      "corrupt_mean_activation": 0.1097002774477005,
+      "clean_activation_rate": 0.10526315867900848,
+      "corrupt_activation_rate": 0.035087719559669495,
+      "rate_differential": 0.07017543911933899
+    },
+    {
+      "feature_index": 275,
+      "differential_activation": 0.7121383547782898,
+      "clean_mean_activation": 0.773465096950531,
+      "corrupt_mean_activation": 0.061326764523983,
+      "clean_activation_rate": 0.12280701845884323,
+      "corrupt_activation_rate": 0.035087719559669495,
+      "rate_differential": 0.08771929889917374
+    },
+    {
+      "feature_index": 15891,
+      "differential_activation": -0.5965654850006104,
+      "clean_mean_activation": 0.0,
+      "corrupt_mean_activation": 0.5965654850006104,
+      "clean_activation_rate": 0.0,
+      "corrupt_activation_rate": 0.05263157933950424,
+      "rate_differential": -0.05263157933950424
+    },
+    {
+      "feature_index": 126,
+      "differential_activation": 0.5548818707466125,
+      "clean_mean_activation": 0.7696914076805115,
+      "corrupt_mean_activation": 0.21480955183506012,
+      "clean_activation_rate": 0.07017543911933899,
+      "corrupt_activation_rate": 0.08771929889917374,
+      "rate_differential": -0.017543859779834747
+    },
+    {
+      "feature_index": 469,
+      "differential_activation": -0.5466532707214355,
+      "clean_mean_activation": 0.11089033633470535,
+      "corrupt_mean_activation": 0.6575435996055603,
+      "clean_activation_rate": 0.05263157933950424,
+      "corrupt_activation_rate": 0.08771929889917374,
+      "rate_differential": -0.035087719559669495
+    },
+    {
+      "feature_index": 1906,
+      "differential_activation": 0.5410391092300415,
+      "clean_mean_activation": 0.7732765078544617,
+      "corrupt_mean_activation": 0.23223736882209778,
+      "clean_activation_rate": 0.12280701845884323,
+      "corrupt_activation_rate": 0.07017543911933899,
+      "rate_differential": 0.05263157933950424
+    },
+    {
+      "feature_index": 2777,
+      "differential_activation": 0.5173120498657227,
+      "clean_mean_activation": 0.5548157691955566,
+      "corrupt_mean_activation": 0.03750370442867279,
+      "clean_activation_rate": 0.07017543911933899,
+      "corrupt_activation_rate": 0.017543859779834747,
+      "rate_differential": 0.05263157933950424
+    },
+    {
+      "feature_index": 5529,
+      "differential_activation": 0.4823031425476074,
+      "clean_mean_activation": 0.4823031425476074,
+      "corrupt_mean_activation": 0.0,
+      "clean_activation_rate": 0.035087719559669495,
+      "corrupt_activation_rate": 0.0,
+      "rate_differential": 0.035087719559669495
+    },
+    {
+      "feature_index": 2263,
+      "differential_activation": -0.47976768016815186,
+      "clean_mean_activation": 0.21325530111789703,
+      "corrupt_mean_activation": 0.6930229663848877,
+      "clean_activation_rate": 0.05263157933950424,
+      "corrupt_activation_rate": 0.10526315867900848,
+      "rate_differential": -0.05263157933950424
+    },
+    {
+      "feature_index": 1349,
+      "differential_activation": -0.4365220367908478,
+      "clean_mean_activation": 0.0,
+      "corrupt_mean_activation": 0.4365220367908478,
+      "clean_activation_rate": 0.0,
+      "corrupt_activation_rate": 0.017543859779834747,
+      "rate_differential": -0.017543859779834747
+    },
+    {
+      "feature_index": 913,
+      "differential_activation": 0.43589645624160767,
+      "clean_mean_activation": 0.6737947463989258,
+      "corrupt_mean_activation": 0.23789827525615692,
+      "clean_activation_rate": 0.035087719559669495,
+      "corrupt_activation_rate": 0.035087719559669495,
+      "rate_differential": 0.0
+    },
+    {
+      "feature_index": 6117,
+      "differential_activation": -0.4278344213962555,
+      "clean_mean_activation": 0.0,
+      "corrupt_mean_activation": 0.4278344213962555,
+      "clean_activation_rate": 0.0,
+      "corrupt_activation_rate": 0.035087719559669495,
+      "rate_differential": -0.035087719559669495
+    },
+    {
+      "feature_index": 15157,
+      "differential_activation": 0.42779383063316345,
+      "clean_mean_activation": 0.42779383063316345,
+      "corrupt_mean_activation": 0.0,
+      "clean_activation_rate": 0.035087719559669495,
+      "corrupt_activation_rate": 0.0,
+      "rate_differential": 0.035087719559669495
+    },
+    {
+      "feature_index": 1911,
+      "differential_activation": -0.4140670597553253,
+      "clean_mean_activation": 0.032518692314624786,
+      "corrupt_mean_activation": 0.4465857446193695,
+      "clean_activation_rate": 0.017543859779834747,
+      "corrupt_activation_rate": 0.035087719559669495,
+      "rate_differential": -0.017543859779834747
+    },
+    {
+      "feature_index": 4857,
+      "differential_activation": -0.40868598222732544,
+      "clean_mean_activation": 0.09530020505189896,
+      "corrupt_mean_activation": 0.5039861798286438,
+      "clean_activation_rate": 0.017543859779834747,
+      "corrupt_activation_rate": 0.17543859779834747,
+      "rate_differential": -0.15789473056793213
+    },
+    {
+      "feature_index": 1238,
+      "differential_activation": -0.4036964476108551,
+      "clean_mean_activation": 0.06532934308052063,
+      "corrupt_mean_activation": 0.46902579069137573,
+      "clean_activation_rate": 0.035087719559669495,
+      "corrupt_activation_rate": 0.035087719559669495,
+      "rate_differential": 0.0
+    },
+    {
+      "feature_index": 176,
+      "differential_activation": -0.4012896716594696,
+      "clean_mean_activation": 0.12112637609243393,
+      "corrupt_mean_activation": 0.5224160552024841,
+      "clean_activation_rate": 0.05263157933950424,
+      "corrupt_activation_rate": 0.05263157933950424,
+      "rate_differential": 0.0
+    },
+    {
+      "feature_index": 3647,
+      "differential_activation": -0.3999840021133423,
+      "clean_mean_activation": 0.21070076525211334,
+      "corrupt_mean_activation": 0.6106847524642944,
+      "clean_activation_rate": 0.07017543911933899,
+      "corrupt_activation_rate": 0.12280701845884323,
+      "rate_differential": -0.05263157933950424
+    }
+  ],
+  "top_features_by_rate": [
+    {
+      "feature_index": 4857,
+      "differential_activation": -0.40868598222732544,
+      "clean_mean_activation": 0.09530020505189896,
+      "corrupt_mean_activation": 0.5039861798286438,
+      "clean_activation_rate": 0.017543859779834747,
+      "corrupt_activation_rate": 0.17543859779834747,
+      "rate_differential": -0.15789473056793213
+    },
+    {
+      "feature_index": 289,
+      "differential_activation": -0.2558596432209015,
+      "clean_mean_activation": 0.0,
+      "corrupt_mean_activation": 0.2558596432209015,
+      "clean_activation_rate": 0.0,
+      "corrupt_activation_rate": 0.10526315867900848,
+      "rate_differential": -0.10526315867900848
+    },
+    {
+      "feature_index": 544,
+      "differential_activation": -0.18645229935646057,
+      "clean_mean_activation": 0.10670275241136551,
+      "corrupt_mean_activation": 0.2931550443172455,
+      "clean_activation_rate": 0.035087719559669495,
+      "corrupt_activation_rate": 0.12280701845884323,
+      "rate_differential": -0.08771929889917374
+    },
+    {
+      "feature_index": 275,
+      "differential_activation": 0.7121383547782898,
+      "clean_mean_activation": 0.773465096950531,
+      "corrupt_mean_activation": 0.061326764523983,
+      "clean_activation_rate": 0.12280701845884323,
+      "corrupt_activation_rate": 0.035087719559669495,
+      "rate_differential": 0.08771929889917374
+    },
+    {
+      "feature_index": 478,
+      "differential_activation": 0.2827899158000946,
+      "clean_mean_activation": 0.3449067771434784,
+      "corrupt_mean_activation": 0.062116868793964386,
+      "clean_activation_rate": 0.12280701845884323,
+      "corrupt_activation_rate": 0.035087719559669495,
+      "rate_differential": 0.08771929889917374
+    },
+    {
+      "feature_index": 1554,
+      "differential_activation": -0.10392150282859802,
+      "clean_mean_activation": 0.37289437651634216,
+      "corrupt_mean_activation": 0.4768158793449402,
+      "clean_activation_rate": 0.08771929889917374,
+      "corrupt_activation_rate": 0.17543859779834747,
+      "rate_differential": -0.08771929889917374
+    },
+    {
+      "feature_index": 1967,
+      "differential_activation": -0.17018280923366547,
+      "clean_mean_activation": 0.035394903272390366,
+      "corrupt_mean_activation": 0.20557771623134613,
+      "clean_activation_rate": 0.017543859779834747,
+      "corrupt_activation_rate": 0.08771929889917374,
+      "rate_differential": -0.07017543911933899
+    },
+    {
+      "feature_index": 383,
+      "differential_activation": 0.13958480954170227,
+      "clean_mean_activation": 0.13958480954170227,
+      "corrupt_mean_activation": 0.0,
+      "clean_activation_rate": 0.07017543911933899,
+      "corrupt_activation_rate": 0.0,
+      "rate_differential": 0.07017543911933899
+    },
+    {
+      "feature_index": 115,
+      "differential_activation": -0.3930284082889557,
+      "clean_mean_activation": 0.29142341017723083,
+      "corrupt_mean_activation": 0.6844518184661865,
+      "clean_activation_rate": 0.017543859779834747,
+      "corrupt_activation_rate": 0.08771929889917374,
+      "rate_differential": -0.07017543911933899
+    },
+    {
+      "feature_index": 3662,
+      "differential_activation": -0.16638803482055664,
+      "clean_mean_activation": 0.21769845485687256,
+      "corrupt_mean_activation": 0.3840864896774292,
+      "clean_activation_rate": 0.05263157933950424,
+      "corrupt_activation_rate": 0.12280701845884323,
+      "rate_differential": -0.07017543911933899
+    },
+    {
+      "feature_index": 1899,
+      "differential_activation": 0.7872381806373596,
+      "clean_mean_activation": 0.8969384431838989,
+      "corrupt_mean_activation": 0.1097002774477005,
+      "clean_activation_rate": 0.10526315867900848,
+      "corrupt_activation_rate": 0.035087719559669495,
+      "rate_differential": 0.07017543911933899
+    },
+    {
+      "feature_index": 1815,
+      "differential_activation": 0.8557942509651184,
+      "clean_mean_activation": 0.8557942509651184,
+      "corrupt_mean_activation": 0.0,
+      "clean_activation_rate": 0.07017543911933899,
+      "corrupt_activation_rate": 0.0,
+      "rate_differential": 0.07017543911933899
+    },
+    {
+      "feature_index": 2501,
+      "differential_activation": 0.1321646124124527,
+      "clean_mean_activation": 0.17255200445652008,
+      "corrupt_mean_activation": 0.04038739576935768,
+      "clean_activation_rate": 0.08771929889917374,
+      "corrupt_activation_rate": 0.017543859779834747,
+      "rate_differential": 0.07017543911933899
+    },
+    {
+      "feature_index": 3622,
+      "differential_activation": -0.17493006587028503,
+      "clean_mean_activation": 0.06506874412298203,
+      "corrupt_mean_activation": 0.23999881744384766,
+      "clean_activation_rate": 0.035087719559669495,
+      "corrupt_activation_rate": 0.10526315867900848,
+      "rate_differential": -0.07017543911933899
+    },
+    {
+      "feature_index": 69,
+      "differential_activation": 0.21130672097206116,
+      "clean_mean_activation": 0.3832189440727234,
+      "corrupt_mean_activation": 0.17191222310066223,
+      "clean_activation_rate": 0.12280701845884323,
+      "corrupt_activation_rate": 0.05263157933950424,
+      "rate_differential": 0.07017543911933899
+    },
+    {
+      "feature_index": 1051,
+      "differential_activation": -0.12969271838665009,
+      "clean_mean_activation": 0.0,
+      "corrupt_mean_activation": 0.12969271838665009,
+      "clean_activation_rate": 0.0,
+      "corrupt_activation_rate": 0.07017543911933899,
+      "rate_differential": -0.07017543911933899
+    },
+    {
+      "feature_index": 855,
+      "differential_activation": -0.13452765345573425,
+      "clean_mean_activation": 0.0,
+      "corrupt_mean_activation": 0.13452765345573425,
+      "clean_activation_rate": 0.0,
+      "corrupt_activation_rate": 0.07017543911933899,
+      "rate_differential": -0.07017543911933899
+    },
+    {
+      "feature_index": 205,
+      "differential_activation": -0.14452064037322998,
+      "clean_mean_activation": 0.0,
+      "corrupt_mean_activation": 0.14452064037322998,
+      "clean_activation_rate": 0.0,
+      "corrupt_activation_rate": 0.07017543911933899,
+      "rate_differential": -0.07017543911933899
+    },
+    {
+      "feature_index": 829,
+      "differential_activation": 0.13678330183029175,
+      "clean_mean_activation": 0.46775874495506287,
+      "corrupt_mean_activation": 0.3309754431247711,
+      "clean_activation_rate": 0.035087719559669495,
+      "corrupt_activation_rate": 0.10526315867900848,
+      "rate_differential": -0.07017543911933899
+    },
+    {
+      "feature_index": 761,
+      "differential_activation": -0.2928823232650757,
+      "clean_mean_activation": 1.0962733030319214,
+      "corrupt_mean_activation": 1.389155626296997,
+      "clean_activation_rate": 0.3333333432674408,
+      "corrupt_activation_rate": 0.4035087823867798,
+      "rate_differential": -0.07017543911933899
+    }
+  ],
+  "differential_stats": {
+    "mean": -0.00043179490603506565,
+    "std": 0.0318327359855175,
+    "max": 0.8557942509651184,
+    "min": -1.0930731296539307,
+    "n_nonzero_features": 1927
+  }
+}
