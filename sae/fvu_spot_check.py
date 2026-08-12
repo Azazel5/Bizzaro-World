@@ -189,6 +189,25 @@ def _load_sae(sae_release_candidates: list[str], sae_id: str, device: str) -> tu
     raise SystemExit(1)
 
 
+def _declared_hook_name(sae: Any) -> str | None:
+    """
+    Read the SAE's own declaration of which TransformerLens hook it was
+    trained on, if the installed SAELens version exposes it. This is ground
+    truth from the SAE's training metadata, not an inference from tensor
+    shape -- e.g. 'blocks.0.attn.hook_z'. Checks both the current SAELens
+    location (cfg.metadata.hook_name) and the older one (cfg.hook_name)
+    defensively, since this script may run against either.
+    """
+    cfg = getattr(sae, "cfg", None)
+    if cfg is None:
+        return None
+    metadata = getattr(cfg, "metadata", None)
+    name = getattr(metadata, "hook_name", None) if metadata is not None else None
+    if name is None:
+        name = getattr(cfg, "hook_name", None)
+    return name
+
+
 def _resolve_hook(
     site: str,
     model: HookedTransformer,
@@ -202,18 +221,17 @@ def _resolve_hook(
 
     resid_post: fixed, no probing needed -- unchanged from the original script.
 
-    attn_out: probes the model once with a throwaway prompt to check both
-    candidate hooks and picks whichever one's dimension actually matches the
-    SAE's d_in -- NOT "prefer hook_attn_out unless absent". Gemma 3 sets
-    head_dim independently of hidden_size / num_attention_heads (a deliberate
-    GQA-era config choice), so n_heads * head_dim can legitimately differ from
-    d_model. When it does, hook_attn_out (post-W_O, d_model-dim) and hook_z
-    flattened (pre-W_O, n_heads*head_dim-dim) are simply different sizes, and
-    whichever one matches d_in is the one the SAE was almost certainly trained
-    on -- e.g. for gemma-3-12b-it, 16 heads x 256 head_dim = 4096 exactly
-    matches the attn_out SAE's d_in, while hook_attn_out is 3840 (hidden_size)
-    and does not. Stops with a clear error, both shapes printed, only if
-    neither candidate matches.
+    attn_out: PRIMARY source of truth is the SAE's own training metadata
+    (sae.cfg.metadata.hook_name in current SAELens, sae.cfg.hook_name in
+    older versions) -- SAELens SAEs carry the exact TransformerLens hook they
+    were trained on, e.g. 'blocks.0.attn.hook_z', so this should never need
+    guessing. A dimension match between hook_attn_out/hook_z and the SAE's
+    d_in is necessary but NOT sufficient evidence of which one is correct --
+    two architecturally-independent Gemma 3 sizes (12B: 16x256, 27B: 32x128)
+    both landing on 4096 turned out to still be the wrong tensor for both
+    models (FVU 0.32 / 0.48, L0 ~2-3x over budget), so that heuristic is now
+    demoted to a last-resort fallback, only used if this SAELens version
+    doesn't expose declared hook_name metadata at all.
     """
     if site == "resid_post":
         return f"blocks.{target_layer}.hook_resid_post", False
@@ -221,34 +239,89 @@ def _resolve_hook(
     if site != "attn_out":
         raise ValueError(f"Unknown site {site!r}")
 
-    post_wo = f"blocks.{target_layer}.hook_attn_out"
-    pre_wo = f"blocks.{target_layer}.attn.hook_z"
-
     d_in = getattr(getattr(sae, "cfg", None), "d_in", None)
     print(f"[hook] SAE expects d_in={d_in}", flush=True)
+
+    declared = _declared_hook_name(sae)
+    post_wo = f"blocks.{target_layer}.hook_attn_out"
+    pre_wo = f"blocks.{target_layer}.attn.hook_z"
+    probe_names = {post_wo, pre_wo}
+    if declared is not None:
+        print(
+            f"[hook] SAE declares hook_name={declared!r} in its own training metadata "
+            f"-- ground truth, not inferred from shape.",
+            flush=True,
+        )
+        if f"blocks.{target_layer}." not in declared:
+            print(
+                f"[warn] declared hook_name={declared!r} does not reference "
+                f"'blocks.{target_layer}.' -- Gemma Scope's attn_out layer numbering for "
+                f"this release may not line up 1:1 with resid_post's (i.e. this SAE may "
+                f"not actually sit at the causally-identified layer from path_patching). "
+                f"Proceeding with the declared name as-is since it's still ground truth "
+                f"for whatever layer it names, but verify target_layer={target_layer} is "
+                f"really what you want before trusting the result.",
+                flush=True,
+            )
+        probe_names.add(declared)
+    else:
+        print(
+            "[hook] this SAELens version does not expose a declared hook_name on the SAE "
+            "config -- falling back to dimension-matching inference (weaker evidence, see "
+            "the FAIL note printed after FVU if this turns out wrong).",
+            flush=True,
+        )
 
     probe_tokens = model.to_tokens("The capital of France is")
     with t.no_grad():
         _, probe_cache = model.run_with_cache(
             probe_tokens.to(device),
-            names_filter=lambda n: n in (post_wo, pre_wo),
+            names_filter=lambda n: n in probe_names,
             return_type=None,
         )
 
+    def _dim_and_shape(name: str) -> tuple[int, tuple[int, ...], bool] | None:
+        if name not in probe_cache:
+            return None
+        shape = tuple(probe_cache[name].shape)
+        if len(shape) == 4:  # [batch, seq, n_heads, d_head] -- per-head hook, needs flatten
+            return shape[-2] * shape[-1], shape, True
+        return shape[-1], shape, False
+
+    # --- Ground-truth path: trust the SAE's own declared hook_name ---
+    if declared is not None:
+        found = _dim_and_shape(declared)
+        if found is None:
+            print(
+                f"\n[error] Declared hook {declared!r} does not exist on this "
+                f"HookedTransformer's hook dictionary. The SAE's training metadata may "
+                f"not match this TransformerLens model/version. Stopping rather than "
+                f"guessing a substitute.\n",
+                flush=True,
+            )
+            raise SystemExit(1)
+        dim, shape, needs_flatten = found
+        print(f"[hook] {declared!r} shape={shape}, dim={dim}", flush=True)
+        if d_in is not None and dim != d_in:
+            print(
+                f"\n[error] Declared hook {declared!r} has dim {dim} but SAE d_in={d_in} "
+                f"-- the SAE's own metadata is internally inconsistent with its own d_in. "
+                f"Stopping rather than guessing further. shape={shape}.\n",
+                flush=True,
+            )
+            raise SystemExit(1)
+        del probe_cache
+        return declared, needs_flatten
+
+    # --- Fallback path: dimension-matching heuristic (only if no declared hook_name) ---
     candidates: list[tuple[str, tuple[int, ...], int, bool]] = []  # (hook, shape, dim, needs_flatten)
-    if post_wo in probe_cache:
-        shape = tuple(probe_cache[post_wo].shape)
-        print(f"[hook] {post_wo!r} present, shape={shape} (post-W_O, d_model-dim)", flush=True)
-        candidates.append((post_wo, shape, shape[-1], False))
-    if pre_wo in probe_cache:
-        shape = tuple(probe_cache[pre_wo].shape)  # [..., n_heads, d_head]
-        flat_dim = shape[-2] * shape[-1]
-        print(
-            f"[hook] {pre_wo!r} present, shape={shape} "
-            f"(pre-W_O per-head, n_heads={shape[-2]} x d_head={shape[-1]} = {flat_dim} flattened)",
-            flush=True,
-        )
-        candidates.append((pre_wo, shape, flat_dim, True))
+    for name, desc in ((post_wo, "post-W_O, d_model-dim"), (pre_wo, "pre-W_O per-head")):
+        found = _dim_and_shape(name)
+        if found is None:
+            continue
+        dim, shape, needs_flatten = found
+        print(f"[hook] {name!r} present, shape={shape}, dim={dim} ({desc})", flush=True)
+        candidates.append((name, shape, dim, needs_flatten))
     del probe_cache
 
     if not candidates:
@@ -271,10 +344,10 @@ def _resolve_hook(
 
     matches = [c for c in candidates if c[2] == d_in]
     if not matches:
-        found = ", ".join(f"{h!r} dim={dim} shape={s}" for h, s, dim, _ in candidates)
+        found_str = ", ".join(f"{h!r} dim={dim} shape={s}" for h, s, dim, _ in candidates)
         print(
             f"\n[error] No candidate hook's dimension matches SAE d_in={d_in}.\n"
-            f"        Checked: {found}\n"
+            f"        Checked: {found_str}\n"
             f"        Refusing to guess a reshape. Check Gemma Scope's attn_out "
             f"documentation for the correct hook point before retrying.\n",
             flush=True,
@@ -286,14 +359,20 @@ def _resolve_hook(
             f"[warn] Both candidate hooks match d_in={d_in} -- this shouldn't normally "
             f"happen (post-W_O and pre-W_O flattened dims are coincidentally equal here). "
             f"Defaulting to post-W_O {post_wo!r} since that's the documented Gemma Scope "
-            f"attn_out convention when the two are indistinguishable by shape alone.",
+            f"attn_out convention when the two are indistinguishable by shape alone. This "
+            f"is a weak tiebreak, not a confirmed answer -- prefer getting a declared "
+            f"hook_name (upgrade sae_lens) over trusting this branch.",
             flush=True,
         )
         matches.sort(key=lambda c: c[0] != post_wo)  # post_wo first if present among matches
 
     hook_name, shape, dim, needs_flatten = matches[0]
     site_desc = "pre-W_O, flattened across heads" if needs_flatten else "post-W_O"
-    print(f"[hook] selected {hook_name!r} ({site_desc}) -- dim {dim} matches SAE d_in={d_in}", flush=True)
+    print(
+        f"[hook] selected {hook_name!r} ({site_desc}) -- dim {dim} matches SAE d_in={d_in} "
+        f"[dimension-matching fallback -- UNCONFIRMED against SAE metadata]",
+        flush=True,
+    )
     return hook_name, needs_flatten
 
 
