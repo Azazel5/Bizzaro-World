@@ -47,6 +47,16 @@ before this can produce real output.
 Install:
     pip install transformers accelerate pyyaml huggingface_hub
 
+Disk, not VRAM: from_pretrained() caches full model weights to
+~/.cache/huggingface/hub/, and del model / gc.collect() / torch.cuda.empty_cache()
+never touch those files -- they only free GPU/RAM. Phase A's base extraction
+model and Phase B's AV checkpoint are each a full 12B/27B download; left
+cached simultaneously that's ~54GB + ~54GB for the 27B pair. cleanup_hf_cache()
+now removes the extraction model's cache right after Phase A (or right after
+--skip-extraction confirms we don't need it this run at all), and
+print_disk_usage() reports the HF cache total at every phase boundary so any
+future blowup is caught immediately with a before/after number.
+
 Usage:
     python nla_av_extraction.py --model gemma_12b_L32 --limit 3   # smoke test
     python nla_av_extraction.py --model gemma_12b_L32              # full battery
@@ -54,6 +64,10 @@ Usage:
 
     # Sanity-check extraction alone, without touching the AV checkpoint at all:
     python nla_av_extraction.py --model gemma_12b_L32 --extract-only
+
+    # Already have activations_{model}.pt from a prior run -- go straight to
+    # Phase B, never load the base extraction model this run:
+    python nla_av_extraction.py --model gemma_27b_L41 --skip-extraction
 
 Run on a single A100 80GB.
 """
@@ -68,9 +82,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+import shutil
+
 import torch as t
 import yaml
-from huggingface_hub import hf_hub_download
+from huggingface_hub import hf_hub_download, scan_cache_dir
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -106,6 +122,50 @@ MODEL_CONFIGS: dict[str, dict[str, Any]] = {
         "expected_injection_scale": 60000.0,
     },
 }
+
+
+# ---------------------------------------------------------------------------
+# Disk-usage diagnostics and HF cache cleanup
+# ---------------------------------------------------------------------------
+# del model / gc.collect() / torch.cuda.empty_cache() only free GPU/RAM for
+# this process -- they do NOT touch weight files from_pretrained() already
+# wrote to ~/.cache/huggingface/hub/. Both the base extraction model and the
+# AV checkpoint are full-size 12B/27B models; leaving both cached
+# simultaneously is what actually blows up disk (~54GB + ~54GB =~ 108GB for
+# 27B, matching the observed number). This is a disk-cache problem, not a
+# VRAM/offload problem -- confirmed separately: device_map=device with device
+# a plain string ("cuda") is a static single-device assignment, not "auto";
+# it never invokes accelerate's balancing/offload logic, and if disk offload
+# were ever triggered via "auto" it raises ValueError rather than silently
+# writing files, so that path is ruled out for this code.
+
+def print_disk_usage(label: str) -> None:
+    try:
+        cache_info = scan_cache_dir()
+    except Exception as e:
+        print(f"[disk:{label}] could not scan HF cache: {type(e).__name__}: {e}", flush=True)
+        return
+    total = sum(repo.size_on_disk for repo in cache_info.repos)
+    print(f"[disk:{label}] HF cache total: {total / 1e9:.1f} GB across {len(cache_info.repos)} repos:", flush=True)
+    for repo in sorted(cache_info.repos, key=lambda r: -r.size_on_disk):
+        print(f"    {repo.repo_id}: {repo.size_on_disk / 1e9:.2f} GB", flush=True)
+
+
+def cleanup_hf_cache(repo_id: str) -> None:
+    """Remove one repo's weights from the local HF hub cache, freeing disk
+    immediately. Safe to call even if the repo isn't cached (no-op)."""
+    try:
+        cache_info = scan_cache_dir()
+    except Exception as e:
+        print(f"[cleanup] could not scan HF cache: {type(e).__name__}: {e}", flush=True)
+        return
+    for repo in cache_info.repos:
+        if repo.repo_id == repo_id:
+            size_gb = repo.size_on_disk / 1e9
+            shutil.rmtree(repo.repo_path, ignore_errors=True)
+            print(f"[cleanup] removed {repo.repo_id} cache ({size_gb:.1f} GB freed)", flush=True)
+            return
+    print(f"[cleanup] {repo_id} not in HF cache -- nothing to remove", flush=True)
 
 
 # ---------------------------------------------------------------------------
@@ -303,6 +363,7 @@ def run_model(
     temperature: float,
     max_new_tokens: int,
     extract_only: bool,
+    skip_extraction: bool,
     limit: int | None,
 ) -> None:
     config = MODEL_CONFIGS[model_key]
@@ -311,6 +372,7 @@ def run_model(
     print(f"\n{'#' * 60}")
     print(f"# NLA AV extraction: {model_key}")
     print(f"{'#' * 60}\n", flush=True)
+    print_disk_usage("start")
 
     battery = load_fact_battery(battery_path)
     if limit is not None:
@@ -318,15 +380,37 @@ def run_model(
         print(f"[data] --limit {limit}: using first {len(battery)} pairs only", flush=True)
     print(f"[data] {len(battery)} prompt pairs loaded from {battery_path}", flush=True)
 
-    # --- Phase A: extract ---
-    clean_acts, corrupt_acts = extract_resid_post(
-        config["tl_model_name"], config["target_layer"], battery, device
-    )
-
     results_dir.mkdir(parents=True, exist_ok=True)
     activations_path = results_dir / f"activations_{model_key}.pt"
-    t.save({"clean_acts": clean_acts, "corrupt_acts": corrupt_acts}, activations_path)
-    print(f"[extract] saved raw activations to {activations_path}", flush=True)
+
+    # --- Phase A: extract, or load already-extracted activations ---
+    if skip_extraction:
+        if not activations_path.exists():
+            raise FileNotFoundError(
+                f"--skip-extraction requires an existing activations file at "
+                f"{activations_path}, but it doesn't exist. Run without "
+                f"--skip-extraction (or with --extract-only) first to produce it."
+            )
+        print(f"[extract] --skip-extraction: loading cached activations from {activations_path}", flush=True)
+        saved = t.load(activations_path)
+        clean_acts, corrupt_acts = saved["clean_acts"], saved["corrupt_acts"]
+        if limit is not None:
+            clean_acts, corrupt_acts = clean_acts[:limit], corrupt_acts[:limit]
+        print(f"[extract] loaded shapes clean={tuple(clean_acts.shape)} corrupt={tuple(corrupt_acts.shape)}. "
+              f"Base extraction model NOT loaded this run.", flush=True)
+    else:
+        clean_acts, corrupt_acts = extract_resid_post(
+            config["tl_model_name"], config["target_layer"], battery, device
+        )
+        t.save({"clean_acts": clean_acts, "corrupt_acts": corrupt_acts}, activations_path)
+        print(f"[extract] saved raw activations to {activations_path}", flush=True)
+        print_disk_usage("after Phase A, before cache cleanup")
+
+    # Whether we just loaded the base model ourselves or it's leftover from a
+    # prior run, we don't need it again this run -- free its disk cache
+    # before Phase B downloads the (also full-size) AV checkpoint.
+    cleanup_hf_cache(config["extraction_model"])
+    print_disk_usage("after extraction-model cache cleanup")
 
     if extract_only:
         print("[extract-only] stopping before AV decoding, as requested.", flush=True)
@@ -354,6 +438,7 @@ def run_model(
     )
     model.eval()
     print("[av] model ready", flush=True)
+    print_disk_usage("after AV model load")
 
     records: list[dict[str, Any]] = []
     n = len(battery)
@@ -423,6 +508,7 @@ def run_model(
     if device == "cuda":
         t.cuda.empty_cache()
     print(f"\n[cleanup] freed AV model for {model_key}", flush=True)
+    print_disk_usage("end of run")
 
 
 def _resolve_device() -> str:
@@ -442,10 +528,18 @@ def main() -> int:
     parser.add_argument("--max_new_tokens", type=int, default=200)
     parser.add_argument("--extract-only", action="store_true",
                         help="Stop after Phase A (save raw activations); skip AV decoding entirely.")
+    parser.add_argument("--skip-extraction", action="store_true",
+                        help="Load activations_{model}.pt from --results_dir instead of running "
+                             "Phase A -- the base extraction model is never loaded this run. "
+                             "Requires that file to already exist (e.g. from a prior --extract-only "
+                             "or full run).")
     parser.add_argument("--limit", type=int, default=None,
                         help="Use only the first N pairs -- for a cheap smoke test before "
                              "the full battery.")
     args = parser.parse_args()
+
+    if args.extract_only and args.skip_extraction:
+        parser.error("--extract-only and --skip-extraction are opposites -- pass at most one.")
 
     device = _resolve_device()
     run_model(
@@ -455,6 +549,7 @@ def main() -> int:
         temperature=args.temperature,
         max_new_tokens=args.max_new_tokens,
         extract_only=args.extract_only,
+        skip_extraction=args.skip_extraction,
         limit=args.limit,
     )
     return 0
