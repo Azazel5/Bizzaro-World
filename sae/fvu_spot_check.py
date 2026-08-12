@@ -202,13 +202,18 @@ def _resolve_hook(
 
     resid_post: fixed, no probing needed -- unchanged from the original script.
 
-    attn_out: probes the model once with a throwaway prompt to check which
-    hook exists and whether its last dim matches the SAE's expected d_in.
-    Tries hook_attn_out (post-W_O, d_model-dim -- what the Gemma Scope paper
-    documents attn_out SAEs as trained on) first, falls back to hook_z
-    (pre-W_O, per-head -- flattened across heads) only if hook_attn_out isn't
-    present on this model. Stops with a clear error on any dimension mismatch
-    rather than guessing a reshape.
+    attn_out: probes the model once with a throwaway prompt to check both
+    candidate hooks and picks whichever one's dimension actually matches the
+    SAE's d_in -- NOT "prefer hook_attn_out unless absent". Gemma 3 sets
+    head_dim independently of hidden_size / num_attention_heads (a deliberate
+    GQA-era config choice), so n_heads * head_dim can legitimately differ from
+    d_model. When it does, hook_attn_out (post-W_O, d_model-dim) and hook_z
+    flattened (pre-W_O, n_heads*head_dim-dim) are simply different sizes, and
+    whichever one matches d_in is the one the SAE was almost certainly trained
+    on -- e.g. for gemma-3-12b-it, 16 heads x 256 head_dim = 4096 exactly
+    matches the attn_out SAE's d_in, while hook_attn_out is 3840 (hidden_size)
+    and does not. Stops with a clear error, both shapes printed, only if
+    neither candidate matches.
     """
     if site == "resid_post":
         return f"blocks.{target_layer}.hook_resid_post", False
@@ -216,8 +221,8 @@ def _resolve_hook(
     if site != "attn_out":
         raise ValueError(f"Unknown site {site!r}")
 
-    primary = f"blocks.{target_layer}.hook_attn_out"
-    fallback = f"blocks.{target_layer}.attn.hook_z"
+    post_wo = f"blocks.{target_layer}.hook_attn_out"
+    pre_wo = f"blocks.{target_layer}.attn.hook_z"
 
     d_in = getattr(getattr(sae, "cfg", None), "d_in", None)
     print(f"[hook] SAE expects d_in={d_in}", flush=True)
@@ -226,58 +231,70 @@ def _resolve_hook(
     with t.no_grad():
         _, probe_cache = model.run_with_cache(
             probe_tokens.to(device),
-            names_filter=lambda n: n in (primary, fallback),
+            names_filter=lambda n: n in (post_wo, pre_wo),
             return_type=None,
         )
 
-    if primary in probe_cache:
-        shape = tuple(probe_cache[primary].shape)
-        print(f"[hook] using {primary!r} (post-W_O attention output), shape={shape}", flush=True)
-        if d_in is not None and shape[-1] != d_in:
-            print(
-                f"\n[error] {primary!r} last dim {shape[-1]} != SAE d_in={d_in}.\n"
-                f"        Refusing to guess a reshape. Full shape={shape}.\n"
-                f"        Check Gemma Scope's attn_out documentation for the correct hook "
-                f"point before retrying.\n",
-                flush=True,
-            )
-            raise SystemExit(1)
-        del probe_cache
-        return primary, False
-
-    if fallback in probe_cache:
-        shape = tuple(probe_cache[fallback].shape)  # [..., n_heads, d_head]
+    candidates: list[tuple[str, tuple[int, ...], int, bool]] = []  # (hook, shape, dim, needs_flatten)
+    if post_wo in probe_cache:
+        shape = tuple(probe_cache[post_wo].shape)
+        print(f"[hook] {post_wo!r} present, shape={shape} (post-W_O, d_model-dim)", flush=True)
+        candidates.append((post_wo, shape, shape[-1], False))
+    if pre_wo in probe_cache:
+        shape = tuple(probe_cache[pre_wo].shape)  # [..., n_heads, d_head]
         flat_dim = shape[-2] * shape[-1]
         print(
-            f"[hook] {primary!r} not found on this model -- falling back to {fallback!r} "
-            f"shape={shape} (n_heads={shape[-2]}, d_head={shape[-1]}, flattened_dim={flat_dim})",
+            f"[hook] {pre_wo!r} present, shape={shape} "
+            f"(pre-W_O per-head, n_heads={shape[-2]} x d_head={shape[-1]} = {flat_dim} flattened)",
             flush=True,
         )
-        print(
-            "[warn] hook_z is the PRE-W_O per-head value, not the post-W_O attention "
-            "output the Gemma Scope paper documents attn_out SAEs as trained on. This "
-            "fallback flattens heads only because flat_dim happens to match d_in -- that "
-            "match does NOT prove it's the right activation. Treat a WARN/FAIL FVU under "
-            "this fallback with real suspicion; a PASS is weak evidence at best.",
-            flush=True,
-        )
-        if d_in is not None and flat_dim != d_in:
-            print(
-                f"\n[error] Flattened hook_z dim {flat_dim} != SAE d_in={d_in}. "
-                f"shape={shape}. Refusing to guess further.\n",
-                flush=True,
-            )
-            raise SystemExit(1)
-        del probe_cache
-        return fallback, True
+        candidates.append((pre_wo, shape, flat_dim, True))
+    del probe_cache
 
-    print(
-        f"\n[error] Neither {primary!r} nor {fallback!r} exist on this model's hook "
-        f"dictionary. Run model.run_with_cache once and inspect cache.keys() filtered "
-        f"to 'blocks.{target_layer}.' to find the correct hook name.\n",
-        flush=True,
-    )
-    raise SystemExit(1)
+    if not candidates:
+        print(
+            f"\n[error] Neither {post_wo!r} nor {pre_wo!r} exist on this model's hook "
+            f"dictionary. Run model.run_with_cache once and inspect cache.keys() filtered "
+            f"to 'blocks.{target_layer}.' to find the correct hook name.\n",
+            flush=True,
+        )
+        raise SystemExit(1)
+
+    if d_in is None:
+        hook_name, shape, _dim, needs_flatten = candidates[0]
+        print(
+            f"[warn] SAE reports no d_in -- can't dimension-check, defaulting to "
+            f"{hook_name!r} (first candidate found). Verify this manually.",
+            flush=True,
+        )
+        return hook_name, needs_flatten
+
+    matches = [c for c in candidates if c[2] == d_in]
+    if not matches:
+        found = ", ".join(f"{h!r} dim={dim} shape={s}" for h, s, dim, _ in candidates)
+        print(
+            f"\n[error] No candidate hook's dimension matches SAE d_in={d_in}.\n"
+            f"        Checked: {found}\n"
+            f"        Refusing to guess a reshape. Check Gemma Scope's attn_out "
+            f"documentation for the correct hook point before retrying.\n",
+            flush=True,
+        )
+        raise SystemExit(1)
+
+    if len(matches) > 1:
+        print(
+            f"[warn] Both candidate hooks match d_in={d_in} -- this shouldn't normally "
+            f"happen (post-W_O and pre-W_O flattened dims are coincidentally equal here). "
+            f"Defaulting to post-W_O {post_wo!r} since that's the documented Gemma Scope "
+            f"attn_out convention when the two are indistinguishable by shape alone.",
+            flush=True,
+        )
+        matches.sort(key=lambda c: c[0] != post_wo)  # post_wo first if present among matches
+
+    hook_name, shape, dim, needs_flatten = matches[0]
+    site_desc = "pre-W_O, flattened across heads" if needs_flatten else "post-W_O"
+    print(f"[hook] selected {hook_name!r} ({site_desc}) -- dim {dim} matches SAE d_in={d_in}", flush=True)
+    return hook_name, needs_flatten
 
 
 def _extract_final_token_activation(
@@ -485,8 +502,9 @@ def main() -> int:
     parser.add_argument(
         "--results_dir",
         type=Path,
-        default=REPO_ROOT / "results" / "fvu",
-        help="Directory to write fvu_results_*.json files (default: results/fvu/).",
+        default=SCRIPT_DIR / "fvu",
+        help="Directory to write fvu_results_*.json files (default: sae/fvu/, "
+        "matching where fvu_results_gemma_12b.json / _gemma_27b.json already live).",
     )
     args = parser.parse_args()
 
