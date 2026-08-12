@@ -1,0 +1,584 @@
+{
+  "model_key": "gemma_27b_L41",
+  "ar_repo": "kitft/nla-gemma3-27b-L41-ar",
+  "output_scale_diagnosis": "mutual_renormalization_to_mse_scale=73.3212 (sqrt(d_model), from this checkpoint's own nla_meta.yaml) -- matches kitft's own NLACritic.score() methodology. cosine_similarity is scale-invariant and needs no such resolution.",
+  "n_pairs": 57,
+  "records": [
+    {
+      "idx": 0,
+      "category": "geography_capitals",
+      "clean_cosine_similarity": 0.9945964217185974,
+      "clean_mse": 30831.958984375,
+      "clean_normalized_mse": 0.010805917903780937,
+      "corrupt_cosine_similarity": 0.9939055442810059,
+      "corrupt_mse": 20155.78515625,
+      "corrupt_normalized_mse": 0.012188173830509186
+    },
+    {
+      "idx": 1,
+      "category": "geography_capitals",
+      "clean_cosine_similarity": 0.9929705262184143,
+      "clean_mse": 24832.8125,
+      "clean_normalized_mse": 0.014057038351893425,
+      "corrupt_cosine_similarity": 0.992577850818634,
+      "corrupt_mse": 31380.6875,
+      "corrupt_normalized_mse": 0.01484388392418623
+    },
+    {
+      "idx": 2,
+      "category": "geography_capitals",
+      "clean_cosine_similarity": 0.9920920729637146,
+      "clean_mse": 25210.87890625,
+      "clean_normalized_mse": 0.01581447385251522,
+      "corrupt_cosine_similarity": 0.9930327534675598,
+      "corrupt_mse": 21430.630859375,
+      "corrupt_normalized_mse": 0.013933436945080757
+    },
+    {
+      "idx": 3,
+      "category": "geography_continents",
+      "clean_cosine_similarity": 0.9926256537437439,
+      "clean_mse": 33757.94140625,
+      "clean_normalized_mse": 0.014747470617294312,
+      "corrupt_cosine_similarity": 0.9913247227668762,
+      "corrupt_mse": 38996.0390625,
+      "corrupt_normalized_mse": 0.017350314185023308
+    },
+    {
+      "idx": 4,
+      "category": "geography_continents",
+      "clean_cosine_similarity": 0.9802863001823425,
+      "clean_mse": 121118.546875,
+      "clean_normalized_mse": 0.03942693769931793,
+      "corrupt_cosine_similarity": 0.9856569766998291,
+      "corrupt_mse": 84989.1171875,
+      "corrupt_normalized_mse": 0.028685271739959717
+    },
+    {
+      "idx": 5,
+      "category": "geography_continents",
+      "clean_cosine_similarity": 0.9926062226295471,
+      "clean_mse": 32942.1953125,
+      "clean_normalized_mse": 0.014786620624363422,
+      "corrupt_cosine_similarity": 0.9934791922569275,
+      "corrupt_mse": 32030.0234375,
+      "corrupt_normalized_mse": 0.013039326295256615
+    },
+    {
+      "idx": 6,
+      "category": "chemistry_symbols",
+      "clean_cosine_similarity": 0.9938480854034424,
+      "clean_mse": 16935.25390625,
+      "clean_normalized_mse": 0.012302984483540058,
+      "corrupt_cosine_similarity": 0.993867039680481,
+      "corrupt_mse": 16602.62890625,
+      "corrupt_normalized_mse": 0.012265513651072979
+    },
+    {
+      "idx": 7,
+      "category": "chemistry_symbols",
+      "clean_cosine_similarity": 0.9927902817726135,
+      "clean_mse": 17007.31640625,
+      "clean_normalized_mse": 0.014419503509998322,
+      "corrupt_cosine_similarity": 0.9949839115142822,
+      "corrupt_mse": 14684.1083984375,
+      "corrupt_normalized_mse": 0.010030990466475487
+    },
+    {
+      "idx": 8,
+      "category": "chemistry_symbols",
+      "clean_cosine_similarity": 0.994118332862854,
+      "clean_mse": 25156.146484375,
+      "clean_normalized_mse": 0.011762205511331558,
+      "corrupt_cosine_similarity": 0.9947541952133179,
+      "corrupt_mse": 21352.43359375,
+      "corrupt_normalized_mse": 0.010490398854017258
+    },
+    {
+      "idx": 9,
+      "category": "physics_constants",
+      "clean_cosine_similarity": 0.9953224062919617,
+      "clean_mse": 25327.921875,
+      "clean_normalized_mse": 0.009354010224342346,
+      "corrupt_cosine_similarity": 0.993285596370697,
+      "corrupt_mse": 41376.78125,
+      "corrupt_normalized_mse": 0.01342715136706829
+    },
+    {
+      "idx": 10,
+      "category": "physics_constants",
+      "clean_cosine_similarity": 0.991209864616394,
+      "clean_mse": 49057.21875,
+      "clean_normalized_mse": 0.017580315470695496,
+      "corrupt_cosine_similarity": 0.9881591200828552,
+      "corrupt_mse": 36285.7578125,
+      "corrupt_normalized_mse": 0.023681901395320892
+    },
+    {
+      "idx": 11,
+      "category": "anatomy_organs",
+      "clean_cosine_similarity": 0.9953626990318298,
+      "clean_mse": 31790.853515625,
+      "clean_normalized_mse": 0.009273338131606579,
+      "corrupt_cosine_similarity": 0.9942830204963684,
+      "corrupt_mse": 32706.49609375,
+      "corrupt_normalized_mse": 0.011433126404881477
+    },
+    {
+      "idx": 12,
+      "category": "anatomy_organs",
+      "clean_cosine_similarity": 0.9939943552017212,
+      "clean_mse": 21536.203125,
+      "clean_normalized_mse": 0.012010271660983562,
+      "corrupt_cosine_similarity": 0.9919729232788086,
+      "corrupt_mse": 36586.85546875,
+      "corrupt_normalized_mse": 0.01605263724923134
+    },
+    {
+      "idx": 13,
+      "category": "anatomy_organs",
+      "clean_cosine_similarity": 0.9935701489448547,
+      "clean_mse": 57770.41015625,
+      "clean_normalized_mse": 0.012857871130108833,
+      "corrupt_cosine_similarity": 0.9934757351875305,
+      "corrupt_mse": 35170.83203125,
+      "corrupt_normalized_mse": 0.013047960586845875
+    },
+    {
+      "idx": 14,
+      "category": "astronomy_planets",
+      "clean_cosine_similarity": 0.9899054169654846,
+      "clean_mse": 29379.74609375,
+      "clean_normalized_mse": 0.02018917165696621,
+      "corrupt_cosine_similarity": 0.9939214587211609,
+      "corrupt_mse": 53397.01953125,
+      "corrupt_normalized_mse": 0.012155537493526936
+    },
+    {
+      "idx": 15,
+      "category": "astronomy_planets",
+      "clean_cosine_similarity": 0.9937874674797058,
+      "clean_mse": 46345.06640625,
+      "clean_normalized_mse": 0.012423163279891014,
+      "corrupt_cosine_similarity": 0.9905431270599365,
+      "corrupt_mse": 49517.65234375,
+      "corrupt_normalized_mse": 0.01891382411122322
+    },
+    {
+      "idx": 16,
+      "category": "astronomy_planets",
+      "clean_cosine_similarity": 0.9927760362625122,
+      "clean_mse": 23273.990234375,
+      "clean_normalized_mse": 0.014446405693888664,
+      "corrupt_cosine_similarity": 0.991830587387085,
+      "corrupt_mse": 63327.63671875,
+      "corrupt_normalized_mse": 0.016337957233190536
+    },
+    {
+      "idx": 17,
+      "category": "mathematics_addition",
+      "clean_cosine_similarity": 0.9907326102256775,
+      "clean_mse": 62014.796875,
+      "clean_normalized_mse": 0.01853357069194317,
+      "corrupt_cosine_similarity": 0.9785158038139343,
+      "corrupt_mse": 72165.5234375,
+      "corrupt_normalized_mse": 0.04296660050749779
+    },
+    {
+      "idx": 18,
+      "category": "mathematics_addition",
+      "clean_cosine_similarity": 0.9900028705596924,
+      "clean_mse": 61979.63671875,
+      "clean_normalized_mse": 0.019993266090750694,
+      "corrupt_cosine_similarity": 0.9789641499519348,
+      "corrupt_mse": 87292.2890625,
+      "corrupt_normalized_mse": 0.04207086190581322
+    },
+    {
+      "idx": 19,
+      "category": "mathematics_addition",
+      "clean_cosine_similarity": 0.9803197979927063,
+      "clean_mse": 75725.109375,
+      "clean_normalized_mse": 0.03935925289988518,
+      "corrupt_cosine_similarity": 0.9824120402336121,
+      "corrupt_mse": 62506.41796875,
+      "corrupt_normalized_mse": 0.035173431038856506
+    },
+    {
+      "idx": 20,
+      "category": "mathematics_geometry",
+      "clean_cosine_similarity": 0.9934819936752319,
+      "clean_mse": 33102.22265625,
+      "clean_normalized_mse": 0.013035513460636139,
+      "corrupt_cosine_similarity": 0.9946437478065491,
+      "corrupt_mse": 27217.705078125,
+      "corrupt_normalized_mse": 0.010710879229009151
+    },
+    {
+      "idx": 21,
+      "category": "mathematics_geometry",
+      "clean_cosine_similarity": 0.9945162534713745,
+      "clean_mse": 45389.7265625,
+      "clean_normalized_mse": 0.010967109352350235,
+      "corrupt_cosine_similarity": 0.9928281307220459,
+      "corrupt_mse": 57629.9921875,
+      "corrupt_normalized_mse": 0.01434219442307949
+    },
+    {
+      "idx": 22,
+      "category": "mathematics_geometry",
+      "clean_cosine_similarity": 0.994592010974884,
+      "clean_mse": 30775.822265625,
+      "clean_normalized_mse": 0.01081556174904108,
+      "corrupt_cosine_similarity": 0.995195209980011,
+      "corrupt_mse": 17932.6875,
+      "corrupt_normalized_mse": 0.009607684798538685
+    },
+    {
+      "idx": 23,
+      "category": "sports_equipment",
+      "clean_cosine_similarity": 0.9907058477401733,
+      "clean_mse": 57987.8046875,
+      "clean_normalized_mse": 0.01858707144856453,
+      "corrupt_cosine_similarity": 0.992857038974762,
+      "corrupt_mse": 17967.6953125,
+      "corrupt_normalized_mse": 0.014285500161349773
+    },
+    {
+      "idx": 24,
+      "category": "sports_equipment",
+      "clean_cosine_similarity": 0.994127094745636,
+      "clean_mse": 36866.73828125,
+      "clean_normalized_mse": 0.011745141819119453,
+      "corrupt_cosine_similarity": 0.9919278025627136,
+      "corrupt_mse": 42632.3203125,
+      "corrupt_normalized_mse": 0.016143448650836945
+    },
+    {
+      "idx": 25,
+      "category": "sports_equipment",
+      "clean_cosine_similarity": 0.990435779094696,
+      "clean_mse": 47751.3203125,
+      "clean_normalized_mse": 0.01912696100771427,
+      "corrupt_cosine_similarity": 0.992399275302887,
+      "corrupt_mse": 56446.7421875,
+      "corrupt_normalized_mse": 0.015201883390545845
+    },
+    {
+      "idx": 26,
+      "category": "translation_spanish",
+      "clean_cosine_similarity": 0.9929708242416382,
+      "clean_mse": 37702.14453125,
+      "clean_normalized_mse": 0.014056803658604622,
+      "corrupt_cosine_similarity": 0.9924160242080688,
+      "corrupt_mse": 33406.46875,
+      "corrupt_normalized_mse": 0.015165909193456173
+    },
+    {
+      "idx": 27,
+      "category": "translation_spanish",
+      "clean_cosine_similarity": 0.9933196306228638,
+      "clean_mse": 34345.546875,
+      "clean_normalized_mse": 0.013359535485506058,
+      "corrupt_cosine_similarity": 0.9928383827209473,
+      "corrupt_mse": 36245.26171875,
+      "corrupt_normalized_mse": 0.01432187482714653
+    },
+    {
+      "idx": 28,
+      "category": "translation_spanish",
+      "clean_cosine_similarity": 0.9915912747383118,
+      "clean_mse": 26706.544921875,
+      "clean_normalized_mse": 0.01681564934551716,
+      "corrupt_cosine_similarity": 0.9927067756652832,
+      "corrupt_mse": 30064.203125,
+      "corrupt_normalized_mse": 0.014585370197892189
+    },
+    {
+      "idx": 29,
+      "category": "translation_french",
+      "clean_cosine_similarity": 0.9926302433013916,
+      "clean_mse": 38553.89453125,
+      "clean_normalized_mse": 0.014738177880644798,
+      "corrupt_cosine_similarity": 0.9934763312339783,
+      "corrupt_mse": 34572.10546875,
+      "corrupt_normalized_mse": 0.013046319596469402
+    },
+    {
+      "idx": 30,
+      "category": "translation_french",
+      "clean_cosine_similarity": 0.9906073212623596,
+      "clean_mse": 27454.392578125,
+      "clean_normalized_mse": 0.018784265965223312,
+      "corrupt_cosine_similarity": 0.9936155676841736,
+      "corrupt_mse": 30556.2890625,
+      "corrupt_normalized_mse": 0.012767022475600243
+    },
+    {
+      "idx": 31,
+      "category": "colors_mixing",
+      "clean_cosine_similarity": 0.9923341274261475,
+      "clean_mse": 47675.97265625,
+      "clean_normalized_mse": 0.015330839902162552,
+      "corrupt_cosine_similarity": 0.991790235042572,
+      "corrupt_mse": 42739.1953125,
+      "corrupt_normalized_mse": 0.016419250518083572
+    },
+    {
+      "idx": 32,
+      "category": "colors_mixing",
+      "clean_cosine_similarity": 0.9930083751678467,
+      "clean_mse": 35417.94921875,
+      "clean_normalized_mse": 0.013982869684696198,
+      "corrupt_cosine_similarity": 0.9923341274261475,
+      "corrupt_mse": 47675.97265625,
+      "corrupt_normalized_mse": 0.015330839902162552
+    },
+    {
+      "idx": 33,
+      "category": "colors_mixing",
+      "clean_cosine_similarity": 0.99311763048172,
+      "clean_mse": 51891.6953125,
+      "clean_normalized_mse": 0.013763843104243279,
+      "corrupt_cosine_similarity": 0.9931865334510803,
+      "corrupt_mse": 70967.765625,
+      "corrupt_normalized_mse": 0.013624757528305054
+    },
+    {
+      "idx": 34,
+      "category": "animal_taxonomy",
+      "clean_cosine_similarity": 0.994255781173706,
+      "clean_mse": 36555.39453125,
+      "clean_normalized_mse": 0.011487962678074837,
+      "corrupt_cosine_similarity": 0.9940274357795715,
+      "corrupt_mse": 39209.58203125,
+      "corrupt_normalized_mse": 0.0119441207498312
+    },
+    {
+      "idx": 35,
+      "category": "animal_taxonomy",
+      "clean_cosine_similarity": 0.9900709986686707,
+      "clean_mse": 90562.265625,
+      "clean_normalized_mse": 0.019856391474604607,
+      "corrupt_cosine_similarity": 0.9941026568412781,
+      "corrupt_mse": 52917.671875,
+      "corrupt_normalized_mse": 0.011793742887675762
+    },
+    {
+      "idx": 36,
+      "category": "animal_taxonomy",
+      "clean_cosine_similarity": 0.9894221425056458,
+      "clean_mse": 52945.68359375,
+      "clean_normalized_mse": 0.021155323833227158,
+      "corrupt_cosine_similarity": 0.9931631088256836,
+      "corrupt_mse": 34533.9453125,
+      "corrupt_normalized_mse": 0.01367238350212574
+    },
+    {
+      "idx": 37,
+      "category": "history_dates",
+      "clean_cosine_similarity": 0.9932861328125,
+      "clean_mse": 23562.953125,
+      "clean_normalized_mse": 0.01342794019728899,
+      "corrupt_cosine_similarity": 0.9947805404663086,
+      "corrupt_mse": 56264.23828125,
+      "corrupt_normalized_mse": 0.01043739914894104
+    },
+    {
+      "idx": 38,
+      "category": "history_dates",
+      "clean_cosine_similarity": 0.9940820932388306,
+      "clean_mse": 46488.97265625,
+      "clean_normalized_mse": 0.011834545060992241,
+      "corrupt_cosine_similarity": 0.995546817779541,
+      "corrupt_mse": 29284.44140625,
+      "corrupt_normalized_mse": 0.008905701339244843
+    },
+    {
+      "idx": 39,
+      "category": "history_dates",
+      "clean_cosine_similarity": 0.9892733693122864,
+      "clean_mse": 46176.84375,
+      "clean_normalized_mse": 0.021453067660331726,
+      "corrupt_cosine_similarity": 0.9946882128715515,
+      "corrupt_mse": 23703.384765625,
+      "corrupt_normalized_mse": 0.010623985901474953
+    },
+    {
+      "idx": 40,
+      "category": "technology_founders",
+      "clean_cosine_similarity": 0.9900138974189758,
+      "clean_mse": 41242.46484375,
+      "clean_normalized_mse": 0.019971508532762527,
+      "corrupt_cosine_similarity": 0.9892750978469849,
+      "corrupt_mse": 37342.46484375,
+      "corrupt_normalized_mse": 0.021449049934744835
+    },
+    {
+      "idx": 41,
+      "category": "technology_founders",
+      "clean_cosine_similarity": 0.9905153512954712,
+      "clean_mse": 45466.15234375,
+      "clean_normalized_mse": 0.01896841824054718,
+      "corrupt_cosine_similarity": 0.9907665848731995,
+      "corrupt_mse": 84437.7109375,
+      "corrupt_normalized_mse": 0.018465682864189148
+    },
+    {
+      "idx": 42,
+      "category": "technology_founders",
+      "clean_cosine_similarity": 0.9929156303405762,
+      "clean_mse": 45183.12890625,
+      "clean_normalized_mse": 0.014167734421789646,
+      "corrupt_cosine_similarity": 0.9937410354614258,
+      "corrupt_mse": 30790.146484375,
+      "corrupt_normalized_mse": 0.012516295537352562
+    },
+    {
+      "idx": 43,
+      "category": "units_measurement",
+      "clean_cosine_similarity": 0.9916646480560303,
+      "clean_mse": 60624.453125,
+      "clean_normalized_mse": 0.016667719930410385,
+      "corrupt_cosine_similarity": 0.9893975853919983,
+      "corrupt_mse": 91015.546875,
+      "corrupt_normalized_mse": 0.02120310626924038
+    },
+    {
+      "idx": 44,
+      "category": "units_measurement",
+      "clean_cosine_similarity": 0.9947238564491272,
+      "clean_mse": 39495.34765625,
+      "clean_normalized_mse": 0.010551015846431255,
+      "corrupt_cosine_similarity": 0.9931861162185669,
+      "corrupt_mse": 67103.4765625,
+      "corrupt_normalized_mse": 0.013625727035105228
+    },
+    {
+      "idx": 45,
+      "category": "units_measurement",
+      "clean_cosine_similarity": 0.9947494268417358,
+      "clean_mse": 30691.958984375,
+      "clean_normalized_mse": 0.010500635020434856,
+      "corrupt_cosine_similarity": 0.992367148399353,
+      "corrupt_mse": 34632.9453125,
+      "corrupt_normalized_mse": 0.01526529062539339
+    },
+    {
+      "idx": 46,
+      "category": "literature_authors",
+      "clean_cosine_similarity": 0.9936965703964233,
+      "clean_mse": 18145.9140625,
+      "clean_normalized_mse": 0.012607469223439693,
+      "corrupt_cosine_similarity": 0.9960052371025085,
+      "corrupt_mse": 13004.8720703125,
+      "corrupt_normalized_mse": 0.007989015430212021
+    },
+    {
+      "idx": 47,
+      "category": "literature_authors",
+      "clean_cosine_similarity": 0.9959620833396912,
+      "clean_mse": 15141.4892578125,
+      "clean_normalized_mse": 0.008075198158621788,
+      "corrupt_cosine_similarity": 0.9817048907279968,
+      "corrupt_mse": 28857.119140625,
+      "corrupt_normalized_mse": 0.036589860916137695
+    },
+    {
+      "idx": 48,
+      "category": "mythology_roman_greek",
+      "clean_cosine_similarity": 0.9909723401069641,
+      "clean_mse": 34044.796875,
+      "clean_normalized_mse": 0.018053332343697548,
+      "corrupt_cosine_similarity": 0.9908431172370911,
+      "corrupt_mse": 36155.23046875,
+      "corrupt_normalized_mse": 0.018314359709620476
+    },
+    {
+      "idx": 49,
+      "category": "mythology_roman_greek",
+      "clean_cosine_similarity": 0.9934329986572266,
+      "clean_mse": 21746.837890625,
+      "clean_normalized_mse": 0.013133076019585133,
+      "corrupt_cosine_similarity": 0.9918386340141296,
+      "corrupt_mse": 45128.72265625,
+      "corrupt_normalized_mse": 0.016322489827871323
+    },
+    {
+      "idx": 50,
+      "category": "mythology_roman_greek",
+      "clean_cosine_similarity": 0.9899711608886719,
+      "clean_mse": 40763.9140625,
+      "clean_normalized_mse": 0.020055588334798813,
+      "corrupt_cosine_similarity": 0.9912624955177307,
+      "corrupt_mse": 40953.80078125,
+      "corrupt_normalized_mse": 0.017474422231316566
+    },
+    {
+      "idx": 51,
+      "category": "pop_culture_bands",
+      "clean_cosine_similarity": 0.9947950839996338,
+      "clean_mse": 28875.02734375,
+      "clean_normalized_mse": 0.010409537702798843,
+      "corrupt_cosine_similarity": 0.9905323386192322,
+      "corrupt_mse": 54194.6796875,
+      "corrupt_normalized_mse": 0.018934527412056923
+    },
+    {
+      "idx": 52,
+      "category": "pop_culture_bands",
+      "clean_cosine_similarity": 0.9922300577163696,
+      "clean_mse": 48340.78125,
+      "clean_normalized_mse": 0.015538085252046585,
+      "corrupt_cosine_similarity": 0.995073676109314,
+      "corrupt_mse": 25707.50390625,
+      "corrupt_normalized_mse": 0.009852672927081585
+    },
+    {
+      "idx": 53,
+      "category": "pop_culture_bands",
+      "clean_cosine_similarity": 0.9938887357711792,
+      "clean_mse": 49672.71875,
+      "clean_normalized_mse": 0.012220642529428005,
+      "corrupt_cosine_similarity": 0.9936330914497375,
+      "corrupt_mse": 57253.73828125,
+      "corrupt_normalized_mse": 0.012732126750051975
+    },
+    {
+      "idx": 54,
+      "category": "materials_composition",
+      "clean_cosine_similarity": 0.9945082664489746,
+      "clean_mse": 33290.41015625,
+      "clean_normalized_mse": 0.010982302017509937,
+      "corrupt_cosine_similarity": 0.9950872659683228,
+      "corrupt_mse": 32952.0,
+      "corrupt_normalized_mse": 0.009823759086430073
+    },
+    {
+      "idx": 55,
+      "category": "materials_composition",
+      "clean_cosine_similarity": 0.988636314868927,
+      "clean_mse": 52328.28515625,
+      "clean_normalized_mse": 0.022727275267243385,
+      "corrupt_cosine_similarity": 0.9922562837600708,
+      "corrupt_mse": 17992.515625,
+      "corrupt_normalized_mse": 0.015486679971218109
+    },
+    {
+      "idx": 56,
+      "category": "materials_composition",
+      "clean_cosine_similarity": 0.993755042552948,
+      "clean_mse": 50001.3984375,
+      "clean_normalized_mse": 0.0124895591288805,
+      "corrupt_cosine_similarity": 0.9930601119995117,
+      "corrupt_mse": 66129.4296875,
+      "corrupt_normalized_mse": 0.01387938391417265
+    }
+  ],
+  "summary_stats": {
+    "mean_clean_cosine": 0.9922311922960114,
+    "mean_corrupt_cosine": 0.9919210599179853,
+    "std_clean_cosine": 0.0028748690318026794,
+    "std_corrupt_cosine": 0.0036849852841346906
+  }
+}
