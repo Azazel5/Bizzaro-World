@@ -1,0 +1,17 @@
+{
+  "model_key": "gemma_27b_attn_out",
+  "site": "attn_out",
+  "model_name": "google/gemma-3-27b-it",
+  "sae_release": "gemma-scope-2-27b-it-att-all",
+  "sae_id": "layer_54_width_16k_l0_small",
+  "target_layer": 54,
+  "hook_name": "blocks.54.attn.hook_z",
+  "needs_head_flatten": true,
+  "battery_path": "/content/Bizzaro-World/fact_battery/gemma-3-27b-it.json",
+  "n_prompts": 57,
+  "verdict": "FAIL",
+  "fvu": 0.4829966425895691,
+  "mean_activation_norm": 54.230201721191406,
+  "mean_reconstruction_norm": 48.204044342041016,
+  "mean_l0": 62.122806549072266
+}
