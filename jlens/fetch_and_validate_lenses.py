@@ -82,14 +82,14 @@ for path in (SCRIPT_DIR, REPO_ROOT):
     if str(path) not in sys.path:
         sys.path.insert(0, str(path))
 
-import jlens  # noqa: E402  (from Phase 1's pip install -e .)
-from jlens.lens import JacobianLens  # noqa: E402  (direct submodule import -- see
-# the AttributeError this session hit on `jlens.JacobianLens`: the real
-# jlens/lens.py definitely defines this class (confirmed by reading the file
-# directly), so importing it from there sidesteps whatever is/isn't correctly
-# re-exported at the jlens/__init__.py top level, and sidesteps any sys.path
-# ordering issue from this project's own "jlens" folder name colliding with
-# the installed package's name.
+# Import directly from submodules, not the jlens/__init__.py top level.
+# jlens.JacobianLens and jlens.from_hf both raised AttributeError against a
+# real, correctly-installed package this session -- jlens/__init__.py does
+# not actually re-export these (confirmed by reading jlens/lens.py and
+# jlens/hf.py directly; both classes/functions are real and exist exactly
+# where the module name implies, just not re-exported at the top level).
+from jlens.lens import JacobianLens  # noqa: E402
+from jlens.hf import from_hf  # noqa: E402
 
 from shared.fact_battery import load_fact_battery  # noqa: E402
 
@@ -196,7 +196,7 @@ def run_model(model_key: str, results_dir: Path, device: str) -> None:
     print(f"\n[load] {config['hf_name']} via plain HF transformers (bfloat16, {device})", flush=True)
     hf = AutoModelForCausalLM.from_pretrained(config["hf_name"], torch_dtype=t.bfloat16).to(device)
     tok = AutoTokenizer.from_pretrained(config["hf_name"])
-    model = jlens.from_hf(hf, tok)
+    model = from_hf(hf, tok)
     print("[load] model ready", flush=True)
     print_disk_usage("after model load")
 

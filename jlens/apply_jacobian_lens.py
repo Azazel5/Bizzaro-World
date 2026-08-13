@@ -41,9 +41,10 @@ for path in (SCRIPT_DIR, REPO_ROOT):
     if str(path) not in sys.path:
         sys.path.insert(0, str(path))
 
-import jlens  # noqa: E402
-from jlens.lens import JacobianLens  # noqa: E402  (direct submodule import -- see
-# fetch_and_validate_lenses.py's comment on the same import for why)
+# Import directly from submodules, not jlens/__init__.py -- see
+# fetch_and_validate_lenses.py's comment on this same pattern for why.
+from jlens.lens import JacobianLens  # noqa: E402
+from jlens.hf import from_hf  # noqa: E402
 
 from shared.fact_battery import load_fact_battery  # noqa: E402
 
@@ -95,7 +96,7 @@ def run_model(model_key: str, results_dir: Path, device: str) -> None:
     print(f"\n[load] {config['hf_name']} via plain HF transformers (bfloat16, {device})", flush=True)
     hf = AutoModelForCausalLM.from_pretrained(config["hf_name"], torch_dtype=t.bfloat16).to(device)
     tok = AutoTokenizer.from_pretrained(config["hf_name"])
-    model = jlens.from_hf(hf, tok)
+    model = from_hf(hf, tok)
     print("[load] model ready", flush=True)
     print_disk_usage("after model load")
 
