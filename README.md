@@ -189,6 +189,76 @@ Recent runs on **Gemma-3-12B-IT** (48 layers, 15 pairs in Mode A, 20 in B, 57 in
 
 ---
 
+## Path patching (head-level circuit discovery) — `path_patching/`
+
+A second, independent activation-patching framework, separate from the `scripts/experiments/exp1-4.py` pipeline above — built specifically to find **which individual attention heads** are causally load-bearing for the clean-vs-corrupt flip, across **all three model scales (2B, 12B, 27B)**, using [ARENA](https://arena.education/)/IOI-style **path patching** rather than whole-layer residual swaps.
+
+### Methodology
+
+Three sweep types, all in `path_patching/patching.py`, driven by `path_patching/run_experiments.py --model {gemma_2b,gemma_12b,gemma_27b}`:
+
+1. **Head → final residual** (`get_path_patch_head_to_final_resid_post`, `path_patch_final_resid.*`) — every `(layer, head)` patched directly into the final residual stream, bypassing all downstream composition. Ranks heads by direct causal contribution to the clean-vs-corrupt logit margin. The **top 5 most-negative** ("load-bearing" — necessary for the correct answer) and **top 5 most-positive** ("suppressive" — actively working against it) heads become the **core circuit** for that model.
+2. **Head → head query composition** (`get_path_patch_head_to_heads`, `path_patch_heads_q.*`) — sweeps every upstream `(layer, head)` as a sender into the fixed 10-head core-circuit receiver set's **query** input. Reading caveat (confirmed this session, not a bug): rows at or past a receiver's own layer are structurally suppressed — same-layer heads share one pre-attention residual input, so a same-layer "sender" is a causal no-op, and later senders have fewer of the 10 receivers still downstream of them. A flat row late in this heatmap is **not** evidence that layer is unimportant; see the dedicated sender sweep instead.
+3. **Fixed sender → downstream heads** (`get_path_patch_sender_to_heads`, `path_patch_sender_{L}_{H}.*`) — each of the 10 core-circuit heads run individually as a fixed sender, sweeping only strictly-downstream receivers (causally valid, unlike #2 for late senders). This is the trustworthy read on "where does head X send information."
+
+All three sweeps additionally reuse the `heads_q` heatmap's own top cells (most negative/positive individual sender cells) as a second-order **`load_bearing_senders` / `suppressive_senders`** list — "who most strongly feeds the core circuit."
+
+Every sweep uses `factual_recall_metric` (`path_patching/metrics.py`): `(patched_ld - clean_ld) / (clean_ld - corrupt_ld)`, i.e. the fraction of the clean→corrupt swing restored by patching that one component — and only ever tests **query composition** (`receiver_input="q"`); key/value composition was never swept for any model, a real scope limitation on all "who feeds whom" conclusions below.
+
+### Results (`path_patching/results/visuals/circuit_summary.json`, `circuit_summary_27b.json`)
+
+| model | n_layers × n_heads | baseline (clean_ld / corrupt_ld / swing) | top load-bearing head | top suppressive head |
+|---|---|---|---|---|
+| Gemma 2B | 18 × 8 | 0.0115 / −0.6914 / 0.7031 | L16H2 (−0.2305) | L14H2 (+0.0752) |
+| Gemma 12B-IT | 48 × 16 | 0.2227 / −0.0903 / 0.3125 | **L38H8 (−0.7461)** — ≈2× the runner-up | L46H5 (+1.1094) — largest single-head effect found anywhere in this project |
+| Gemma 27B-IT | 62 × 32 | 0.6914 / −0.5703 / 1.2617 | **L54H23 (−0.1768)** | **L54H22 (+0.0996)** |
+
+**27B's standout finding**: layer 54 uniquely hosts *both* the strongest load-bearing head (L54H23) and the strongest suppressive head (L54H22) — the single most causally loaded depth in that model, not just "a layer that matters." Full 10-head core circuits (load-bearing + suppressive) per model are in the `circuit_summary*.json` files linked above; per-head sender heatmaps/profiles are in `path_patching/results/visuals/sender_heatmap_*` and `sender_profile_*`.
+
+**Depth, expressed as a fraction of model depth**, is what later work (NLA, J-Lens below) keys off of: L38/48 = **79%** (12B), L54/62 = **87%** (27B).
+
+---
+
+## Natural Language Autoencoders (NLA) — `nla/`
+
+A pair of fine-tuned decoder checkpoints (**AV** = activation verbalizer, **AR** = activation reconstructor) from [kitft/natural_language_autoencoders](https://github.com/kitft/natural_language_autoencoders), used to translate a raw residual-stream vector into natural-language text (AV) and back into a vector (AR) — a qualitative, semantic-content complement to path patching's purely causal/numeric picture.
+
+### Checkpoints and extraction
+
+| model | AV / AR repo | layer | d_model | injection_scale |
+|---|---|---|---|---|
+| Gemma 12B-IT | `kitft/nla-gemma3-12b-L32-{av,ar}` | 32 | 3840 | 80,000 |
+| Gemma 27B-IT | `kitft/nla-gemma3-27b-L41-{av,ar}` | 41 | 5376 | 60,000 |
+
+These layers (32/41) are **not** the causally-dominant layers found by path patching (38/54) — a known, accepted mismatch (these are simply the layers the public checkpoints were trained at), and exactly what the J-Lens work below was built to reconcile.
+
+Extraction (`nla/nla_av_extraction.py`) pulls `blocks.{L}.hook_resid_post` at the **final token** (index −1, confirmed against the real `nla_inference` source and the AR prompt template's fixed `...</text> <summary>` suffix), rescales it to `injection_scale` (L2-norm), injects it into AV's embedding table at a validated marker position, and decodes via plain HuggingFace `model.generate(inputs_embeds=...)` — deliberately **not** the reference implementation's SGLang-server design, which is built for high-throughput concurrent serving and adds nothing at our scale (114 sequential decodes) beyond a heavyweight second dependency.
+
+### Results
+
+- **AV description quality** (`nla/results/av_descriptions_gemma_{12b,27b}.json`, 57/57 pairs, 0 missing `<explanation>` tags either model): descriptions track the specific injected fact, not just genre — e.g. clean/corrupt pairs correctly diverge "...about Paris" vs "...about Spain", and *relational* facts are correctly discriminated, not just entities copied through (Venus→Aphrodite "goddess of love" vs Diana→Artemis "goddess of the hunt", both models).
+- **AR faithfulness** (`nla/nla_ar_faithfulness.py`, `results/ar_faithfulness_gemma_{12b,27b}.json`): reconstructed-vector cosine similarity to the real ground-truth activation, mean **0.9964** (12B, std 0.0014) / **0.9921** (27B, std 0.0029) across all 57×2 pairs — scale-invariant by construction (reconstruction and ground truth independently L2-renormalized to `mse_scale = √d_model` before comparing, matching kitft's own `NLACritic.score()` methodology). Converts to **FVE ≈ 0.76** (12B) / **0.73** (27B) against kitft's own published baseline variance constants — in the "correctly wired" range they themselves cite (their docs: 0.77 good vs 0.31 broken).
+
+---
+
+## Jacobian lens (J-Lens) — `jlens_pipeline/`
+
+A linear "corrected logit lens": `lens_l(h) = unembed(J_l @ h)`, where `J_l` is a per-layer linear transport matrix estimated from the network's own local Jacobians, correcting for representational basis drift across layers that a bare logit lens (unembed applied directly to an intermediate residual) doesn't account for. From [anthropics/jacobian-lens](https://github.com/anthropics/jacobian-lens) ("Verbalizable Workspace" companion code).
+
+**Uses pretrained lenses, not a from-scratch fit** — [neuronpedia/jacobian-lens](https://huggingface.co/neuronpedia/jacobian-lens) hosts lenses for the exact `google/gemma-3-{12b,27b}-it` checkpoints this project uses (fit on 844/828 converged `wikitext-103` prompts, bfloat16), eliminating what would otherwise have been a multi-hour full-backward-pass-per-prompt fitting job per model.
+
+### Position convention: resolved empirically per model, not assumed
+
+`fetch_and_validate_lenses.py` tests both `positions=[-1]` and `positions=[-2]` against real model output before trusting either (the lens's own fitting code excludes the true final sequence position from its training statistics, so `-1` is out-of-distribution for it — confirmed, not assumed). Both Gemma models decisively prefer **position −2**: **100% top-1 agreement** vs. only **50%** for `-1`. The chosen position is recorded per-model in `{model_key}_lens_meta.json` and read from there by every downstream script — never hardcoded.
+
+### Results
+
+- **Rank of the correct-answer token vs. layer** (`apply_jacobian_lens.py`, `results/jlens_ranks_gemma_{12b,27b}.json`, plotted in `results/figures/`): mean rank collapses from the tens-of-thousands down to the low hundreds in a narrow window that lands within a few layers of — or, for 27B corrupt, **exactly at** — the causally-dominant layer from path patching (12B: min mean rank at L43, causal layer 38; 27B: min corrupt rank 148.4 at L54, exactly the causal layer). Two independent techniques (head-ablation and continuous linear readout) converge on the same depth. Median rank is far better than the mean (12B: median 27 vs. mean 213; 27B: median 9 vs. mean 284) — a tail of hard prompts skews the aggregate; per-pair, ~40–53% of facts land in the readout's top 10 at the best layer.
+- **Top-5 tokens per layer, all layers, full battery** (`decode_top_tokens.py`, `results/jlens_top_tokens_gemma_{12b,27b}.json`) — a qualitative complement the rank number alone can't give: a real four-stage progression, not a smooth climb. Formatting/junk tokens (L0–5) → a **multilingual entity echo** (L6–26: e.g. `法國`/`🇫` for "France", well before the answer itself appears) → an unexplained generic-verb detour common to both models (L27–34: `" has"`, `" is"`, `" was"`) → answer crystallization (L35+). 12B's answer peaks near its causal layer then **degrades** again; 27B's, once it locks in, holds a **stable plateau** through its causal layer — a real cross-model difference in readout stability. Some facts never resolve to the specific correct token even at the final fitted layer (e.g. "Mars is the Greek god ___" never surfaces "Ares," staying on generic `god`/`counterpart`/`deity`) — a concrete, previously-invisible per-fact failure mode.
+- **Open methodological question, not yet resolved**: whether the Jacobian correction (`J_l`, fit on generic wikitext, not fact-battery-style prompts) is revealing genuine model content in the above, or partly its own fitting-corpus artifact — not yet checked against a bare/uncorrected logit lens run on the same prompts as a control.
+
+---
+
 ## Multi-model layout (shared triage, batteries, runs)
 
 ### `fact_battery/`
@@ -290,6 +360,16 @@ Keep **`fact_battery/gemma-2b.json`** as the Gemma battery, or pass a path into 
 | `gemma-2b/notebooks/experiment1_analysis.ipynb` | Pooled analysis for **`experiment_A/B/C.json`** (figures + correlations). |
 | `gemma-2b/legacy-runs/experiment1_pooled/` | Optional directory for symlinks or copies of all three experiment JSONs (used by the notebook). |
 | `behavioral_friction_gemma2b_colab.ipynb` | Optional Colab-oriented notes (legacy / exploratory). |
+| `path_patching/run_experiments.py` | Head-level path patching driver (`--model {gemma_2b,gemma_12b,gemma_27b}`); see **Path patching** above. |
+| `path_patching/results/visuals/circuit_summary.json`, `circuit_summary_27b.json` | Core circuit heads (load-bearing + suppressive) per model, source of truth for the causal layers (38/12B, 54/27B) referenced throughout NLA and J-Lens. |
+| `path_patching/visualize.ipynb` | Generates all heatmaps/figures under `path_patching/results/visuals/`. |
+| `sae/fvu_spot_check.py` | Gemma Scope SAE reconstruction-quality check (`--site resid_post\|attn_out`) at the causal layers; `resid_post` PASSED both models, `attn_out` unresolved FAIL (see file docstring). |
+| `sae/sae_differential_features.py`, `sae_differential_features_attn_out.py` | Per-SAE-feature clean-vs-corrupt differential activation extraction. |
+| `nla/nla_av_extraction.py` | AV extraction + decoding over the fact battery; see **Natural Language Autoencoders** above. |
+| `nla/nla_ar_faithfulness.py` | AR reconstruction-fidelity scoring against ground-truth activations. |
+| `jlens_pipeline/fetch_and_validate_lenses.py` | Fetches the pretrained Jacobian lens, validates position convention + final-layer agreement before anything downstream trusts it. |
+| `jlens_pipeline/apply_jacobian_lens.py`, `decode_top_tokens.py` | Rank-vs-layer and top-5-tokens-vs-layer sweeps over the fact battery; see **Jacobian lens** above. |
+| `jlens_pipeline/plot_jlens_results.py` | Headline rank-vs-layer figure, causal-layer reference line. |
 
 ---
 
