@@ -83,6 +83,13 @@ for path in (SCRIPT_DIR, REPO_ROOT):
         sys.path.insert(0, str(path))
 
 import jlens  # noqa: E402  (from Phase 1's pip install -e .)
+from jlens.lens import JacobianLens  # noqa: E402  (direct submodule import -- see
+# the AttributeError this session hit on `jlens.JacobianLens`: the real
+# jlens/lens.py definitely defines this class (confirmed by reading the file
+# directly), so importing it from there sidesteps whatever is/isn't correctly
+# re-exported at the jlens/__init__.py top level, and sidesteps any sys.path
+# ordering issue from this project's own "jlens" folder name colliding with
+# the installed package's name.
 
 from shared.fact_battery import load_fact_battery  # noqa: E402
 
@@ -179,7 +186,7 @@ def run_model(model_key: str, results_dir: Path, device: str) -> None:
     print_disk_usage("start")
 
     print(f"[fetch] {LENS_REPO} :: {config['lens_filename']}", flush=True)
-    lens = jlens.JacobianLens.from_pretrained(LENS_REPO, filename=config["lens_filename"])
+    lens = JacobianLens.from_pretrained(LENS_REPO, filename=config["lens_filename"])
     probe_layer = max(lens.jacobians.keys())
     print(f"[fetch] lens ready. Fitted source layers: {min(lens.jacobians.keys())}..{probe_layer} "
           f"({len(lens.jacobians)} layers), n_prompts={lens.n_prompts}, d_model={lens.d_model}", flush=True)

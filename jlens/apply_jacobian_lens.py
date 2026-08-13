@@ -42,6 +42,8 @@ for path in (SCRIPT_DIR, REPO_ROOT):
         sys.path.insert(0, str(path))
 
 import jlens  # noqa: E402
+from jlens.lens import JacobianLens  # noqa: E402  (direct submodule import -- see
+# fetch_and_validate_lenses.py's comment on the same import for why)
 
 from shared.fact_battery import load_fact_battery  # noqa: E402
 
@@ -86,7 +88,7 @@ def run_model(model_key: str, results_dir: Path, device: str) -> None:
     print(f"[data] {len(battery)} prompt pairs loaded from {config['battery_path']}", flush=True)
 
     print(f"\n[fetch] {LENS_REPO} :: {config['lens_filename']}", flush=True)
-    lens = jlens.JacobianLens.from_pretrained(LENS_REPO, filename=config["lens_filename"])
+    lens = JacobianLens.from_pretrained(LENS_REPO, filename=config["lens_filename"])
     layers = sorted(lens.jacobians.keys())
     print(f"[fetch] lens ready, {len(layers)} fitted layers: L{layers[0]}..L{layers[-1]}", flush=True)
 
