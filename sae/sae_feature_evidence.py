@@ -61,7 +61,24 @@ MODEL_CONFIGS: dict[str, dict[str, Any]] = {
         "sae_id": "layer_38_width_16k_l0_small",
         "target_layer": 38,
         "battery_path": "fact_battery/gemma-3-12b-it.json",
-        "target_features": [432, 4043, 4086, 8614, 11511, 11641],
+        # "overlap": in both top-by-magnitude AND top-by-rate -- recurring,
+        # defensible to interpret. "magnitude_only": top-5-by-magnitude but
+        # NOT in top-by-rate -- each fires on only 2/57 prompts, included
+        # here deliberately as a low-evidence contrast group, not because
+        # they're trustworthy. See the differential_activation_gemma_12b.json
+        # discussion this session for why (huge value from 1-2 prompts, not
+        # a recurring pattern).
+        "target_features": [
+            {"index": 432, "tier": "overlap"},
+            {"index": 4043, "tier": "overlap"},
+            {"index": 4086, "tier": "overlap"},
+            {"index": 8614, "tier": "overlap"},
+            {"index": 11511, "tier": "overlap"},
+            {"index": 11641, "tier": "overlap"},
+            {"index": 5760, "tier": "magnitude_only_low_evidence"},
+            {"index": 5332, "tier": "magnitude_only_low_evidence"},
+            {"index": 9043, "tier": "magnitude_only_low_evidence"},
+        ],
     },
     "gemma_27b": {
         "model_name": "google/gemma-3-27b-it",
@@ -70,7 +87,13 @@ MODEL_CONFIGS: dict[str, dict[str, Any]] = {
         "sae_id": "layer_54_width_16k_l0_small",
         "target_layer": 54,
         "battery_path": "fact_battery/gemma-3-27b-it.json",
-        "target_features": [669, 739, 288, 137, 1737],
+        # Strict overlap only -- no magnitude-only or rate-only padding this
+        # time, unlike the earlier 5-feature list. The overlap set for 27B is
+        # just these two; left at 2 rather than padded out to match 12B's count.
+        "target_features": [
+            {"index": 669, "tier": "overlap"},
+            {"index": 739, "tier": "overlap"},
+        ],
     },
 }
 
@@ -120,12 +143,17 @@ def _extract_final_token_features(
 
 def run_model(model_key: str, results_dir: Path, device: str) -> None:
     config = MODEL_CONFIGS[model_key]
-    target_features = config["target_features"]
+    feature_specs = config["target_features"]  # list of {"index": int, "tier": str}
+    target_indices = [f["index"] for f in feature_specs]
+    tier_by_index = {f["index"]: f["tier"] for f in feature_specs}
     target_layer = config["target_layer"]
     hook_name = f"blocks.{target_layer}.hook_resid_post"
 
     print(f"\n{'#' * 60}")
-    print(f"# SAE feature evidence: {model_key}, targets={target_features}")
+    print(f"# SAE feature evidence: {model_key}")
+    for tier in sorted(set(tier_by_index.values())):
+        idxs = [i for i in target_indices if tier_by_index[i] == tier]
+        print(f"#   tier={tier}: {idxs}")
     print(f"{'#' * 60}\n", flush=True)
 
     battery = load_fact_battery(REPO_ROOT / config["battery_path"])
@@ -154,7 +182,7 @@ def run_model(model_key: str, results_dir: Path, device: str) -> None:
                     "clean_activation": float(clean_feats[fidx]),
                     "corrupt_activation": float(corrupt_feats[fidx]),
                 }
-                for fidx in target_features
+                for fidx in target_indices
             },
         })
         if (i + 1) % 10 == 0 or (i + 1) == n:
@@ -165,10 +193,10 @@ def run_model(model_key: str, results_dir: Path, device: str) -> None:
     # Quick per-feature firing summary, printed now so you don't have to open
     # the JSON to sanity-check this run before moving to the table builder.
     print("\n[summary] firing prompts per target feature (nonzero activation):")
-    for fidx in target_features:
+    for fidx in target_indices:
         clean_fires = [r for r in records if r["features"][str(fidx)]["clean_activation"] > 0]
         corrupt_fires = [r for r in records if r["features"][str(fidx)]["corrupt_activation"] > 0]
-        print(f"\n  feature {fidx}:")
+        print(f"\n  feature {fidx}  [tier={tier_by_index[fidx]}]:")
         print(f"    clean fires ({len(clean_fires)}): "
               f"{[(r['idx'], r['category']) for r in clean_fires]}")
         print(f"    corrupt fires ({len(corrupt_fires)}): "
@@ -181,7 +209,7 @@ def run_model(model_key: str, results_dir: Path, device: str) -> None:
         "target_layer": target_layer,
         "sae_release": config["sae_release"],
         "sae_id": config["sae_id"],
-        "target_features": target_features,
+        "target_features": feature_specs,
         "n_prompts": len(records),
         "records": records,
     }, indent=2) + "\n")

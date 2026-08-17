@@ -88,7 +88,8 @@ def build_table(model_key: str) -> None:
     print(f"{'#' * 70}\n")
 
     rows = []
-    for fidx in evidence["target_features"]:
+    for spec in evidence["target_features"]:
+        fidx, tier = spec["index"], spec["tier"]
         clean_fires = [r for r in evidence["records"] if r["features"][str(fidx)]["clean_activation"] > 0]
         corrupt_fires = [r for r in evidence["records"] if r["features"][str(fidx)]["corrupt_activation"] > 0]
         clean_cats = [r["category"] for r in clean_fires]
@@ -96,8 +97,10 @@ def build_table(model_key: str) -> None:
 
         diff_rec = _find_diff_record(diff_data, fidx)
         draft = _draft_label(clean_cats, corrupt_cats)
+        if tier != "overlap":
+            draft = f"[{tier}, LOW EVIDENCE] {draft}"
 
-        print(f"--- feature {fidx} ---")
+        print(f"--- feature {fidx}  [tier={tier}] ---")
         if diff_rec:
             print(f"  differential_activation={diff_rec['differential_activation']:+.3f}  "
                   f"clean_rate={diff_rec['clean_activation_rate']:.3f}  "
@@ -114,6 +117,7 @@ def build_table(model_key: str) -> None:
 
         rows.append({
             "feature_index": fidx,
+            "tier": tier,
             "differential_activation": diff_rec["differential_activation"] if diff_rec else None,
             "clean_activation_rate": diff_rec["clean_activation_rate"] if diff_rec else None,
             "corrupt_activation_rate": diff_rec["corrupt_activation_rate"] if diff_rec else None,
@@ -131,17 +135,20 @@ def build_table(model_key: str) -> None:
 
     md_path = out_dir / f"sae_feature_handlabels_{model_key}.md"
     lines = [
-        f"| feature | diff_act | clean_rate | corrupt_rate | draft label | hand label |",
-        f"|---|---|---|---|---|---|",
+        f"| feature | tier | diff_act | clean_rate | corrupt_rate | draft label | hand label |",
+        f"|---|---|---|---|---|---|---|",
     ]
     for r in rows:
         lines.append(
-            f"| {r['feature_index']} | {r['differential_activation']:+.2f} | "
+            f"| {r['feature_index']} | {r['tier']} | {r['differential_activation']:+.2f} | "
             f"{r['clean_activation_rate']:.2f} | {r['corrupt_activation_rate']:.2f} | "
             f"{r['draft_label'][:60]} | {r['hand_label']} |"
         )
     md_path.write_text("\n".join(lines) + "\n")
     print(f"[save] wrote {md_path} (paper-ready table skeleton, drop into the draft and fill 'hand label')")
+    print(f"\n[note] rows tagged tier != 'overlap' are the low-evidence contrast group "
+          f"(fires on only ~2/57 prompts) -- keep them visually distinct in the paper table, "
+          f"don't present them with the same confidence as the overlap-set rows.")
 
 
 def main() -> int:
