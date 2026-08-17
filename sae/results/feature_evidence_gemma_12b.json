@@ -1,0 +1,2555 @@
+{
+  "model_key": "gemma_12b",
+  "target_layer": 38,
+  "sae_release": "gemma-scope-2-12b-it-res-all",
+  "sae_id": "layer_38_width_16k_l0_small",
+  "target_features": [
+    {
+      "index": 432,
+      "tier": "overlap"
+    },
+    {
+      "index": 4043,
+      "tier": "overlap"
+    },
+    {
+      "index": 4086,
+      "tier": "overlap"
+    },
+    {
+      "index": 8614,
+      "tier": "overlap"
+    },
+    {
+      "index": 11511,
+      "tier": "overlap"
+    },
+    {
+      "index": 11641,
+      "tier": "overlap"
+    },
+    {
+      "index": 5760,
+      "tier": "magnitude_only_low_evidence"
+    },
+    {
+      "index": 5332,
+      "tier": "magnitude_only_low_evidence"
+    },
+    {
+      "index": 9043,
+      "tier": "magnitude_only_low_evidence"
+    }
+  ],
+  "n_prompts": 57,
+  "records": [
+    {
+      "idx": 0,
+      "category": "geography_capitals",
+      "clean_prompt": "The capital of France is",
+      "corrupt_prompt": "The capital of Spain is",
+      "features": {
+        "432": {
+          "clean_activation": 3473.78955078125,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 1,
+      "category": "geography_capitals",
+      "clean_prompt": "The capital of Italy is",
+      "corrupt_prompt": "The capital of Germany is",
+      "features": {
+        "432": {
+          "clean_activation": 1725.95654296875,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 3978.357666015625,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 2,
+      "category": "geography_capitals",
+      "clean_prompt": "The capital of Japan is",
+      "corrupt_prompt": "The capital of China is",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 3,
+      "category": "geography_continents",
+      "clean_prompt": "The continent where Egypt is found is",
+      "corrupt_prompt": "The continent where Japan is found is",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 4,
+      "category": "geography_continents",
+      "clean_prompt": "France lies entirely within the continent of",
+      "corrupt_prompt": "Australia lies entirely within the continent of",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 5,
+      "category": "geography_continents",
+      "clean_prompt": "The continent where penguins mainly breed is",
+      "corrupt_prompt": "The continent where lions mainly live is",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 6,
+      "category": "chemistry_symbols",
+      "clean_prompt": "The chemical symbol for gold is",
+      "corrupt_prompt": "The chemical symbol for iron is",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 6805.7119140625,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 7,
+      "category": "chemistry_symbols",
+      "clean_prompt": "The chemical symbol for silver is",
+      "corrupt_prompt": "The chemical symbol for copper is",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 1466.6888427734375,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 8,
+      "category": "chemistry_symbols",
+      "clean_prompt": "The chemical symbol for sodium is",
+      "corrupt_prompt": "The chemical symbol for chlorine is",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 9,
+      "category": "physics_constants",
+      "clean_prompt": "The particle with a negative charge in an atom is the",
+      "corrupt_prompt": "The particle with a positive charge in an atom is the",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 10,
+      "category": "physics_constants",
+      "clean_prompt": "The SI unit of electric current is the",
+      "corrupt_prompt": "The SI unit of electric resistance is the",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 1494.57763671875,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 11,
+      "category": "anatomy_organs",
+      "clean_prompt": "The human organ that pumps blood is the",
+      "corrupt_prompt": "The human organ that filters blood is the",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 12,
+      "category": "anatomy_organs",
+      "clean_prompt": "The organ responsible for breathing is the",
+      "corrupt_prompt": "The organ responsible for digestion is the",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 13,
+      "category": "anatomy_organs",
+      "clean_prompt": "A whale breathes air using its",
+      "corrupt_prompt": "A fish extracts oxygen using its",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 14,
+      "category": "astronomy_planets",
+      "clean_prompt": "The planet closest to our Sun is",
+      "corrupt_prompt": "The planet third from our Sun is",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 15,
+      "category": "astronomy_planets",
+      "clean_prompt": "The largest planet in the solar system is",
+      "corrupt_prompt": "The smallest planet in the solar system is",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 16,
+      "category": "astronomy_planets",
+      "clean_prompt": "The planet famous for its rings is",
+      "corrupt_prompt": "The planet famous for its craters is",
+      "features": {
+        "432": {
+          "clean_activation": 3262.69287109375,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 3741.644775390625
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 17,
+      "category": "mathematics_addition",
+      "clean_prompt": "Two plus two equals",
+      "corrupt_prompt": "Three plus three equals",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 18,
+      "category": "mathematics_addition",
+      "clean_prompt": "One plus two equals",
+      "corrupt_prompt": "One plus three equals",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 19,
+      "category": "mathematics_addition",
+      "clean_prompt": "Six plus two equals",
+      "corrupt_prompt": "Five plus two equals",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 20,
+      "category": "mathematics_geometry",
+      "clean_prompt": "A shape with three equal sides is",
+      "corrupt_prompt": "A shape with four equal sides is",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 21,
+      "category": "mathematics_geometry",
+      "clean_prompt": "A three dimensional box shape is a",
+      "corrupt_prompt": "A round three dimensional ball is a",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 22,
+      "category": "mathematics_geometry",
+      "clean_prompt": "A triangle has",
+      "corrupt_prompt": "A square has",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 23,
+      "category": "sports_equipment",
+      "clean_prompt": "Tennis is played with a",
+      "corrupt_prompt": "Golf is played with a",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 24,
+      "category": "sports_equipment",
+      "clean_prompt": "The sport played with a racket is",
+      "corrupt_prompt": "The sport played with a club is",
+      "features": {
+        "432": {
+          "clean_activation": 5925.97998046875,
+          "corrupt_activation": 3598.25244140625
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 25,
+      "category": "sports_equipment",
+      "clean_prompt": "Olympic archery targets are shot with an",
+      "corrupt_prompt": "Olympic fencing bouts are fought with a",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 26,
+      "category": "translation_spanish",
+      "clean_prompt": "The Spanish word for cat is",
+      "corrupt_prompt": "The Spanish word for dog is",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 6738.52197265625,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 27,
+      "category": "translation_spanish",
+      "clean_prompt": "The Spanish word for sun is",
+      "corrupt_prompt": "The Spanish word for moon is",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 8726.955078125
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 28,
+      "category": "translation_spanish",
+      "clean_prompt": "The Spanish word for water is",
+      "corrupt_prompt": "The Spanish word for fire is",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 8849.99609375
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 29,
+      "category": "translation_french",
+      "clean_prompt": "The French word for cat is",
+      "corrupt_prompt": "The French word for dog is",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 7111.1923828125,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 30,
+      "category": "translation_french",
+      "clean_prompt": "The French word for water is",
+      "corrupt_prompt": "The French word for fire is",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 8144.37548828125
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 31,
+      "category": "colors_mixing",
+      "clean_prompt": "When blue paint mixes with yellow paint the result is",
+      "corrupt_prompt": "When red paint mixes with blue paint the result is",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 32,
+      "category": "colors_mixing",
+      "clean_prompt": "When red paint mixes with yellow paint the result is",
+      "corrupt_prompt": "When blue paint mixes with yellow paint the result is",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 33,
+      "category": "colors_mixing",
+      "clean_prompt": "Mixing red light with green light produces",
+      "corrupt_prompt": "Mixing red light with blue light produces",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 1508.248291015625,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 34,
+      "category": "animal_taxonomy",
+      "clean_prompt": "A trout is a kind of",
+      "corrupt_prompt": "A sparrow is a kind of",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 35,
+      "category": "animal_taxonomy",
+      "clean_prompt": "A cat is a common example of a",
+      "corrupt_prompt": "A salmon is a common example of a",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 4367.982421875,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 36,
+      "category": "animal_taxonomy",
+      "clean_prompt": "A polar bear is classified as a",
+      "corrupt_prompt": "A great white is classified as a",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 37,
+      "category": "history_dates",
+      "clean_prompt": "The first US president was",
+      "corrupt_prompt": "The sixteenth US president was",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 38,
+      "category": "history_dates",
+      "clean_prompt": "The scientist Isaac Newton was",
+      "corrupt_prompt": "The scientist Albert Einstein was",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 39,
+      "category": "history_dates",
+      "clean_prompt": "The leader Napoleon was born in",
+      "corrupt_prompt": "The leader Churchill was born in",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 3635.326171875,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 40,
+      "category": "technology_founders",
+      "clean_prompt": "Steve Jobs co-founded the company named",
+      "corrupt_prompt": "Bill Gates co-founded the company named",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 41,
+      "category": "technology_founders",
+      "clean_prompt": "YouTube was later acquired by the company",
+      "corrupt_prompt": "Instagram was later acquired by the company",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 42,
+      "category": "technology_founders",
+      "clean_prompt": "The web browser Chrome was built by the company",
+      "corrupt_prompt": "The web browser Safari was built by the company",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 43,
+      "category": "units_measurement",
+      "clean_prompt": "Distance in the metric system uses",
+      "corrupt_prompt": "Mass in the metric system uses",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 3588.30419921875,
+          "corrupt_activation": 1513.728515625
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 44,
+      "category": "units_measurement",
+      "clean_prompt": "Liquid volume in metric science uses",
+      "corrupt_prompt": "Electric potential in metric science uses",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 1384.115234375,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 45,
+      "category": "units_measurement",
+      "clean_prompt": "The metric unit for length is the",
+      "corrupt_prompt": "The metric unit for mass is the",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 6644.08251953125,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 46,
+      "category": "literature_authors",
+      "clean_prompt": "The epic Inferno was written by",
+      "corrupt_prompt": "The epic Odyssey was written by",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 5774.8193359375,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 47,
+      "category": "literature_authors",
+      "clean_prompt": "The novel Dune was written by",
+      "corrupt_prompt": "The novel It was written by",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 48,
+      "category": "mythology_roman_greek",
+      "clean_prompt": "The Roman god Mars is the Greek god",
+      "corrupt_prompt": "The Roman god Jupiter is the Greek god",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 49,
+      "category": "mythology_roman_greek",
+      "clean_prompt": "The Roman god Mercury matches the Greek god",
+      "corrupt_prompt": "The Roman god Neptune matches the Greek god",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 50,
+      "category": "mythology_roman_greek",
+      "clean_prompt": "The Roman goddess Venus matches the Greek goddess",
+      "corrupt_prompt": "The Roman goddess Diana matches the Greek goddess",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 5116.44091796875
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 51,
+      "category": "pop_culture_bands",
+      "clean_prompt": "The band Nirvana was associated strongly with",
+      "corrupt_prompt": "The band Metallica was associated strongly with",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 52,
+      "category": "pop_culture_bands",
+      "clean_prompt": "The band Beatles hailed originally from",
+      "corrupt_prompt": "The band Eagles hailed originally from",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 12335.2705078125,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 53,
+      "category": "pop_culture_bands",
+      "clean_prompt": "The rock band Queen formed in the city of",
+      "corrupt_prompt": "The rock band Oasis formed in the city of",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 1649.13134765625,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 54,
+      "category": "materials_composition",
+      "clean_prompt": "Common drinking glasses are made of",
+      "corrupt_prompt": "Common plastic bottles are made of",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 55,
+      "category": "materials_composition",
+      "clean_prompt": "Most consumer aluminum foil is made from",
+      "corrupt_prompt": "Most consumer plastic wrap is made from",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 3892.529052734375,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    },
+    {
+      "idx": 56,
+      "category": "materials_composition",
+      "clean_prompt": "Steel beams in construction are mostly made of",
+      "corrupt_prompt": "Copper wires in circuits are mostly made of",
+      "features": {
+        "432": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "4086": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "8614": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11511": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "11641": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5760": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        },
+        "5332": {
+          "clean_activation": 12141.4404296875,
+          "corrupt_activation": 0.0
+        },
+        "9043": {
+          "clean_activation": 0.0,
+          "corrupt_activation": 0.0
+        }
+      }
+    }
+  ]
+}

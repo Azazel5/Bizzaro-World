@@ -1,0 +1,143 @@
+{
+  "model_key": "gemma_12b",
+  "rows": [
+    {
+      "feature_index": 432,
+      "tier": "overlap",
+      "differential_activation": 189.30117797851562,
+      "clean_activation_rate": 0.07017543911933899,
+      "corrupt_activation_rate": 0.017543859779834747,
+      "clean_firing_categories": [
+        "geography_capitals",
+        "geography_capitals",
+        "astronomy_planets",
+        "sports_equipment"
+      ],
+      "corrupt_firing_categories": [
+        "sports_equipment"
+      ],
+      "draft_label": "DRAFT: spread across 3 categories, no dominant one ({'geography_capitals': 2, 'astronomy_planets': 1, 'sports_equipment': 2}) -- possibly generic/syntactic, read the prompts",
+      "hand_label": "TODO -- fill in after reading the firing prompts above"
+    },
+    {
+      "feature_index": 4043,
+      "tier": "overlap",
+      "differential_activation": 171.59031677246094,
+      "clean_activation_rate": 0.05263157933950424,
+      "corrupt_activation_rate": 0.0,
+      "clean_firing_categories": [
+        "chemistry_symbols",
+        "chemistry_symbols",
+        "colors_mixing"
+      ],
+      "corrupt_firing_categories": [],
+      "draft_label": "DRAFT: mostly 'chemistry_symbols' (2/3) -- probably topical, check outliers",
+      "hand_label": "TODO -- fill in after reading the firing prompts above"
+    },
+    {
+      "feature_index": 4086,
+      "tier": "overlap",
+      "differential_activation": 234.88601684570312,
+      "clean_activation_rate": 0.05263157933950424,
+      "corrupt_activation_rate": 0.0,
+      "clean_firing_categories": [
+        "geography_capitals",
+        "history_dates",
+        "literature_authors"
+      ],
+      "corrupt_firing_categories": [],
+      "draft_label": "DRAFT: spread across 3 categories, no dominant one ({'geography_capitals': 1, 'history_dates': 1, 'literature_authors': 1}) -- possibly generic/syntactic, read the prompts",
+      "hand_label": "TODO -- fill in after reading the firing prompts above"
+    },
+    {
+      "feature_index": 8614,
+      "tier": "overlap",
+      "differential_activation": 319.6087341308594,
+      "clean_activation_rate": 0.05263157933950424,
+      "corrupt_activation_rate": 0.0,
+      "clean_firing_categories": [
+        "translation_spanish",
+        "translation_french",
+        "animal_taxonomy"
+      ],
+      "corrupt_firing_categories": [],
+      "draft_label": "DRAFT: spread across 3 categories, no dominant one ({'translation_spanish': 1, 'translation_french': 1, 'animal_taxonomy': 1}) -- possibly generic/syntactic, read the prompts",
+      "hand_label": "TODO -- fill in after reading the firing prompts above"
+    },
+    {
+      "feature_index": 11511,
+      "tier": "overlap",
+      "differential_activation": 203.46231079101562,
+      "clean_activation_rate": 0.07017543911933899,
+      "corrupt_activation_rate": 0.017543859779834747,
+      "clean_firing_categories": [
+        "physics_constants",
+        "units_measurement",
+        "units_measurement",
+        "units_measurement"
+      ],
+      "corrupt_firing_categories": [
+        "units_measurement"
+      ],
+      "draft_label": "DRAFT: mostly 'units_measurement' (4/5) -- probably topical, check outliers",
+      "hand_label": "TODO -- fill in after reading the firing prompts above"
+    },
+    {
+      "feature_index": 11641,
+      "tier": "overlap",
+      "differential_activation": -308.5094909667969,
+      "clean_activation_rate": 0.0,
+      "corrupt_activation_rate": 0.05263157933950424,
+      "clean_firing_categories": [],
+      "corrupt_firing_categories": [
+        "astronomy_planets",
+        "translation_spanish",
+        "mythology_roman_greek"
+      ],
+      "draft_label": "DRAFT: spread across 3 categories, no dominant one ({'astronomy_planets': 1, 'translation_spanish': 1, 'mythology_roman_greek': 1}) -- possibly generic/syntactic, read the prompts",
+      "hand_label": "TODO -- fill in after reading the firing prompts above"
+    },
+    {
+      "feature_index": 5760,
+      "tier": "magnitude_only_low_evidence",
+      "differential_activation": -298.1468505859375,
+      "clean_activation_rate": 0.0,
+      "corrupt_activation_rate": 0.035087719559669495,
+      "clean_firing_categories": [],
+      "corrupt_firing_categories": [
+        "translation_spanish",
+        "translation_french"
+      ],
+      "draft_label": "[magnitude_only_low_evidence, LOW EVIDENCE] DRAFT: spread across 2 categories, no dominant one ({'translation_spanish': 1, 'translation_french': 1}) -- possibly generic/syntactic, read the prompts",
+      "hand_label": "TODO -- fill in after reading the firing prompts above"
+    },
+    {
+      "feature_index": 5332,
+      "tier": "magnitude_only_low_evidence",
+      "differential_activation": 281.2977294921875,
+      "clean_activation_rate": 0.035087719559669495,
+      "corrupt_activation_rate": 0.0,
+      "clean_firing_categories": [
+        "materials_composition",
+        "materials_composition"
+      ],
+      "corrupt_firing_categories": [],
+      "draft_label": "[magnitude_only_low_evidence, LOW EVIDENCE] DRAFT: fires only on 'materials_composition' prompts (2/2) -- likely topical",
+      "hand_label": "TODO -- fill in after reading the firing prompts above"
+    },
+    {
+      "feature_index": 9043,
+      "tier": "magnitude_only_low_evidence",
+      "differential_activation": 245.34039306640625,
+      "clean_activation_rate": 0.035087719559669495,
+      "corrupt_activation_rate": 0.0,
+      "clean_firing_categories": [
+        "pop_culture_bands",
+        "pop_culture_bands"
+      ],
+      "corrupt_firing_categories": [],
+      "draft_label": "[magnitude_only_low_evidence, LOW EVIDENCE] DRAFT: fires only on 'pop_culture_bands' prompts (2/2) -- likely topical",
+      "hand_label": "TODO -- fill in after reading the firing prompts above"
+    }
+  ]
+}
