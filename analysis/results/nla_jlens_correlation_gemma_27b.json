@@ -1,0 +1,487 @@
+{
+  "model_key": "gemma_27b",
+  "nla_layer": 41,
+  "n_pairs": 57,
+  "expected_direction": "negative (higher cosine -> lower/better rank)",
+  "correlations": {
+    "clean": {
+      "n": 57,
+      "spearman_rho": 0.1294639450205375,
+      "spearman_p": 0.3371437388950504,
+      "pearson_r_log_rank": 0.1605016111973856,
+      "pearson_p_log_rank": 0.23300051767575417
+    },
+    "corrupt": {
+      "n": 57,
+      "spearman_rho": -0.00984168087615336,
+      "spearman_p": 0.942077770743327,
+      "pearson_r_log_rank": -0.08931368833670403,
+      "pearson_p_log_rank": 0.5088131042048892
+    },
+    "pooled": {
+      "n": 114,
+      "spearman_rho": 0.077264651069417,
+      "spearman_p": 0.4138760955471835,
+      "pearson_r_log_rank": 0.02517541305110293,
+      "pearson_p_log_rank": 0.7903318948419898
+    }
+  },
+  "rows": [
+    {
+      "idx": 0,
+      "category": "geography_capitals",
+      "clean_cosine": 0.9945964217185974,
+      "clean_rank": 1,
+      "corrupt_cosine": 0.9939055442810059,
+      "corrupt_rank": 3
+    },
+    {
+      "idx": 1,
+      "category": "geography_capitals",
+      "clean_cosine": 0.9929705262184143,
+      "clean_rank": 18,
+      "corrupt_cosine": 0.992577850818634,
+      "corrupt_rank": 4
+    },
+    {
+      "idx": 2,
+      "category": "geography_capitals",
+      "clean_cosine": 0.9920920729637146,
+      "clean_rank": 1,
+      "corrupt_cosine": 0.9930327534675598,
+      "corrupt_rank": 2
+    },
+    {
+      "idx": 3,
+      "category": "geography_continents",
+      "clean_cosine": 0.9926256537437439,
+      "clean_rank": 1,
+      "corrupt_cosine": 0.9913247227668762,
+      "corrupt_rank": 3
+    },
+    {
+      "idx": 4,
+      "category": "geography_continents",
+      "clean_cosine": 0.9802863001823425,
+      "clean_rank": 1,
+      "corrupt_cosine": 0.9856569766998291,
+      "corrupt_rank": 1
+    },
+    {
+      "idx": 5,
+      "category": "geography_continents",
+      "clean_cosine": 0.9926062226295471,
+      "clean_rank": 13,
+      "corrupt_cosine": 0.9934791922569275,
+      "corrupt_rank": 1
+    },
+    {
+      "idx": 6,
+      "category": "chemistry_symbols",
+      "clean_cosine": 0.9938480854034424,
+      "clean_rank": 62894,
+      "corrupt_cosine": 0.993867039680481,
+      "corrupt_rank": 1270
+    },
+    {
+      "idx": 7,
+      "category": "chemistry_symbols",
+      "clean_cosine": 0.9927902817726135,
+      "clean_rank": 11133,
+      "corrupt_cosine": 0.9949839115142822,
+      "corrupt_rank": 168
+    },
+    {
+      "idx": 8,
+      "category": "chemistry_symbols",
+      "clean_cosine": 0.994118332862854,
+      "clean_rank": 2885,
+      "corrupt_cosine": 0.9947541952133179,
+      "corrupt_rank": 6967
+    },
+    {
+      "idx": 9,
+      "category": "physics_constants",
+      "clean_cosine": 0.9953224062919617,
+      "clean_rank": 4,
+      "corrupt_cosine": 0.993285596370697,
+      "corrupt_rank": 11
+    },
+    {
+      "idx": 10,
+      "category": "physics_constants",
+      "clean_cosine": 0.991209864616394,
+      "clean_rank": 12,
+      "corrupt_cosine": 0.9881591200828552,
+      "corrupt_rank": 3
+    },
+    {
+      "idx": 11,
+      "category": "anatomy_organs",
+      "clean_cosine": 0.9953626990318298,
+      "clean_rank": 11,
+      "corrupt_cosine": 0.9942830204963684,
+      "corrupt_rank": 4
+    },
+    {
+      "idx": 12,
+      "category": "anatomy_organs",
+      "clean_cosine": 0.9939943552017212,
+      "clean_rank": 1,
+      "corrupt_cosine": 0.9919729232788086,
+      "corrupt_rank": 15
+    },
+    {
+      "idx": 13,
+      "category": "anatomy_organs",
+      "clean_cosine": 0.9935701489448547,
+      "clean_rank": 1,
+      "corrupt_cosine": 0.9934757351875305,
+      "corrupt_rank": 1
+    },
+    {
+      "idx": 14,
+      "category": "astronomy_planets",
+      "clean_cosine": 0.9899054169654846,
+      "clean_rank": 10,
+      "corrupt_cosine": 0.9939214587211609,
+      "corrupt_rank": 13
+    },
+    {
+      "idx": 15,
+      "category": "astronomy_planets",
+      "clean_cosine": 0.9937874674797058,
+      "clean_rank": 1,
+      "corrupt_cosine": 0.9905431270599365,
+      "corrupt_rank": 2
+    },
+    {
+      "idx": 16,
+      "category": "astronomy_planets",
+      "clean_cosine": 0.9927760362625122,
+      "clean_rank": 5,
+      "corrupt_cosine": 0.991830587387085,
+      "corrupt_rank": 1919
+    },
+    {
+      "idx": 17,
+      "category": "mathematics_addition",
+      "clean_cosine": 0.9907326102256775,
+      "clean_rank": 95,
+      "corrupt_cosine": 0.9785158038139343,
+      "corrupt_rank": 260
+    },
+    {
+      "idx": 18,
+      "category": "mathematics_addition",
+      "clean_cosine": 0.9900028705596924,
+      "clean_rank": 310,
+      "corrupt_cosine": 0.9789641499519348,
+      "corrupt_rank": 212
+    },
+    {
+      "idx": 19,
+      "category": "mathematics_addition",
+      "clean_cosine": 0.9803197979927063,
+      "clean_rank": 109,
+      "corrupt_cosine": 0.9824120402336121,
+      "corrupt_rank": 63
+    },
+    {
+      "idx": 20,
+      "category": "mathematics_geometry",
+      "clean_cosine": 0.9934819936752319,
+      "clean_rank": 6,
+      "corrupt_cosine": 0.9946437478065491,
+      "corrupt_rank": 216
+    },
+    {
+      "idx": 21,
+      "category": "mathematics_geometry",
+      "clean_cosine": 0.9945162534713745,
+      "clean_rank": 33,
+      "corrupt_cosine": 0.9928281307220459,
+      "corrupt_rank": 22
+    },
+    {
+      "idx": 22,
+      "category": "mathematics_geometry",
+      "clean_cosine": 0.994592010974884,
+      "clean_rank": 7974,
+      "corrupt_cosine": 0.995195209980011,
+      "corrupt_rank": 23560
+    },
+    {
+      "idx": 23,
+      "category": "sports_equipment",
+      "clean_cosine": 0.9907058477401733,
+      "clean_rank": 10,
+      "corrupt_cosine": 0.992857038974762,
+      "corrupt_rank": 605
+    },
+    {
+      "idx": 24,
+      "category": "sports_equipment",
+      "clean_cosine": 0.994127094745636,
+      "clean_rank": 5,
+      "corrupt_cosine": 0.9919278025627136,
+      "corrupt_rank": 4
+    },
+    {
+      "idx": 25,
+      "category": "sports_equipment",
+      "clean_cosine": 0.990435779094696,
+      "clean_rank": 3,
+      "corrupt_cosine": 0.992399275302887,
+      "corrupt_rank": 10
+    },
+    {
+      "idx": 26,
+      "category": "translation_spanish",
+      "clean_cosine": 0.9929708242416382,
+      "clean_rank": 17,
+      "corrupt_cosine": 0.9924160242080688,
+      "corrupt_rank": 27
+    },
+    {
+      "idx": 27,
+      "category": "translation_spanish",
+      "clean_cosine": 0.9933196306228638,
+      "clean_rank": 64043,
+      "corrupt_cosine": 0.9928383827209473,
+      "corrupt_rank": 16
+    },
+    {
+      "idx": 28,
+      "category": "translation_spanish",
+      "clean_cosine": 0.9915912747383118,
+      "clean_rank": 2,
+      "corrupt_cosine": 0.9927067756652832,
+      "corrupt_rank": 3
+    },
+    {
+      "idx": 29,
+      "category": "translation_french",
+      "clean_cosine": 0.9926302433013916,
+      "clean_rank": 19572,
+      "corrupt_cosine": 0.9934763312339783,
+      "corrupt_rank": 27
+    },
+    {
+      "idx": 30,
+      "category": "translation_french",
+      "clean_cosine": 0.9906073212623596,
+      "clean_rank": 82,
+      "corrupt_cosine": 0.9936155676841736,
+      "corrupt_rank": 224
+    },
+    {
+      "idx": 31,
+      "category": "colors_mixing",
+      "clean_cosine": 0.9923341274261475,
+      "clean_rank": 2930,
+      "corrupt_cosine": 0.991790235042572,
+      "corrupt_rank": 1269
+    },
+    {
+      "idx": 32,
+      "category": "colors_mixing",
+      "clean_cosine": 0.9930083751678467,
+      "clean_rank": 535,
+      "corrupt_cosine": 0.9923341274261475,
+      "corrupt_rank": 2930
+    },
+    {
+      "idx": 33,
+      "category": "colors_mixing",
+      "clean_cosine": 0.99311763048172,
+      "clean_rank": 622,
+      "corrupt_cosine": 0.9931865334510803,
+      "corrupt_rank": 604
+    },
+    {
+      "idx": 34,
+      "category": "animal_taxonomy",
+      "clean_cosine": 0.994255781173706,
+      "clean_rank": 3,
+      "corrupt_cosine": 0.9940274357795715,
+      "corrupt_rank": 11
+    },
+    {
+      "idx": 35,
+      "category": "animal_taxonomy",
+      "clean_cosine": 0.9900709986686707,
+      "clean_rank": 12,
+      "corrupt_cosine": 0.9941026568412781,
+      "corrupt_rank": 1
+    },
+    {
+      "idx": 36,
+      "category": "animal_taxonomy",
+      "clean_cosine": 0.9894221425056458,
+      "clean_rank": 3,
+      "corrupt_cosine": 0.9931631088256836,
+      "corrupt_rank": 30
+    },
+    {
+      "idx": 37,
+      "category": "history_dates",
+      "clean_cosine": 0.9932861328125,
+      "clean_rank": 83,
+      "corrupt_cosine": 0.9947805404663086,
+      "corrupt_rank": 13
+    },
+    {
+      "idx": 38,
+      "category": "history_dates",
+      "clean_cosine": 0.9940820932388306,
+      "clean_rank": 5083,
+      "corrupt_cosine": 0.995546817779541,
+      "corrupt_rank": 2332
+    },
+    {
+      "idx": 39,
+      "category": "history_dates",
+      "clean_cosine": 0.9892733693122864,
+      "clean_rank": 15,
+      "corrupt_cosine": 0.9946882128715515,
+      "corrupt_rank": 26
+    },
+    {
+      "idx": 40,
+      "category": "technology_founders",
+      "clean_cosine": 0.9900138974189758,
+      "clean_rank": 1,
+      "corrupt_cosine": 0.9892750978469849,
+      "corrupt_rank": 1
+    },
+    {
+      "idx": 41,
+      "category": "technology_founders",
+      "clean_cosine": 0.9905153512954712,
+      "clean_rank": 1,
+      "corrupt_cosine": 0.9907665848731995,
+      "corrupt_rank": 348
+    },
+    {
+      "idx": 42,
+      "category": "technology_founders",
+      "clean_cosine": 0.9929156303405762,
+      "clean_rank": 1,
+      "corrupt_cosine": 0.9937410354614258,
+      "corrupt_rank": 1
+    },
+    {
+      "idx": 43,
+      "category": "units_measurement",
+      "clean_cosine": 0.9916646480560303,
+      "clean_rank": 10,
+      "corrupt_cosine": 0.9893975853919983,
+      "corrupt_rank": 16
+    },
+    {
+      "idx": 44,
+      "category": "units_measurement",
+      "clean_cosine": 0.9947238564491272,
+      "clean_rank": 169,
+      "corrupt_cosine": 0.9931861162185669,
+      "corrupt_rank": 563
+    },
+    {
+      "idx": 45,
+      "category": "units_measurement",
+      "clean_cosine": 0.9947494268417358,
+      "clean_rank": 13,
+      "corrupt_cosine": 0.992367148399353,
+      "corrupt_rank": 86
+    },
+    {
+      "idx": 46,
+      "category": "literature_authors",
+      "clean_cosine": 0.9936965703964233,
+      "clean_rank": 7,
+      "corrupt_cosine": 0.9960052371025085,
+      "corrupt_rank": 2
+    },
+    {
+      "idx": 47,
+      "category": "literature_authors",
+      "clean_cosine": 0.9959620833396912,
+      "clean_rank": 604,
+      "corrupt_cosine": 0.9817048907279968,
+      "corrupt_rank": 3257
+    },
+    {
+      "idx": 48,
+      "category": "mythology_roman_greek",
+      "clean_cosine": 0.9909723401069641,
+      "clean_rank": 14,
+      "corrupt_cosine": 0.9908431172370911,
+      "corrupt_rank": 1
+    },
+    {
+      "idx": 49,
+      "category": "mythology_roman_greek",
+      "clean_cosine": 0.9934329986572266,
+      "clean_rank": 28,
+      "corrupt_cosine": 0.9918386340141296,
+      "corrupt_rank": 330
+    },
+    {
+      "idx": 50,
+      "category": "mythology_roman_greek",
+      "clean_cosine": 0.9899711608886719,
+      "clean_rank": 69,
+      "corrupt_cosine": 0.9912624955177307,
+      "corrupt_rank": 81
+    },
+    {
+      "idx": 51,
+      "category": "pop_culture_bands",
+      "clean_cosine": 0.9947950839996338,
+      "clean_rank": 226,
+      "corrupt_cosine": 0.9905323386192322,
+      "corrupt_rank": 1608
+    },
+    {
+      "idx": 52,
+      "category": "pop_culture_bands",
+      "clean_cosine": 0.9922300577163696,
+      "clean_rank": 265,
+      "corrupt_cosine": 0.995073676109314,
+      "corrupt_rank": 560
+    },
+    {
+      "idx": 53,
+      "category": "pop_culture_bands",
+      "clean_cosine": 0.9938887357711792,
+      "clean_rank": 10,
+      "corrupt_cosine": 0.9936330914497375,
+      "corrupt_rank": 3
+    },
+    {
+      "idx": 54,
+      "category": "materials_composition",
+      "clean_cosine": 0.9945082664489746,
+      "clean_rank": 1,
+      "corrupt_cosine": 0.9950872659683228,
+      "corrupt_rank": 1
+    },
+    {
+      "idx": 55,
+      "category": "materials_composition",
+      "clean_cosine": 0.988636314868927,
+      "clean_rank": 1,
+      "corrupt_cosine": 0.9922562837600708,
+      "corrupt_rank": 3
+    },
+    {
+      "idx": 56,
+      "category": "materials_composition",
+      "clean_cosine": 0.993755042552948,
+      "clean_rank": 1,
+      "corrupt_cosine": 0.9930601119995117,
+      "corrupt_rank": 4
+    }
+  ]
+}
